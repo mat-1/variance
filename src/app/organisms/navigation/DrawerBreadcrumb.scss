@@ -55,7 +55,7 @@
     }
 
     & .notification-badge {
-      @include dir.side(margin, var(--sp-extra-tight), 0);
+      @include dir.side(margin, var(--sp-extra-tight), var(--sp-extra-tight));
     }
   }
 
