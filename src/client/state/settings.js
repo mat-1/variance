@@ -28,10 +28,12 @@ class Settings extends EventEmitter {
     this.isPeopleDrawer = this.getIsPeopleDrawer();
     this.hideMembershipEvents = this.getHideMembershipEvents();
     this.hideNickAvatarEvents = this.getHideNickAvatarEvents();
+    this.sendOnEnter = this.getSendOnEnter();
     this._showNotifications = this.getShowNotifications();
     this.isNotificationSounds = this.getIsNotificationSounds();
 
-    this.isTouchScreenDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+    this.isTouchScreenDevice =
+      'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
   }
 
   getThemeIndex() {
@@ -115,6 +117,15 @@ class Settings extends EventEmitter {
     return settings.hideNickAvatarEvents;
   }
 
+  getSendOnEnter() {
+    if (typeof this.sendOnEnter === 'boolean') return this.sendOnEnter;
+
+    const settings = getSettings();
+    if (settings === null) return true;
+    if (typeof settings.sendOnEnter === 'undefined') return true;
+    return settings.sendOnEnter;
+  }
+
   getIsPeopleDrawer() {
     if (typeof this.isPeopleDrawer === 'boolean') return this.isPeopleDrawer;
 
@@ -171,6 +182,11 @@ class Settings extends EventEmitter {
         this.hideNickAvatarEvents = !this.hideNickAvatarEvents;
         setSettings('hideNickAvatarEvents', this.hideNickAvatarEvents);
         this.emit(cons.events.settings.NICKAVATAR_EVENTS_TOGGLED, this.hideNickAvatarEvents);
+      },
+      [cons.actions.settings.TOGGLE_SEND_ON_ENTER]: () => {
+        this.sendOnEnter = !this.sendOnEnter;
+        setSettings('sendOnEnter', this.sendOnEnter);
+        this.emit(cons.events.settings.SEND_ON_ENTER_TOGGLED, this.sendOnEnter);
       },
       [cons.actions.settings.TOGGLE_NOTIFICATIONS]: async () => {
         if (window.Notification?.permission !== 'granted') {

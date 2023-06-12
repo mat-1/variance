@@ -31,6 +31,12 @@ export function toggleNickAvatarEvents() {
   });
 }
 
+export function toggleSendOnEnter() {
+  appDispatcher.dispatch({
+    type: cons.actions.settings.TOGGLE_SEND_ON_ENTER,
+  });
+}
+
 export function toggleNotifications() {
   appDispatcher.dispatch({
     type: cons.actions.settings.TOGGLE_NOTIFICATIONS,
