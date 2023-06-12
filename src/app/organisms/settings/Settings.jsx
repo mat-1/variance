@@ -13,6 +13,9 @@ import {
   toggleNotifications,
   toggleNotificationSounds,
   toggleSendMessageOnEnter,
+  toggleShowRoomListAvatar,
+  toggleShowYoutubeEmbedPlayer,
+  toggleShowUrlPreview,
 } from '../../../client/action/settings';
 import { usePermission } from '../../hooks/usePermission';
 
@@ -89,6 +92,40 @@ function AppearanceSection() {
               }}
             />
           }
+        />
+        <SettingTile
+          title="Show room-list avatar"
+          options={(
+            <Toggle
+              isActive={settings.showRoomListAvatar}
+              onToggle={() => { toggleShowRoomListAvatar(); updateState({}); }}
+            />
+          )}
+          content={<Text variant="b3">Will show room avatars in the room list.</Text>}
+        />
+      </div>
+      <div className="settings-appearance__card">
+        <MenuHeader>URL Previews</MenuHeader>
+        <SettingTile
+          title="Show URL previews"
+          options={(
+            <Toggle
+              isActive={settings.showUrlPreview}
+              onToggle={() => { toggleShowUrlPreview(); updateState({}); }}
+            />
+              )}
+          content={<Text variant="b3">Show additional info about URLs.</Text>}
+        />
+        <SettingTile
+          title="Show Youtube embed player"
+          options={(
+            <Toggle
+              isActive={settings.showYoutubeEmbedPlayer}
+              onToggle={() => { toggleShowYoutubeEmbedPlayer(); updateState({}); }}
+              disabled={!settings.showUrlPreview}
+            />
+              )}
+          content={<Text variant="b3">Will show a YouTube embed player for youtube links.</Text>}
         />
       </div>
       <div className="settings-appearance__card">
