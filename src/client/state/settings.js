@@ -28,7 +28,7 @@ class Settings extends EventEmitter {
     this.isPeopleDrawer = this.getIsPeopleDrawer();
     this.hideMembershipEvents = this.getHideMembershipEvents();
     this.hideNickAvatarEvents = this.getHideNickAvatarEvents();
-    this.sendOnEnter = this.getSendOnEnter();
+    this.sendMessageOnEnter = this.getSendOnEnter();
     this._showNotifications = this.getShowNotifications();
     this.isNotificationSounds = this.getIsNotificationSounds();
 
@@ -118,12 +118,12 @@ class Settings extends EventEmitter {
   }
 
   getSendOnEnter() {
-    if (typeof this.sendOnEnter === 'boolean') return this.sendOnEnter;
+    if (typeof this.sendMessageOnEnter === 'boolean') return this.sendMessageOnEnter;
 
     const settings = getSettings();
     if (settings === null) return true;
-    if (typeof settings.sendOnEnter === 'undefined') return true;
-    return settings.sendOnEnter;
+    if (typeof settings.sendMessageOnEnter === 'undefined') return true;
+    return settings.sendMessageOnEnter;
   }
 
   getIsPeopleDrawer() {
@@ -183,10 +183,10 @@ class Settings extends EventEmitter {
         setSettings('hideNickAvatarEvents', this.hideNickAvatarEvents);
         this.emit(cons.events.settings.NICKAVATAR_EVENTS_TOGGLED, this.hideNickAvatarEvents);
       },
-      [cons.actions.settings.TOGGLE_SEND_ON_ENTER]: () => {
-        this.sendOnEnter = !this.sendOnEnter;
-        setSettings('sendOnEnter', this.sendOnEnter);
-        this.emit(cons.events.settings.SEND_ON_ENTER_TOGGLED, this.sendOnEnter);
+      [cons.actions.settings.TOGGLE_SEND_MESSAGE_ON_ENTER]: () => {
+        this.sendMessageOnEnter = !this.sendMessageOnEnter;
+        setSettings('sendMessageOnEnter', this.sendMessageOnEnter);
+        this.emit(cons.events.settings.SEND_ON_ENTER_TOGGLED, this.sendMessageOnEnter);
       },
       [cons.actions.settings.TOGGLE_NOTIFICATIONS]: async () => {
         if (window.Notification?.permission !== 'granted') {

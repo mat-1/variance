@@ -12,7 +12,7 @@ import {
   toggleNickAvatarEvents,
   toggleNotifications,
   toggleNotificationSounds,
-  toggleSendOnEnter,
+  toggleSendMessageOnEnter,
 } from '../../../client/action/settings';
 import { usePermission } from '../../hooks/usePermission';
 
@@ -152,12 +152,12 @@ function AccessibilitySection() {
       <div className="settings-appearance__card">
         <MenuHeader>Chat input</MenuHeader>
         <SettingTile
-          title="Send on enter"
+          title="Send message on enter"
           options={
             <Toggle
-              isActive={settings.sendOnEnter}
+              isActive={settings.sendMessageOnEnter}
               onToggle={() => {
-                toggleSendOnEnter();
+                toggleSendMessageOnEnter();
                 updateState({});
               }}
             />

@@ -299,7 +299,7 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
       roomsInput.cancelReplyTo(roomId);
       setReplyTo(null);
     }
-    if (e.key === 'Enter' && settings.sendOnEnter && e.shiftKey === false) {
+    if (e.key === 'Enter' && settings.sendMessageOnEnter && e.shiftKey === false) {
       e.preventDefault();
       sendMessage();
     }

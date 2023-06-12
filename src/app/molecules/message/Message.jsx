@@ -305,7 +305,7 @@ function MessageEdit({ body, onSave, onCancel }) {
       onCancel();
     }
 
-    if (e.key === 'Enter' && settings.sendOnEnter && e.shiftKey === false) {
+    if (e.key === 'Enter' && settings.sendMessageOnEnter && e.shiftKey === false) {
       e.preventDefault();
       onSave(editInputRef.current.value, body);
     }

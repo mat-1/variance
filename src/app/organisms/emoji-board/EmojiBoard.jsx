@@ -200,7 +200,7 @@ function EmojiBoard({ onSelect, searchRef }) {
     searchRef.current.setAttribute('placeholder', shortcodes[0]);
     setEmojiInfo({ shortcode: shortcodes[0], src, unicode });
   }
-
+  
   function handleSearchChange() {
     const term = searchRef.current.value;
     asyncSearch.search(term);
