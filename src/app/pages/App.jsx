@@ -1,5 +1,4 @@
-import React, { StrictMode } from 'react';
-import { Provider } from 'jotai';
+import React from 'react';
 
 import { isAuthenticated } from '../../client/state/auth';
 
@@ -7,11 +6,7 @@ import Auth from '../templates/auth/Auth';
 import Client from '../templates/client/Client';
 
 function App() {
-  return (
-    <StrictMode>
-      <Provider>{isAuthenticated() ? <Client /> : <Auth />}</Provider>
-    </StrictMode>
-  );
+  return isAuthenticated() ? <Client /> : <Auth />;
 }
 
 export default App;

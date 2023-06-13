@@ -1,9 +1,7 @@
-import { lightTheme } from 'folds';
 import EventEmitter from 'events';
 import appDispatcher from '../dispatcher';
 
 import cons from './cons';
-import { darkTheme, butterTheme, silverTheme, ayuTheme } from '../../colors.css';
 
 function getSettings() {
   const settings = localStorage.getItem('settings');
@@ -22,7 +20,6 @@ class Settings extends EventEmitter {
   constructor() {
     super();
 
-    this.themeClasses = [lightTheme, silverTheme, darkTheme, butterTheme, ayuTheme];
     this.themes = ['', 'silver-theme', 'dark-theme', 'butter-theme', 'ayu-theme'];
     this.themeIndex = this.getThemeIndex();
 
@@ -37,10 +34,6 @@ class Settings extends EventEmitter {
     this.showRoomListAvatar = this.getShowRoomListAvatar();
     this.showYoutubeEmbedPlayer = this.getShowYoutubeEmbedPlayer();
     this.showUrlPreview = this.getShowUrlPreview();
-
-    this.darkModeQueryList = window.matchMedia('(prefers-color-scheme: dark)');
-
-    this.darkModeQueryList.addEventListener('change', () => this.applyTheme());
 
     this.isTouchScreenDevice =
       'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
@@ -61,19 +54,20 @@ class Settings extends EventEmitter {
   }
 
   _clearTheme() {
-    this.themes.forEach((themeName, index) => {
-      if (themeName !== '') document.body.classList.remove(themeName);
-      document.body.classList.remove(this.themeClasses[index]);
+    document.body.classList.remove('system-theme');
+    this.themes.forEach((themeName) => {
+      if (themeName === '') return;
+      document.body.classList.remove(themeName);
     });
   }
 
   applyTheme() {
     this._clearTheme();
-    const autoThemeIndex = this.darkModeQueryList.matches ? 2 : 0;
-    const themeIndex = this.useSystemTheme ? autoThemeIndex : this.themeIndex;
-    if (this.themes[themeIndex] === undefined) return;
-    if (this.themes[themeIndex]) document.body.classList.add(this.themes[themeIndex]);
-    document.body.classList.add(this.themeClasses[themeIndex]);
+    if (this.useSystemTheme) {
+      document.body.classList.add('system-theme');
+    } else if (this.themes[this.themeIndex]) {
+      document.body.classList.add(this.themes[this.themeIndex]);
+    }
   }
 
   setTheme(themeIndex) {

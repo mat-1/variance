@@ -2,9 +2,8 @@
   "compilerOptions": {
     "sourceMap": true,
     "jsx": "react",
-    "target": "ES2016",
+    "target": "ES6",
     "allowJs": true,
-    "strict": true,
     "esModuleInterop": true,
     "moduleResolution": "Node",
     "outDir": "dist",

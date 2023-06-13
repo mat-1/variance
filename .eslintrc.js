@@ -27,7 +27,6 @@ module.exports = {
   rules: {
     'linebreak-style': 0,
     'no-underscore-dangle': 0,
-    "no-shadow": "off",
 
     "import/prefer-default-export": "off",
     "import/extensions": "off",
@@ -56,6 +55,5 @@ module.exports = {
     "react-hooks/exhaustive-deps": "error",
 
     "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/no-shadow": "error"
   },
 };

@@ -35,12 +35,11 @@
     @extend .cp-fx__item-one;
     position: relative;
   }
-
+  
   &__sticky {
+    min-height: 85px;
     position: relative;
     background: var(--bg-surface);
-  }
-  &__editor {
-    padding: 0 var(--sp-normal);
+    border-top: 1px solid var(--bg-surface-border);
   }
 }
