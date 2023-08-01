@@ -39,11 +39,11 @@ class Navigation extends EventEmitter {
   }
 
   _mapRoomToSpace(roomId) {
-    const { roomList, accountData } = this.initMatrix;
+    const { roomList } = this.initMatrix;
     if (
-      this.selectedTab === cons.tabs.HOME
-      && roomList.rooms.has(roomId)
-      && !roomList.roomIdToParents.has(roomId)
+      this.selectedTab === cons.tabs.HOME &&
+      roomList.rooms.has(roomId) &&
+      !roomList.roomIdToParents.has(roomId)
     ) {
       this.spaceToRoom.set(cons.tabs.HOME, {
         roomId,
@@ -59,23 +59,10 @@ class Navigation extends EventEmitter {
       return;
     }
 
-    const parents = roomList.roomIdToParents.get(roomId);
-    if (!parents) return;
-    if (parents.has(this.selectedSpaceId)) {
-      this.spaceToRoom.set(this.selectedSpaceId, {
-        roomId,
-        timestamp: Date.now(),
-      });
-    } else if (accountData.categorizedSpaces.has(this.selectedSpaceId)) {
-      const categories = roomList.getCategorizedSpaces([this.selectedSpaceId]);
-      const parent = [...parents].find((pId) => categories.has(pId));
-      if (parent) {
-        this.spaceToRoom.set(parent, {
-          roomId,
-          timestamp: Date.now(),
-        });
-      }
-    }
+    this.spaceToRoom.set(this.selectedSpaceId, {
+      roomId,
+      timestamp: Date.now(),
+    });
   }
 
   _selectRoom(roomId, eventId) {
@@ -93,7 +80,7 @@ class Navigation extends EventEmitter {
       cons.events.navigation.ROOM_SELECTED,
       this.selectedRoomId,
       prevSelectedRoomId,
-      eventId,
+      eventId
     );
   }
 
@@ -202,7 +189,7 @@ class Navigation extends EventEmitter {
     const { categorizedSpaces } = accountData;
 
     const data = this.spaceToRoom.get(spaceId);
-    if (data && !categorizedSpaces.has(spaceId)) {
+    if (data) {
       this._selectRoom(data.roomId);
       return;
     }
@@ -211,13 +198,6 @@ class Navigation extends EventEmitter {
 
     if (categorizedSpaces.has(spaceId)) {
       const categories = roomList.getCategorizedSpaces([spaceId]);
-
-      const latestSelectedRoom = this._getLatestSelectedRoomId([...categories.keys()]);
-
-      if (latestSelectedRoom) {
-        this._selectRoom(latestSelectedRoom);
-        return;
-      }
 
       categories?.forEach((categoryId) => {
         categoryId?.forEach((childId) => {
@@ -284,9 +264,10 @@ class Navigation extends EventEmitter {
   navigate(action) {
     const actions = {
       [cons.actions.navigation.SELECT_TAB]: () => {
-        const roomId = (
+        const roomId =
           action.tabId !== cons.tabs.HOME && action.tabId !== cons.tabs.DIRECTS
-        ) ? action.tabId : null;
+            ? action.tabId
+            : null;
 
         this._selectSpace(roomId, true);
         this._selectTab(action.tabId);
@@ -312,7 +293,7 @@ class Navigation extends EventEmitter {
         this.emit(
           cons.events.navigation.ROOM_SETTINGS_TOGGLED,
           this.isRoomSettings,
-          action.tabText,
+          action.tabText
         );
       },
       [cons.actions.navigation.OPEN_SHORTCUT_SPACES]: () => {
@@ -325,17 +306,10 @@ class Navigation extends EventEmitter {
         this.emit(cons.events.navigation.PUBLIC_ROOMS_OPENED, action.searchTerm);
       },
       [cons.actions.navigation.OPEN_CREATE_ROOM]: () => {
-        this.emit(
-          cons.events.navigation.CREATE_ROOM_OPENED,
-          action.isSpace,
-          action.parentId,
-        );
+        this.emit(cons.events.navigation.CREATE_ROOM_OPENED, action.isSpace, action.parentId);
       },
       [cons.actions.navigation.OPEN_JOIN_ALIAS]: () => {
-        this.emit(
-          cons.events.navigation.JOIN_ALIAS_OPENED,
-          action.term,
-        );
+        this.emit(cons.events.navigation.JOIN_ALIAS_OPENED, action.term);
       },
       [cons.actions.navigation.OPEN_INVITE_USER]: () => {
         this.emit(cons.events.navigation.INVITE_USER_OPENED, action.roomId, action.searchTerm);
@@ -353,21 +327,14 @@ class Navigation extends EventEmitter {
         this.emit(
           cons.events.navigation.EMOJIBOARD_OPENED,
           action.cords,
-          action.requestEmojiCallback,
+          action.requestEmojiCallback
         );
       },
       [cons.actions.navigation.OPEN_READRECEIPTS]: () => {
-        this.emit(
-          cons.events.navigation.READRECEIPTS_OPENED,
-          action.roomId,
-          action.userIds,
-        );
+        this.emit(cons.events.navigation.READRECEIPTS_OPENED, action.roomId, action.userIds);
       },
       [cons.actions.navigation.OPEN_VIEWSOURCE]: () => {
-        this.emit(
-          cons.events.navigation.VIEWSOURCE_OPENED,
-          action.event,
-        );
+        this.emit(cons.events.navigation.VIEWSOURCE_OPENED, action.event);
       },
       [cons.actions.navigation.CLICK_REPLY_TO]: () => {
         this.emit(
@@ -375,14 +342,11 @@ class Navigation extends EventEmitter {
           action.userId,
           action.eventId,
           action.body,
-          action.formattedBody,
+          action.formattedBody
         );
       },
       [cons.actions.navigation.OPEN_SEARCH]: () => {
-        this.emit(
-          cons.events.navigation.SEARCH_OPENED,
-          action.term,
-        );
+        this.emit(cons.events.navigation.SEARCH_OPENED, action.term);
       },
       [cons.actions.navigation.OPEN_REUSABLE_CONTEXT_MENU]: () => {
         this.emit(
@@ -390,7 +354,7 @@ class Navigation extends EventEmitter {
           action.placement,
           action.cords,
           action.render,
-          action.afterClose,
+          action.afterClose
         );
       },
       [cons.actions.navigation.OPEN_REUSABLE_DIALOG]: () => {
@@ -398,14 +362,14 @@ class Navigation extends EventEmitter {
           cons.events.navigation.REUSABLE_DIALOG_OPENED,
           action.title,
           action.render,
-          action.afterClose,
+          action.afterClose
         );
       },
       [cons.actions.navigation.OPEN_EMOJI_VERIFICATION]: () => {
         this.emit(
           cons.events.navigation.EMOJI_VERIFICATION_OPENED,
           action.request,
-          action.targetDevice,
+          action.targetDevice
         );
       },
     };
