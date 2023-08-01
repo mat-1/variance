@@ -205,80 +205,82 @@ MessageReplyWrapper.propTypes = {
   eventId: PropTypes.string.isRequired,
 };
 
-const MessageBody = React.memo(({ senderName, body, isCustomHTML, isEdited, msgType }) => {
-  // if body is not string it is a React element.
-  if (typeof body !== 'string') return <div className="message__body">{body}</div>;
+const MessageBody = React.memo(
+  ({ senderName, body, isCustomHTML, isEdited, msgType, isSending }) => {
+    // if body is not string it is a React element.
+    if (typeof body !== 'string') return <div className="message__body">{body}</div>;
 
-  let content = null;
-  if (isCustomHTML) {
-    try {
-      content = twemojify(
-        sanitizeCustomHtml(initMatrix.matrixClient, body),
-        undefined,
-        true,
-        false,
-        true
-      );
-    } catch {
-      console.error('Malformed custom html: ', body);
-      content = twemojify(body, undefined);
+    let content = null;
+    if (isCustomHTML) {
+      try {
+        content = twemojify(
+          sanitizeCustomHtml(initMatrix.matrixClient, body),
+          undefined,
+          true,
+          false,
+          true
+        );
+      } catch {
+        console.error('Malformed custom html: ', body);
+        content = twemojify(body, undefined);
+      }
+    } else {
+      content = twemojify(body, undefined, true);
     }
-  } else {
-    content = twemojify(body, undefined, true);
-  }
 
-  // Determine if this message should render with large emojis
-  // Criteria:
-  // - Contains only emoji
-  // - Contains no more than 10 emoji
-  let emojiOnly = false;
-  if (content.type === 'img') {
-    // If this messages contains only a single (inline) image
-    emojiOnly = true;
-  } else if (content.constructor.name === 'Array') {
-    // Otherwise, it might be an array of images / texb
-
-    // Count the number of emojis
-    const nEmojis = content.filter((e) => e.type === 'img').length;
-
-    // Make sure there's no text besides whitespace and variation selector U+FE0F
-    if (
-      nEmojis <= 10 &&
-      content.every(
-        (element) =>
-          (typeof element === 'object' && element.type === 'img') ||
-          (typeof element === 'string' && /^[\s\ufe0f]*$/g.test(element))
-      )
-    ) {
+    // Determine if this message should render with large emojis
+    // Criteria:
+    // - Contains only emoji
+    // - Contains no more than 10 emoji
+    let emojiOnly = false;
+    if (content.type === 'img') {
+      // If this messages contains only a single (inline) image
       emojiOnly = true;
+    } else if (content.constructor.name === 'Array') {
+      // Otherwise, it might be an array of images / texb
+
+      // Count the number of emojis
+      const nEmojis = content.filter((e) => e.type === 'img').length;
+
+      // Make sure there's no text besides whitespace and variation selector U+FE0F
+      if (
+        nEmojis <= 10 &&
+        content.every(
+          (element) =>
+            (typeof element === 'object' && element.type === 'img') ||
+            (typeof element === 'string' && /^[\s\ufe0f]*$/g.test(element))
+        )
+      ) {
+        emojiOnly = true;
+      }
     }
-  }
 
-  if (!isCustomHTML) {
-    // If this is a plaintext message, wrap it in a <p> element (automatically applying
-    // white-space: pre-wrap) in order to preserve newlines
-    content = <span className="message__body-plain">{content}</span>;
-  }
+    if (!isCustomHTML) {
+      // If this is a plaintext message, wrap it in a <p> element (automatically applying
+      // white-space: pre-wrap) in order to preserve newlines
+      content = <span className="message__body-plain">{content}</span>;
+    }
 
-  return (
-    <div className="message__body">
-      <div dir="auto" className={`text ${emojiOnly ? 'text-h1' : 'text-b1'}`}>
-        {msgType === 'm.emote' && (
-          <>
-            {'* '}
-            {twemojify(senderName)}{' '}
-          </>
-        )}
-        {content}
-        {isEdited && (
-          <Text className="message__body-edited" variant="b3" span>
-            (edited)
-          </Text>
-        )}
+    return (
+      <div className={`message__body ${isSending ? 'message__body-sending' : ''}`}>
+        <div dir="auto" className={`text ${emojiOnly ? 'text-h1' : 'text-b1'}`}>
+          {msgType === 'm.emote' && (
+            <>
+              {'* '}
+              {twemojify(senderName)}{' '}
+            </>
+          )}
+          {content}
+          {isEdited && (
+            <Text className="message__body-edited" variant="b3" span>
+              (edited)
+            </Text>
+          )}
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 MessageBody.defaultProps = {
   isCustomHTML: false,
   isEdited: false,
@@ -749,6 +751,8 @@ function Message({
   const content = mEvent.getContent();
   const eventId = mEvent.getId();
   const msgType = content?.msgtype;
+  // make the message transparent while sending
+  const isSending = mEvent.isSending();
   const senderId = mEvent.getSender();
   let { body } = content;
   const username = mEvent.sender ? getUsernameOfRoomMember(mEvent.sender) : getUsername(senderId);
@@ -816,6 +820,7 @@ function Message({
             body={isMedia(mEvent) ? genMediaContent(mEvent) : customHTML ?? body}
             msgType={msgType}
             isEdited={isEdited}
+            isSending={isSending}
           />
         )}
         {settings.showUrlPreview &&

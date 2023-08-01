@@ -226,6 +226,11 @@
     margin-left: var(--sp-ultra-tight);
     bottom: 1px;
   }
+
+  &-sending {
+    // make messages transparent while they're being sent
+    opacity: 0.5;
+  }
 }
 .message__edit {
   padding: var(--sp-extra-tight) 0;

@@ -72,10 +72,13 @@ class Navigation extends EventEmitter {
     this.removeRecentRoom(prevSelectedRoomId);
     this.addRecentRoom(prevSelectedRoomId);
     this.removeRecentRoom(this.selectedRoomId);
+
+    // close the room settings when we select a room
     if (this.isRoomSettings && typeof this.selectedRoomId === 'string') {
       this.isRoomSettings = !this.isRoomSettings;
       this.emit(cons.events.navigation.ROOM_SETTINGS_TOGGLED, this.isRoomSettings);
     }
+
     this.emit(
       cons.events.navigation.ROOM_SELECTED,
       this.selectedRoomId,
@@ -89,13 +92,12 @@ class Navigation extends EventEmitter {
     const { categorizedSpaces } = accountData;
 
     if (roomList.isOrphan(roomId)) {
-      if (roomList.directs.has(roomId)) {
-        this._selectSpace(null, true, false);
-        this._selectTab(cons.tabs.DIRECTS, false);
-        return;
-      }
       this._selectSpace(null, true, false);
-      this._selectTab(cons.tabs.HOME, false);
+      if (roomList.directs.has(roomId)) {
+        this._selectTab(cons.tabs.DIRECTS, false);
+      } else {
+        this._selectTab(cons.tabs.HOME, false);
+      }
       return;
     }
 
