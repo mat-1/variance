@@ -95,12 +95,15 @@ function AppearanceSection() {
         />
         <SettingTile
           title="Show room-list avatar"
-          options={(
+          options={
             <Toggle
               isActive={settings.showRoomListAvatar}
-              onToggle={() => { toggleShowRoomListAvatar(); updateState({}); }}
+              onToggle={() => {
+                toggleShowRoomListAvatar();
+                updateState({});
+              }}
             />
-          )}
+          }
           content={<Text variant="b3">Will show room avatars in the room list.</Text>}
         />
       </div>
@@ -108,23 +111,29 @@ function AppearanceSection() {
         <MenuHeader>URL Previews</MenuHeader>
         <SettingTile
           title="Show URL previews"
-          options={(
+          options={
             <Toggle
               isActive={settings.showUrlPreview}
-              onToggle={() => { toggleShowUrlPreview(); updateState({}); }}
+              onToggle={() => {
+                toggleShowUrlPreview();
+                updateState({});
+              }}
             />
-              )}
+          }
           content={<Text variant="b3">Show additional info about URLs.</Text>}
         />
         <SettingTile
           title="Show Youtube embed player"
-          options={(
+          options={
             <Toggle
               isActive={settings.showYoutubeEmbedPlayer}
-              onToggle={() => { toggleShowYoutubeEmbedPlayer(); updateState({}); }}
+              onToggle={() => {
+                toggleShowYoutubeEmbedPlayer();
+                updateState({});
+              }}
               disabled={!settings.showUrlPreview}
             />
-              )}
+          }
           content={<Text variant="b3">Will show a YouTube embed player for youtube links.</Text>}
         />
       </div>
@@ -346,7 +355,7 @@ function AboutSection() {
                 style={{ margin: '0 var(--sp-extra-tight)' }}
               >{`v${cons.version}`}</span>
             </Text>
-            <Text>Yet another matrix client</Text>
+            <Text>Yet another Matrix client</Text>
 
             <div className="settings-about__btns">
               <Button onClick={() => window.open('https://github.com/ajbura/cinny')}>
