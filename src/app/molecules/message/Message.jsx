@@ -257,7 +257,7 @@ const MessageBody = React.memo(({ senderName, body, isCustomHTML, isEdited, msgT
   if (!isCustomHTML) {
     // If this is a plaintext message, wrap it in a <p> element (automatically applying
     // white-space: pre-wrap) in order to preserve newlines
-    content = <p className="message__body-plain">{content}</p>;
+    content = <span className="message__body-plain">{content}</span>;
   }
 
   return (
@@ -270,12 +270,12 @@ const MessageBody = React.memo(({ senderName, body, isCustomHTML, isEdited, msgT
           </>
         )}
         {content}
+        {isEdited && (
+          <Text className="message__body-edited" variant="b3" span>
+            (edited)
+          </Text>
+        )}
       </div>
-      {isEdited && (
-        <Text className="message__body-edited" variant="b3">
-          (edited)
-        </Text>
-      )}
     </div>
   );
 });
@@ -728,8 +728,7 @@ function getEditedBody(editedMEvent) {
 }
 
 function findLinks(body) {
-  return find(body, 'url')
-    .filter((v, i, a) => a.findIndex((v2) => (v2.href === v.href)) === i);
+  return find(body, 'url').filter((v, i, a) => a.findIndex((v2) => v2.href === v.href) === i);
 }
 
 function Message({
@@ -819,9 +818,9 @@ function Message({
             isEdited={isEdited}
           />
         )}
-        {settings.showUrlPreview && msgType === 'm.text' && findLinks(body).map((link) => (
-          <Embed key={link.href} link={link.href} />
-        ))}
+        {settings.showUrlPreview &&
+          msgType === 'm.text' &&
+          findLinks(body).map((link) => <Embed key={link.href} link={link.href} />)}
         {isEdit && (
           <MessageEdit
             body={

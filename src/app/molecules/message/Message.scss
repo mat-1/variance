@@ -223,6 +223,8 @@
   }
   &-edited {
     color: var(--tc-surface-low);
+    margin-left: var(--sp-ultra-tight);
+    bottom: 1px;
   }
 }
 .message__edit {
