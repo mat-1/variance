@@ -286,15 +286,42 @@
   --font-secondary: 'InterVariable', 'Roboto', sans-serif;
 }
 
-.dark-theme,
-.butter-theme,
-.ayu-theme {
+@mixin ayu-theme() {
   @include dark-mode();
+
+  /* background color | --bg-[background type]: value */
+  --bg-surface: #0b0e14;
+  --bg-surface-transparent: #0b0e14;
+  --bg-surface-low: #0f131a;
+  --bg-surface-low-transparent: #0f131a;
+  --bg-surface-extra-low: #11151c;
+  --bg-surface-extra-low-transparent: #11151c;
+
+  --bg-badge: #c4c1ab;
+
+  /* text color | --tc-[background type]-[priority]: value */
+  --tc-surface-high: rgb(255, 251, 222);
+  --tc-surface-normal: rgba(255, 251, 222, 94%);
+  --tc-surface-normal-low: rgba(255, 251, 222, 60%);
+  --tc-surface-low: rgba(255, 251, 222, 58%);
+
+  /* system icons | --ic-[background type]-[priority]: value */
+  --ic-surface-high: rgb(255, 251, 222);
+  --ic-surface-normal: rgba(255, 251, 222, 84%);
+  --ic-surface-low: rgba(255, 251, 222, 64%);
+}
+
+.dark-theme,
+.butter-theme {
+  @include dark-mode();
+}
+.ayu-theme {
+  @include ayu-theme();
 }
 
 @media (prefers-color-scheme: dark) {
   .system-theme {
-    @include dark-mode();
+    @include ayu-theme();
   }
 }
 
@@ -311,29 +338,6 @@
 
   /* text color | --tc-[background type]-[priority]: value */
   --tc-surface-high: rgb(255, 251, 222, 94%);
-  --tc-surface-normal: rgba(255, 251, 222, 94%);
-  --tc-surface-normal-low: rgba(255, 251, 222, 60%);
-  --tc-surface-low: rgba(255, 251, 222, 58%);
-
-  /* system icons | --ic-[background type]-[priority]: value */
-  --ic-surface-high: rgb(255, 251, 222);
-  --ic-surface-normal: rgba(255, 251, 222, 84%);
-  --ic-surface-low: rgba(255, 251, 222, 64%);
-}
-
-.ayu-theme {
-  /* background color | --bg-[background type]: value */
-  --bg-surface: #0b0e14;
-  --bg-surface-transparent: #0b0e14;
-  --bg-surface-low: #0f131a;
-  --bg-surface-low-transparent: #0f131a;
-  --bg-surface-extra-low: #11151c;
-  --bg-surface-extra-low-transparent: #11151c;
-
-  --bg-badge: #c4c1ab;
-
-  /* text color | --tc-[background type]-[priority]: value */
-  --tc-surface-high: rgb(255, 251, 222);
   --tc-surface-normal: rgba(255, 251, 222, 94%);
   --tc-surface-normal-low: rgba(255, 251, 222, 60%);
   --tc-surface-low: rgba(255, 251, 222, 58%);
