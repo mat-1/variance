@@ -4,8 +4,14 @@ import SimpleMarkdown from '@khanacademy/simple-markdown';
 import { idRegex, parseIdUri } from './common';
 
 const {
-  defaultRules, parserFor, outputFor, anyScopeRegex, blockRegex, inlineRegex,
-  sanitizeText, sanitizeUrl,
+  defaultRules,
+  parserFor,
+  outputFor,
+  anyScopeRegex,
+  blockRegex,
+  inlineRegex,
+  sanitizeText,
+  sanitizeUrl,
 } = SimpleMarkdown;
 
 function htmlTag(tagName, content, attributes, isClosed) {
@@ -26,7 +32,9 @@ function htmlTag(tagName, content, attributes, isClosed) {
 }
 
 function mathHtml(wrap, node) {
-  return htmlTag(wrap, htmlTag('code', sanitizeText(node.content)), { 'data-mx-maths': node.content });
+  return htmlTag(wrap, htmlTag('code', sanitizeText(node.content)), {
+    'data-mx-maths': node.content,
+  });
 }
 
 const emojiRegex = /^:([\w-]+):/;
@@ -52,9 +60,10 @@ const plainRules = {
   },
   mention: {
     plain: (node, _, state) => (state.kind === 'edit' ? node.id : node.content),
-    html: (node) => htmlTag('a', sanitizeText(node.content), {
-      href: `https://matrix.to/#/${encodeURIComponent(node.id)}`,
-    }),
+    html: (node) =>
+      htmlTag('a', sanitizeText(node.content), {
+        href: `https://matrix.to/#/${encodeURIComponent(node.id)}`,
+      }),
   },
   emoji: {
     order: defaultRules.em.order - 0.1,
@@ -67,18 +76,22 @@ const plainRules = {
       return null;
     },
     parse: (capture, _, state) => ({ content: capture[1], emoji: state.emojis.get(capture[1]) }),
-    plain: ({ emoji }) => (emoji.mxc
-      ? `:${emoji.shortcode}:`
-      : emoji.unicode),
-    html: ({ emoji }) => (emoji.mxc
-      ? htmlTag('img', null, {
-        'data-mx-emoticon': null,
-        src: emoji.mxc,
-        alt: `:${emoji.shortcode}:`,
-        title: `:${emoji.shortcode}:`,
-        height: 32,
-      }, false)
-      : emoji.unicode),
+    plain: ({ emoji }) => (emoji.mxc ? `:${emoji.shortcode}:` : emoji.unicode),
+    html: ({ emoji }) =>
+      emoji.mxc
+        ? htmlTag(
+            'img',
+            null,
+            {
+              'data-mx-emoticon': null,
+              src: emoji.mxc,
+              alt: `:${emoji.shortcode}:`,
+              title: `:${emoji.shortcode}:`,
+              height: 32,
+            },
+            false
+          )
+        : emoji.unicode,
   },
   newline: {
     ...defaultRules.newline,
@@ -120,29 +133,34 @@ const markdownRules = {
   ...plainRules,
   heading: {
     ...defaultRules.heading,
-    match: blockRegex(/^ *(#{1,6})([^\n:]*?(?: [^\n]*?)?)#* *(?:\n *)*\n/),
+    match: blockRegex(/^(#{1,6}) ([^\n]+?)(\n|$)/),
     plain: (node, output, state) => {
       const out = output(node.content, state);
       if (state.kind === 'edit' || state.kind === 'notification' || node.level > 2) {
-        return `${'#'.repeat(node.level)} ${out}\n\n`;
+        return `${'#'.repeat(node.level)} ${out}\n`;
       }
-      return `${out}\n${(node.level === 1 ? '=' : '-').repeat(out.length)}\n\n`;
+      return `${out}\n${(node.level === 1 ? '=' : '-').repeat(out.length)}\n`;
     },
   },
   hr: {
     ...defaultRules.hr,
-    plain: () => '---\n\n',
+    match: blockRegex(/^---\n/),
+    plain: () => '---\n',
   },
   codeBlock: {
     ...defaultRules.codeBlock,
-    plain: (node) => `\`\`\`${node.lang || ''}\n${node.content}\n\`\`\`\n`,
-    html: (node) => htmlTag('pre', htmlTag('code', sanitizeText(node.content), {
-      class: node.lang ? `language-${node.lang}` : undefined,
-    })),
+    plain: (node) => `\`\`\`${node.lang || ''}\n${node.content}\n\`\`\``,
+    html: (node) =>
+      htmlTag(
+        'pre',
+        htmlTag('code', sanitizeText(node.content), {
+          class: node.lang ? `language-${node.lang}` : undefined,
+        })
+      ),
   },
   fence: {
     ...defaultRules.fence,
-    match: blockRegex(/^ *(`{3,}|~{3,}) *(?:(\S+) *)?\n([\s\S]+?)\n?\1 *(?:\n *)*\n/),
+    match: blockRegex(/^ *(```) *(?:(\S+) *)?\n([\s\S]+?)\n?\1/),
   },
   blockQuote: {
     ...defaultRules.blockQuote,
@@ -153,19 +171,43 @@ const markdownRules = {
         content: parse(`${content}`, state),
       };
     },
-    plain: (node, output, state) => `> ${output(node.content, state).trim().replace(/\n/g, '\n> ')}\n`,
+    plain: (node, output, state) =>
+      `> ${output(node.content, state).trim().replace(/\n/g, '\n> ')}\n`,
     html: (node, output, state) => htmlTag('blockquote', output(node.content, state)),
   },
   list: {
     ...defaultRules.list,
+    match: (source, state) => {
+      // only - is a valid bullet point
+      const LIST_BULLET = '(?:-|\\d+\\.)';
+      const LIST_R = new RegExp(
+        `^( *)(${LIST_BULLET}) ` +
+          `[\\s\\S]+?(?:\n{2,}(?! )` +
+          `(?!\\1${LIST_BULLET} )\\n*` +
+          // the \\s*$ here is so that we can parse the inside of nested
+          // lists, where our content might end before we receive two `\n`s
+          `|\\s*\n*$)`
+      );
+      const prevCaptureStr = state.prevCapture == null ? '' : state.prevCapture[0];
+      const isStartOfLineCapture = /(?:^|\n)( *)$/.exec(prevCaptureStr);
+      const isListBlock = state._list || !state.inline;
+
+      if (isStartOfLineCapture && isListBlock) {
+        source = isStartOfLineCapture[1] + source;
+        return LIST_R.exec(source);
+      }
+      return null;
+    },
     plain: (node, output, state) => {
       const oldList = state._list;
       state._list = true;
 
-      let items = node.items.map((item, i) => {
-        const prefix = node.ordered ? `${node.start + i}. ` : '* ';
-        return prefix + output(item, state).replace(/\n/g, `\n${' '.repeat(prefix.length)}`);
-      }).join('\n');
+      let items = node.items
+        .map((item, i) => {
+          const prefix = node.ordered ? `${node.start + i}. ` : '* ';
+          return prefix + output(item, state).replace(/\n/g, `\n${' '.repeat(prefix.length)}`);
+        })
+        .join('\n');
 
       state._list = oldList;
 
@@ -193,16 +235,18 @@ const markdownRules = {
         }
       });
       header.forEach((s, i) => {
-        if (s.length > colWidth[i])colWidth[i] = s.length;
+        if (s.length > colWidth[i]) colWidth[i] = s.length;
       });
 
-      const cells = node.cells.map((row) => row.map((content, i) => {
-        const s = output(content, state);
-        if (colWidth[i] === undefined || s.length > colWidth[i]) {
-          colWidth[i] = s.length;
-        }
-        return s;
-      }));
+      const cells = node.cells.map((row) =>
+        row.map((content, i) => {
+          const s = output(content, state);
+          if (colWidth[i] === undefined || s.length > colWidth[i]) {
+            colWidth[i] = s.length;
+          }
+          return s;
+        })
+      );
 
       function pad(s, i) {
         switch (node.align[i]) {
@@ -230,10 +274,7 @@ const markdownRules = {
         }
       });
 
-      const table = [
-        header.map(pad),
-        line,
-        ...cells.map((row) => row.map(pad))];
+      const table = [header.map(pad), line, ...cells.map((row) => row.map(pad))];
 
       return table.map((row) => `| ${row.join(' | ')} |\n`).join('');
     },
@@ -242,9 +283,8 @@ const markdownRules = {
     order: defaultRules.table.order + 0.1,
     match: blockRegex(/^ *\$\$ *\n?([\s\S]+?)\n?\$\$ *(?:\n *)*\n/),
     parse: (capture) => ({ content: capture[1] }),
-    plain: (node) => (node.content.includes('\n')
-      ? `$$\n${node.content}\n$$\n`
-      : `$$${node.content}$$\n`),
+    plain: (node) =>
+      node.content.includes('\n') ? `$$\n${node.content}\n$$\n` : `$$${node.content}$$\n`,
     html: (node) => mathHtml('div', node),
   },
   shrug: {
@@ -280,12 +320,19 @@ const markdownRules = {
   },
   image: {
     ...defaultRules.image,
-    plain: (node) => `![${node.alt}](${sanitizeUrl(node.target) || ''}${node.title ? ` "${node.title}"` : ''})`,
-    html: (node) => htmlTag('img', '', {
-      src: sanitizeUrl(node.target) || '',
-      alt: node.alt,
-      title: node.title,
-    }, false),
+    plain: (node) =>
+      `![${node.alt}](${sanitizeUrl(node.target) || ''}${node.title ? ` "${node.title}"` : ''})`,
+    html: (node) =>
+      htmlTag(
+        'img',
+        '',
+        {
+          src: sanitizeUrl(node.target) || '',
+          alt: node.alt,
+          title: node.title,
+        },
+        false
+      ),
   },
   reflink: undefined,
   refimage: undefined,
@@ -328,11 +375,8 @@ const markdownRules = {
           return `[${warning}](${output(node.content, state)})`;
       }
     },
-    html: (node, output, state) => htmlTag(
-      'span',
-      output(node.content, state),
-      { 'data-mx-spoiler': node.reason || null },
-    ),
+    html: (node, output, state) =>
+      htmlTag('span', output(node.content, state), { 'data-mx-spoiler': node.reason || null }),
   },
   inlineMath: {
     order: defaultRules.del.order + 0.2,
@@ -381,24 +425,30 @@ function mapElement(el) {
     case 'UL':
       return [{ type: 'list', items: Array.from(el.childNodes).map(mapNode) }];
     case 'OL':
-      return [{
-        type: 'list',
-        ordered: true,
-        start: Number(el.getAttribute('start')),
-        items: Array.from(el.childNodes).map(mapNode),
-      }];
+      return [
+        {
+          type: 'list',
+          ordered: true,
+          start: Number(el.getAttribute('start')),
+          items: Array.from(el.childNodes).map(mapNode),
+        },
+      ];
     case 'TABLE': {
       const headerEl = Array.from(el.querySelector('thead > tr').childNodes);
       const align = headerEl.map((childE) => childE.style['text-align']);
-      return [{
-        type: 'table',
-        header: headerEl.map(mapChildren),
-        align,
-        cells: Array.from(el.querySelectorAll('tbody > tr')).map((rowEl) => Array.from(rowEl.childNodes).map((childEl, i) => {
-          if (align[i] === undefined) align[i] = childEl.style['text-align'];
-          return mapChildren(childEl);
-        })),
-      }];
+      return [
+        {
+          type: 'table',
+          header: headerEl.map(mapChildren),
+          align,
+          cells: Array.from(el.querySelectorAll('tbody > tr')).map((rowEl) =>
+            Array.from(rowEl.childNodes).map((childEl, i) => {
+              if (align[i] === undefined) align[i] = childEl.style['text-align'];
+              return mapChildren(childEl);
+            })
+          ),
+        },
+      ];
     }
     case 'A': {
       const href = el.getAttribute('href');
@@ -406,12 +456,14 @@ function mapElement(el) {
       const id = parseIdUri(href);
       if (id) return [{ type: 'mention', content: el.innerText, id }];
 
-      return [{
-        type: 'link',
-        target: el.getAttribute('href'),
-        title: el.getAttribute('title'),
-        content: mapChildren(el),
-      }];
+      return [
+        {
+          type: 'link',
+          target: el.getAttribute('href'),
+          title: el.getAttribute('title'),
+          content: mapChildren(el),
+        },
+      ];
     }
     case 'IMG': {
       const src = el.getAttribute('src');
@@ -420,22 +472,26 @@ function mapElement(el) {
         if (title.length > 2 && title.startsWith(':') && title.endsWith(':')) {
           title = title.slice(1, -1);
         }
-        return [{
-          type: 'emoji',
-          content: title,
-          emoji: {
-            mxc: src,
-            shortcode: title,
+        return [
+          {
+            type: 'emoji',
+            content: title,
+            emoji: {
+              mxc: src,
+              shortcode: title,
+            },
           },
-        }];
+        ];
       }
 
-      return [{
-        type: 'image',
-        alt: el.getAttribute('alt'),
-        target: src,
-        title,
-      }];
+      return [
+        {
+          type: 'image',
+          alt: el.getAttribute('alt'),
+          target: src,
+          title,
+        },
+      ];
     }
     case 'EM':
     case 'I':
@@ -458,7 +514,9 @@ function mapElement(el) {
       return mapChildren(el);
     case 'SPAN':
       if (el.hasAttribute('data-mx-spoiler')) {
-        return [{ type: 'spoiler', reason: el.getAttribute('data-mx-spoiler'), content: mapChildren(el) }];
+        return [
+          { type: 'spoiler', reason: el.getAttribute('data-mx-spoiler'), content: mapChildren(el) },
+        ];
       }
       if (el.hasAttribute('data-mx-maths')) {
         return [{ type: 'inlineMath', content: el.getAttribute('data-mx-maths') }];
@@ -498,7 +556,10 @@ function render(content, state, plainOut, htmlOut) {
 
   const htmlStr = htmlOut(c, state);
 
-  const plainHtml = htmlStr.replace(/<br>/g, '\n').replace(/<\/p><p>/g, '\n\n').replace(/<\/?p>/g, '');
+  const plainHtml = htmlStr
+    .replace(/<br>/g, '\n')
+    .replace(/<\/p><p>/g, '\n\n')
+    .replace(/<\/?p>/g, '');
   const onlyPlain = sanitizeText(plainStr) === plainHtml;
 
   return {
