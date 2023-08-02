@@ -164,9 +164,9 @@ const markdownRules = {
   },
   blockQuote: {
     ...defaultRules.blockQuote,
-    match: blockRegex(/^( *>[^\n]+(\n *>+[^\n]+)*\n?)+/),
+    match: blockRegex(/^(> [^\n]+(\n> [^\n]+)*\n?)+/),
     parse: (capture, parse, state) => {
-      const content = capture[0].replace(/^ *> ?/gm, '');
+      const content = capture[0].replace(/^> /gm, '');
       return {
         content: parse(`${content}`, state),
       };
