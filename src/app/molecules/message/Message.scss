@@ -227,9 +227,16 @@
     bottom: 1px;
   }
 
-  &-sending {
+  // https://github.com/matrix-org/matrix-js-sdk/blob/develop/src/models/event-status.ts#L21
+  &-status-sending,
+  &-status-queued,
+  &-status-encrypting {
     // make messages transparent while they're being sent
     opacity: 0.5;
+  }
+  &-status-not_sent > .text,
+  &-status-cancelled > .text {
+    color: var(--tc-danger-high);
   }
 }
 .message__edit {

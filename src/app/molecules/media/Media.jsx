@@ -43,10 +43,7 @@ function getNativeHeight(width, height, maxWidth = 296) {
   return scale * height;
 }
 
-function FileHeader({
-  name, link, external,
-  file, type,
-}) {
+function FileHeader({ name, link, external, file, type }) {
   const [url, setUrl] = useState(null);
 
   async function getFile() {
@@ -63,19 +60,19 @@ function FileHeader({
   }
   return (
     <div className="file-header">
-      <Text className="file-name" variant="b3">{name}</Text>
-      { link !== null && (
+      <Text className="file-name" variant="b3">
+        {name}
+      </Text>
+      {link !== null && (
         <>
-          {
-            external && (
-              <IconButton
-                size="extra-small"
-                tooltip="Open in new tab"
-                src={ExternalSVG}
-                onClick={() => window.open(url || link)}
-              />
-            )
-          }
+          {external && (
+            <IconButton
+              size="extra-small"
+              tooltip="Open in new tab"
+              src={ExternalSVG}
+              onClick={() => window.open(url || link)}
+            />
+          )}
           <a href={url || link} download={name} target="_blank" rel="noreferrer">
             <IconButton
               size="extra-small"
@@ -102,9 +99,7 @@ FileHeader.propTypes = {
   type: PropTypes.string.isRequired,
 };
 
-function File({
-  name, link, file, type,
-}) {
+function File({ name, link, file, type }) {
   return (
     <div className="file-container">
       <FileHeader name={name} link={link} file={file} type={type} />
@@ -122,9 +117,7 @@ File.propTypes = {
   file: PropTypes.shape({}),
 };
 
-function Image({
-  name, width, height, link, file, type, blurhash,
-}) {
+function Image({ name, width, height, link, file, type, blurhash }) {
   const [url, setUrl] = useState(null);
   const [blur, setBlur] = useState(true);
   const [lightbox, setLightbox] = useState(false);
@@ -158,8 +151,8 @@ function Image({
           onClick={toggleLightbox}
           onKeyDown={toggleLightbox}
         >
-          { blurhash && blur && <BlurhashCanvas hash={blurhash} punch={1} />}
-          { url !== null && (
+          {blurhash && blur && <BlurhashCanvas hash={blurhash} punch={1} />}
+          {url !== null && (
             <img
               style={{ display: blur ? 'none' : 'unset' }}
               onLoad={() => setBlur(false)}
@@ -170,12 +163,7 @@ function Image({
         </div>
       </div>
       {url && (
-        <ImageLightbox
-          url={url}
-          alt={name}
-          isOpen={lightbox}
-          onRequestClose={toggleLightbox}
-        />
+        <ImageLightbox url={url} alt={name} isOpen={lightbox} onRequestClose={toggleLightbox} />
       )}
     </>
   );
@@ -197,9 +185,7 @@ Image.propTypes = {
   blurhash: PropTypes.string,
 };
 
-function Sticker({
-  name, height, width, link, file, type,
-}) {
+function Sticker({ name, height, width, link, file, type }) {
   const [url, setUrl] = useState(null);
 
   useEffect(() => {
@@ -216,8 +202,11 @@ function Sticker({
   }, []);
 
   return (
-    <div className="sticker-container" style={{ height: width !== null ? getNativeHeight(width, height, 128) : 'unset' }}>
-      { url !== null && <img src={url || link} title={name} alt={name} />}
+    <div
+      className="sticker-container"
+      style={{ height: width !== null ? getNativeHeight(width, height, 128) : 'unset' }}
+    >
+      {url !== null && <img src={url || link} title={name} alt={name} />}
     </div>
   );
 }
@@ -236,9 +225,7 @@ Sticker.propTypes = {
   type: PropTypes.string,
 };
 
-function Audio({
-  name, link, type, file,
-}) {
+function Audio({ name, link, type, file }) {
   const [isLoading, setIsLoading] = useState(false);
   const [url, setUrl] = useState(null);
 
@@ -256,9 +243,11 @@ function Audio({
     <div className="file-container">
       <FileHeader name={name} link={file !== null ? url : url || link} type={type} external />
       <div className="audio-container">
-        { url === null && isLoading && <Spinner size="small" /> }
-        { url === null && !isLoading && <IconButton onClick={handlePlayAudio} tooltip="Play audio" src={PlaySVG} />}
-        { url !== null && (
+        {url === null && isLoading && <Spinner size="small" />}
+        {url === null && !isLoading && (
+          <IconButton onClick={handlePlayAudio} tooltip="Play audio" src={PlaySVG} />
+        )}
+        {url !== null && (
           /* eslint-disable-next-line jsx-a11y/media-has-caption */
           <audio autoPlay controls>
             <source src={url} type={getBlobSafeMimeType(type)} />
@@ -280,8 +269,16 @@ Audio.propTypes = {
 };
 
 function Video({
-  name, link, thumbnail, thumbnailFile, thumbnailType,
-  width, height, file, type, blurhash,
+  name,
+  link,
+  thumbnail,
+  thumbnailFile,
+  thumbnailType,
+  width,
+  height,
+  file,
+  type,
+  blurhash,
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [url, setUrl] = useState(null);
@@ -321,14 +318,21 @@ function Video({
         }}
         className="video-container"
       >
-        { url === null ? (
+        {url === null ? (
           <>
-            { blurhash && blur && <BlurhashCanvas hash={blurhash} punch={1} />}
-            { thumbUrl !== null && (
-              <img style={{ display: blur ? 'none' : 'unset' }} src={thumbUrl} onLoad={() => setBlur(false)} alt={name} />
+            {blurhash && blur && <BlurhashCanvas hash={blurhash} punch={1} />}
+            {thumbUrl !== null && (
+              <img
+                style={{ display: blur ? 'none' : 'unset' }}
+                src={thumbUrl}
+                onLoad={() => setBlur(false)}
+                alt={name}
+              />
             )}
             {isLoading && <Spinner size="small" />}
-            {!isLoading && <IconButton onClick={handlePlayVideo} tooltip="Play video" src={PlaySVG} />}
+            {!isLoading && (
+              <IconButton onClick={handlePlayVideo} tooltip="Play video" src={PlaySVG} />
+            )}
           </>
         ) : (
           /* eslint-disable-next-line jsx-a11y/media-has-caption */
@@ -363,9 +367,7 @@ Video.propTypes = {
   blurhash: PropTypes.string,
 };
 
-function IframePlayer({
-  children, link, sitename, title, thumbnail,
-}) {
+function IframePlayer({ children, link, sitename, title, thumbnail }) {
   const [videoStarted, setVideoStarted] = useState(false);
 
   const handlePlayVideo = () => {
@@ -388,9 +390,7 @@ function IframePlayer({
 
         <div className="video-container">
           {videoStarted ? (
-            <div>
-              {children}
-            </div>
+            <div>{children}</div>
           ) : (
             <>
               <img src={thumbnail} alt={`${sitename} thumbnail`} />
@@ -413,7 +413,13 @@ IframePlayer.propTypes = {
 function Embed({ link }) {
   const url = new URL(link);
 
-  if (settings.showYoutubeEmbedPlayer && (((url.host === 'www.youtube.com' || url.host === 'youtube.com') && (url.pathname === '/watch' || url.pathname.startsWith('/shorts/'))) || url.host === 'youtu.be' || url.host === 'www.youtu.be')) {
+  if (
+    settings.showYoutubeEmbedPlayer &&
+    (((url.host === 'www.youtube.com' || url.host === 'youtube.com') &&
+      (url.pathname === '/watch' || url.pathname.startsWith('/shorts/'))) ||
+      url.host === 'youtu.be' ||
+      url.host === 'www.youtu.be')
+  ) {
     return <YoutubeEmbed link={link} />;
   }
 
@@ -442,23 +448,34 @@ function Embed({ link }) {
 
   if (urlPreviewInfo != null) {
     const imageURL = urlPreviewInfo['og:image'] || urlPreviewInfo['og:image:secure_url'];
-    const image = (imageURL != null) ? (
-      <Image
-        link={mx.mxcUrlToHttp(imageURL)}
-        height={urlPreviewInfo['og:image:height'] != null ? parseInt(urlPreviewInfo['og:image:height'], 10) : null}
-        width={urlPreviewInfo['og:image:width'] != null ? parseInt(urlPreviewInfo['og:image:width'], 10) : null}
-        name={urlPreviewInfo['og:image:alt'] || urlPreviewInfo['og:site_name'] || ''}
-        type={urlPreviewInfo['og:image:type'] != null ? urlPreviewInfo['og:image:type'] : null}
-      />
-    ) : null;
+    const image =
+      imageURL != null ? (
+        <Image
+          link={mx.mxcUrlToHttp(imageURL)}
+          height={
+            urlPreviewInfo['og:image:height'] != null
+              ? parseInt(urlPreviewInfo['og:image:height'], 10)
+              : null
+          }
+          width={
+            urlPreviewInfo['og:image:width'] != null
+              ? parseInt(urlPreviewInfo['og:image:width'], 10)
+              : null
+          }
+          name={urlPreviewInfo['og:image:alt'] || urlPreviewInfo['og:site_name'] || ''}
+          type={urlPreviewInfo['og:image:type'] != null ? urlPreviewInfo['og:image:type'] : null}
+        />
+      ) : null;
 
     // Image only embed
-    if (image != null && urlPreviewInfo['og:title'] == null && urlPreviewInfo['og:description'] == null) {
+    if (
+      image != null &&
+      urlPreviewInfo['og:title'] == null &&
+      urlPreviewInfo['og:description'] == null
+    ) {
       return (
         <div className="embed-container">
-          <div className="file-container">
-            {image}
-          </div>
+          <div className="file-container">{image}</div>
         </div>
       );
     }
@@ -469,22 +486,20 @@ function Embed({ link }) {
       <div className="embed-container">
         <div className="file-container embed">
           <div className="embed-text">
-            {(embedTitle != null) && (
+            {embedTitle != null && (
               <Text className="embed-title" variant="h2">
                 {embedTitle}
               </Text>
             )}
 
-            {(urlPreviewInfo['og:description'] != null) && (
+            {urlPreviewInfo['og:description'] != null && (
               <Text className="embed-description" variant="b3">
                 {urlPreviewInfo['og:description']}
               </Text>
             )}
           </div>
 
-          <div className="embed-media">
-            {image}
-          </div>
+          <div className="embed-media">{image}</div>
         </div>
       </div>
     );
@@ -533,14 +548,20 @@ function YoutubeEmbed({ link }) {
   }
 
   let embedURL = `https://www.youtube-nocookie.com/embed/${videoID}?autoplay=1`;
-  if (url.searchParams.has('t')) { // timestamp flag
+  if (url.searchParams.has('t')) {
+    // timestamp flag
     embedURL += `&start=${url.searchParams.get('t')}`;
   }
 
   if (urlPreviewInfo !== null) {
     return (
       <div className="embed-container">
-        <IframePlayer link={link} sitename="Youtube" title={urlPreviewInfo['og:title']} thumbnail={mx.mxcUrlToHttp(urlPreviewInfo['og:image'])}>
+        <IframePlayer
+          link={link}
+          sitename="Youtube"
+          title={urlPreviewInfo['og:title']}
+          thumbnail={mx.mxcUrlToHttp(urlPreviewInfo['og:image'])}
+        >
           <iframe
             src={embedURL}
             title="YouTube video player"
@@ -559,6 +580,4 @@ YoutubeEmbed.propTypes = {
   link: PropTypes.string.isRequired,
 };
 
-export {
-  File, Image, Sticker, Audio, Video, YoutubeEmbed, Embed, IframePlayer,
-};
+export { File, Image, Sticker, Audio, Video, YoutubeEmbed, Embed, IframePlayer };

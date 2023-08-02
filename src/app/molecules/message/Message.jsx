@@ -206,7 +206,7 @@ MessageReplyWrapper.propTypes = {
 };
 
 const MessageBody = React.memo(
-  ({ senderName, body, isCustomHTML, isEdited, msgType, isSending }) => {
+  ({ senderName, body, isCustomHTML, isEdited, msgType, messageStatus }) => {
     // if body is not string it is a React element.
     if (typeof body !== 'string') return <div className="message__body">{body}</div>;
 
@@ -262,7 +262,7 @@ const MessageBody = React.memo(
     }
 
     return (
-      <div className={`message__body ${isSending ? 'message__body-sending' : ''}`}>
+      <div className={`message__body message__body-status-${messageStatus}`}>
         <div dir="auto" className={`text ${emojiOnly ? 'text-h1' : 'text-b1'}`}>
           {msgType === 'm.emote' && (
             <>
@@ -292,6 +292,7 @@ MessageBody.propTypes = {
   isCustomHTML: PropTypes.bool,
   isEdited: PropTypes.bool,
   msgType: PropTypes.string,
+  messageStatus: PropTypes.string,
 };
 
 function MessageEdit({ body, onSave, onCancel }) {
@@ -751,8 +752,13 @@ function Message({
   const content = mEvent.getContent();
   const eventId = mEvent.getId();
   const msgType = content?.msgtype;
-  // make the message transparent while sending
-  const isSending = mEvent.isSending();
+  // make the message transparent while sending and red if it failed sending
+  const [messageStatus, setMessageStatus] = useState(mEvent.status);
+
+  mEvent.on('Event.status', (e) => {
+    setMessageStatus(e.status);
+  });
+
   const senderId = mEvent.getSender();
   let { body } = content;
   const username = mEvent.sender ? getUsernameOfRoomMember(mEvent.sender) : getUsername(senderId);
@@ -820,7 +826,7 @@ function Message({
             body={isMedia(mEvent) ? genMediaContent(mEvent) : customHTML ?? body}
             msgType={msgType}
             isEdited={isEdited}
-            isSending={isSending}
+            messageStatus={messageStatus}
           />
         )}
         {settings.showUrlPreview &&
