@@ -37,6 +37,12 @@ export function toggleSendMessageOnEnter() {
   });
 }
 
+export function toggleOnlyAnimateOnHover() {
+  appDispatcher.dispatch({
+    type: cons.actions.settings.TOGGLE_ONLY_ANIMATE_ON_HOVER,
+  });
+}
+
 export function toggleNotifications() {
   appDispatcher.dispatch({
     type: cons.actions.settings.TOGGLE_NOTIFICATIONS,

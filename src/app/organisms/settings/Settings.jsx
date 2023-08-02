@@ -13,6 +13,7 @@ import {
   toggleNotifications,
   toggleNotificationSounds,
   toggleSendMessageOnEnter,
+  toggleOnlyAnimateOnHover,
   toggleShowRoomListAvatar,
   toggleShowYoutubeEmbedPlayer,
   toggleShowUrlPreview,
@@ -194,8 +195,8 @@ function AccessibilitySection() {
   const [, updateState] = useState({});
 
   return (
-    <div className="settings-appearance">
-      <div className="settings-appearance__card">
+    <div className="settings-accessibility">
+      <div className="settings-accessibility__card">
         <MenuHeader>Chat input</MenuHeader>
         <SettingTile
           title="Send message on enter"
@@ -209,6 +210,25 @@ function AccessibilitySection() {
             />
           }
           content={<Text variant="b3">Send the typed message when the enter key is pressed.</Text>}
+        />
+      </div>
+
+      <div className="settings-accessibility__card">
+        <MenuHeader>Animations</MenuHeader>
+        <SettingTile
+          title="Only animate GIFs on hover"
+          options={
+            <Toggle
+              isActive={settings.onlyAnimateOnHover}
+              onToggle={() => {
+                toggleOnlyAnimateOnHover();
+                updateState({});
+              }}
+            />
+          }
+          content={
+            <Text variant="b3">Play animations only when the mouse is hovering over them.</Text>
+          }
         />
       </div>
     </div>

@@ -29,6 +29,7 @@ class Settings extends EventEmitter {
     this.hideMembershipEvents = this.getHideMembershipEvents();
     this.hideNickAvatarEvents = this.getHideNickAvatarEvents();
     this.sendMessageOnEnter = this.getSendOnEnter();
+    this.onlyAnimateOnHover = this.getOnlyAnimateOnHover();
     this._showNotifications = this.getShowNotifications();
     this.isNotificationSounds = this.getIsNotificationSounds();
     this.showRoomListAvatar = this.getShowRoomListAvatar();
@@ -127,6 +128,15 @@ class Settings extends EventEmitter {
     if (settings === null) return true;
     if (typeof settings.sendMessageOnEnter === 'undefined') return true;
     return settings.sendMessageOnEnter;
+  }
+
+  getOnlyAnimateOnHover() {
+    if (typeof this.onlyAnimateOnHover === 'boolean') return this.onlyAnimateOnHover;
+
+    const settings = getSettings();
+    if (settings === null) return true;
+    if (typeof settings.onlyAnimateOnHover === 'undefined') return true;
+    return settings.onlyAnimateOnHover;
   }
 
   getIsPeopleDrawer() {
@@ -238,6 +248,11 @@ class Settings extends EventEmitter {
         this.sendMessageOnEnter = !this.sendMessageOnEnter;
         setSettings('sendMessageOnEnter', this.sendMessageOnEnter);
         this.emit(cons.events.settings.SEND_ON_ENTER_TOGGLED, this.sendMessageOnEnter);
+      },
+      [cons.actions.settings.TOGGLE_ONLY_ANIMATE_ON_HOVER]: () => {
+        this.onlyAnimateOnHover = !this.onlyAnimateOnHover;
+        setSettings('onlyAnimateOnHover', this.onlyAnimateOnHover);
+        this.emit(cons.events.settings.ONLY_ANIMATE_ON_HOVER_TOGGLED, this.onlyAnimateOnHover);
       },
       [cons.actions.settings.TOGGLE_NOTIFICATIONS]: async () => {
         if (window.Notification?.permission !== 'granted') {

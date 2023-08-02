@@ -9,45 +9,67 @@ import RawIcon from '../system-icons/RawIcon';
 
 import ImageBrokenSVG from '../../../../public/res/svg/image-broken.svg';
 import { avatarInitials } from '../../../util/common';
+import settings from '../../../client/state/settings';
 
-const Avatar = React.forwardRef(({
-  text, bgColor, iconSrc, iconColor, imageSrc, size,
-}, ref) => {
+const Avatar = React.forwardRef(({ text, bgColor, iconSrc, iconColor, imageSrc, size }, ref) => {
   let textSize = 's1';
   if (size === 'large') textSize = 'h1';
   if (size === 'small') textSize = 'b1';
   if (size === 'extra-small') textSize = 'b3';
 
+  // matrix (or at least synapse) lets us replace .gif with .png in the url to make it static
+  const pausedImageSrc = imageSrc?.replace(/\.gif\b/, '.png') ?? null;
+  const { onlyAnimateOnHover } = settings;
+
+  const [activeImageSrc, setActiveImageSrc] = React.useState(
+    onlyAnimateOnHover ? pausedImageSrc : imageSrc
+  );
+
+  // also update when imageSrc changes
+  React.useEffect(() => {
+    setActiveImageSrc(onlyAnimateOnHover ? pausedImageSrc : imageSrc);
+  }, [imageSrc]);
+
   return (
     <div ref={ref} className={`avatar-container avatar-container__${size} noselect`}>
-      {
-        imageSrc !== null
-          ? (
-            <img
-              draggable="false"
-              src={imageSrc}
-              onLoad={(e) => { e.target.style.backgroundColor = 'transparent'; }}
-              onError={(e) => { e.target.src = ImageBrokenSVG; }}
-              alt=""
-            />
-          )
-          : (
-            <span
-              style={{ backgroundColor: iconSrc === null ? bgColor : 'transparent' }}
-              className={`avatar__border${iconSrc !== null ? '--active' : ''}`}
-            >
-              {
-                iconSrc !== null
-                  ? <RawIcon size={size} src={iconSrc} color={iconColor} />
-                  : text !== null && (
-                    <Text variant={textSize} primary>
-                      {twemojify(avatarInitials(text))}
-                    </Text>
-                  )
-              }
-            </span>
-          )
-      }
+      {activeImageSrc !== null ? (
+        <img
+          draggable="false"
+          src={activeImageSrc}
+          onLoad={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}
+          onError={(e) => {
+            e.target.src = ImageBrokenSVG;
+          }}
+          onMouseEnter={() => {
+            if (onlyAnimateOnHover) {
+              setActiveImageSrc(imageSrc);
+            }
+          }}
+          onMouseLeave={() => {
+            if (onlyAnimateOnHover) {
+              setActiveImageSrc(pausedImageSrc);
+            }
+          }}
+          alt=""
+        />
+      ) : (
+        <span
+          style={{ backgroundColor: iconSrc === null ? bgColor : 'transparent' }}
+          className={`avatar__border${iconSrc !== null ? '--active' : ''}`}
+        >
+          {iconSrc !== null ? (
+            <RawIcon size={size} src={iconSrc} color={iconColor} />
+          ) : (
+            text !== null && (
+              <Text variant={textSize} primary>
+                {twemojify(avatarInitials(text))}
+              </Text>
+            )
+          )}
+        </span>
+      )}
     </div>
   );
 });
