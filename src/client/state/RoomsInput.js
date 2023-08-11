@@ -6,7 +6,7 @@ import { getBlobSafeMimeType } from '../../util/mimetypes';
 import { sanitizeText } from '../../util/sanitize';
 import cons from './cons';
 import settings from './settings';
-import { markdown, plain } from '../../util/markdown';
+import { markdown, plain, html } from '../../util/markdown';
 
 const blurhashField = 'xyz.amorgan.blurhash';
 
@@ -191,6 +191,7 @@ class RoomsInput extends EventEmitter {
   getContent(roomId, options, message, reply, edit) {
     const msgType = options?.msgType || 'm.text';
     const autoMarkdown = options?.autoMarkdown ?? true;
+    const isHtml = options?.isHtml ?? false;
 
     const room = this.matrixClient.getRoom(roomId);
 
@@ -199,8 +200,23 @@ class RoomsInput extends EventEmitter {
     const parentRooms = [...parentIds].map((id) => this.matrixClient.getRoom(id));
     const emojis = getShortcodeToEmoji(this.matrixClient, [room, ...parentRooms]);
 
-    const output = settings.isMarkdown && autoMarkdown ? markdown : plain;
+    console.log('getContent', message);
+
+    let output;
+    if (isHtml) {
+      output = html;
+    } else if (settings.isMarkdown && autoMarkdown) {
+      output = markdown;
+    } else {
+      output = plain;
+    }
+
     const body = output(message, { userNames, emojis });
+    if (isHtml) {
+      // the html parser might remove stuff we want, so we need to re-add it
+      body.onlyPlain = false;
+      body.html = message;
+    }
 
     const content = {
       body: body.plain,

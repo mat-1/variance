@@ -4,6 +4,7 @@ import './commands.scss';
 import initMatrix from '../../../client/initMatrix';
 import * as roomActions from '../../../client/action/room';
 import { hasDMWith, hasDevices } from '../../../util/matrixUtil';
+import { textToHtmlRainbow } from '../../../util/rainbow';
 import { selectRoom, openReusableDialog } from '../../../client/action/navigation';
 
 import Text from '../../atoms/text/Text';
@@ -44,10 +45,8 @@ const commands = {
   shrug: {
     name: 'shrug',
     description: 'Send ¯\\_(ツ)_/¯ as message',
-    exe: (roomId, data, onSuccess) => onSuccess(
-      `¯\\_(ツ)_/¯${data.trim() !== '' ? ` ${data}` : ''}`,
-      { msgType: 'm.text' },
-    ),
+    exe: (roomId, data, onSuccess) =>
+      onSuccess(`¯\\_(ツ)_/¯${data.trim() !== '' ? ` ${data}` : ''}`, { msgType: 'm.text' }),
   },
   plain: {
     name: 'plain',
@@ -56,6 +55,24 @@ const commands = {
       const body = data.trim();
       if (body === '') return;
       onSuccess(body, { msgType: 'm.text', autoMarkdown: false });
+    },
+  },
+  html: {
+    name: 'html',
+    description: 'Send a message as HTML',
+    exe: (roomId, data, onSuccess) => {
+      const body = data.trim();
+      if (body === '') return;
+      onSuccess(body, { msgType: 'm.text', autoMarkdown: false, isHtml: true });
+    },
+  },
+  rainbow: {
+    name: 'rainbow',
+    description: 'Send a message colored as a rainbow',
+    exe: (roomId, data, onSuccess) => {
+      const body = textToHtmlRainbow(data.trim());
+      if (body === '') return;
+      onSuccess(body, { msgType: 'm.text', autoMarkdown: false, isHtml: true });
     },
   },
   help: {
@@ -202,7 +219,9 @@ const commands = {
 
 function openHelpDialog() {
   openReusableDialog(
-    <Text variant="s1" weight="medium">Commands</Text>,
+    <Text variant="s1" weight="medium">
+      Commands
+    </Text>,
     () => (
       <div className="commands-dialog">
         {Object.keys(commands).map((cmdName) => (
@@ -213,7 +232,7 @@ function openHelpDialog() {
           />
         ))}
       </div>
-    ),
+    )
   );
 }
 
