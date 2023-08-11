@@ -345,7 +345,7 @@ function useEventArrive(roomTimeline, readUptoEvtStore, timelineScrollRef, event
       const isViewingLive = roomTimeline.isServingLiveTimeline() && limit.length >= tLength - 1;
       const isAttached = timelineScroll.bottom < SCROLL_TRIGGER_POS;
 
-      if (isViewingLive && isAttached && document.hasFocus()) {
+      if (isViewingLive && isAttached) {
         limit.setFrom(tLength - limit.maxEvents);
         trySendReadReceipt(event);
         setEvent(event);
