@@ -19,8 +19,7 @@
   "author": "Ajay Bura",
   "license": "AGPL-3.0-only",
   "dependencies": {
-    "@fontsource/inter": "4.5.14",
-    "@fontsource/roboto": "4.5.8",
+    "@fontsource/atkinson-hyperlegible": "5.0.8",
     "@khanacademy/simple-markdown": "0.9.2",
     "@matrix-org/olm": "3.2.14",
     "@tippyjs/react": "4.2.6",

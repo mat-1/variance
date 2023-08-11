@@ -185,8 +185,8 @@
   --fluid-slide-down: cubic-bezier(0.02, 0.82, 0.4, 0.96);
   --fluid-slide-up: cubic-bezier(0.13, 0.56, 0.25, 0.99);
 
-  --font-primary: 'Roboto', sans-serif;
-  --font-secondary: 'Roboto', sans-serif;
+  --font-primary: 'Atkinson Hyperlegible', sans-serif;
+  --font-secondary: 'Atkinson Hyperlegible', sans-serif;
 }
 
 .silver-theme {
@@ -282,8 +282,6 @@
 
   /* override normal font weight for dark mode */
   --fw-normal: 350;
-
-  --font-secondary: 'InterVariable', 'Roboto', sans-serif;
 }
 
 @mixin ayu-theme() {
