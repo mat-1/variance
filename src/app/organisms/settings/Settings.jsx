@@ -17,6 +17,7 @@ import {
   toggleShowRoomListAvatar,
   toggleShowYoutubeEmbedPlayer,
   toggleShowUrlPreview,
+  toggleReadReceipts,
 } from '../../../client/action/settings';
 import { usePermission } from '../../hooks/usePermission';
 
@@ -53,6 +54,10 @@ import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
 import CinnySVG from '../../../../public/res/svg/cinny.svg';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
+
+let capabilities = {
+  privateReadReceipts: false,
+};
 
 function AppearanceSection() {
   const [, updateState] = useState({});
@@ -319,6 +324,7 @@ function EmojiSection() {
 }
 
 function SecuritySection() {
+  const [, updateState] = useState({});
   return (
     <div className="settings-security">
       <div className="settings-security__card">
@@ -352,6 +358,33 @@ function SecuritySection() {
                 }
               </Text>
               <ImportE2ERoomKeys />
+            </>
+          }
+        />
+      </div>
+      <div className="settings-security__card">
+        <MenuHeader>Presence</MenuHeader>
+        <SettingTile
+          title="Send read receipts"
+          options={
+            <Toggle
+              /** Always allow to switch receipts on. */
+              disabled={!capabilities.privateReadReceipts && settings.sendReadReceipts}
+              isActive={settings.sendReadReceipts}
+              onToggle={() => {
+                toggleReadReceipts();
+                updateState({});
+              }}
+            />
+          }
+          content={
+            <>
+              <Text variant="b3">Let other people know what messages you read.</Text>
+              {!capabilities.privateReadReceipts && (
+                <Text variant="b3">
+                  Making your read receipts private requires a compatible homeserver.
+                </Text>
+              )}
             </>
           }
         />
@@ -541,9 +574,22 @@ function useWindowToggle(setSelectedTab) {
   return [isOpen, requestClose];
 }
 
+async function getCapabilities() {
+  const mx = initMatrix.matrixClient;
+  capabilities = {
+    privateReadReceipts: (
+      await Promise.all([
+        mx.doesServerSupportUnstableFeature('org.matrix.msc2285.stable'),
+        mx.isVersionSupported('v1.4'),
+      ])
+    ).some((res) => res === true),
+  };
+}
+
 function Settings() {
   const [selectedTab, setSelectedTab] = useState(tabItems[0]);
   const [isOpen, requestClose] = useWindowToggle(setSelectedTab);
+  useEffect(getCapabilities, []);
 
   const handleTabChange = (tabItem) => setSelectedTab(tabItem);
   const handleLogout = async () => {

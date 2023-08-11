@@ -72,3 +72,9 @@ export function toggleShowUrlPreview() {
     type: cons.actions.settings.TOGGLE_SHOW_URL_PREVIEW,
   });
 }
+
+export function toggleReadReceipts() {
+  appDispatcher.dispatch({
+    type: cons.actions.settings.TOGGLE_READ_RECEIPTS,
+  });
+}

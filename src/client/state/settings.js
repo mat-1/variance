@@ -35,6 +35,7 @@ class Settings extends EventEmitter {
     this.showRoomListAvatar = this.getShowRoomListAvatar();
     this.showYoutubeEmbedPlayer = this.getShowYoutubeEmbedPlayer();
     this.showUrlPreview = this.getShowUrlPreview();
+    this.sendReadReceipts = this.getSendReadReceipts();
 
     this.isTouchScreenDevice =
       'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
@@ -219,6 +220,15 @@ class Settings extends EventEmitter {
     return settings.showUrlPreview;
   }
 
+  getSendReadReceipts() {
+    if (typeof this.sendReadReceipts === 'boolean') return this.sendReadReceipts;
+
+    const settings = getSettings();
+    if (settings === null) return true;
+    if (typeof settings.sendReadReceipts === 'undefined') return true;
+    return settings.sendReadReceipts;
+  }
+
   setter(action) {
     const actions = {
       [cons.actions.settings.TOGGLE_SYSTEM_THEME]: () => {
@@ -276,6 +286,11 @@ class Settings extends EventEmitter {
       },
       [cons.actions.settings.TOGGLE_SHOW_URL_PREVIEW]: () => {
         this.toggleShowUrlPreview();
+      },
+      [cons.actions.settings.TOGGLE_READ_RECEIPTS]: () => {
+        this.sendReadReceipts = !this.sendReadReceipts;
+        setSettings('sendReadReceipts', this.sendReadReceipts);
+        this.emit(cons.events.settings.READ_RECEIPTS_TOGGLED, this.sendReadReceipts);
       },
     };
 
