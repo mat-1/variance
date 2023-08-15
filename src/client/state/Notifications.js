@@ -28,10 +28,7 @@ function isMutedRule(rule) {
 }
 
 function findMutedRule(overrideRules, roomId) {
-  return overrideRules.find((rule) => (
-    rule.rule_id === roomId
-    && isMutedRule(rule)
-  ));
+  return overrideRules.find((rule) => rule.rule_id === roomId && isMutedRule(rule));
 }
 
 class Notifications extends EventEmitter {
@@ -252,7 +249,12 @@ class Notifications extends EventEmitter {
       const icon = await renderAvatar({
         text: mEvent.sender.name,
         bgColor: cssColorMXID(mEvent.getSender()),
-        imageSrc: mEvent.sender?.getAvatarUrl(this.matrixClient.baseUrl, iconSize, iconSize, 'crop'),
+        imageSrc: mEvent.sender?.getAvatarUrl(
+          this.matrixClient.baseUrl,
+          iconSize,
+          iconSize,
+          'crop'
+        ),
         size: iconSize,
         borderRadius: 8,
         scale: 8,
@@ -383,17 +385,19 @@ class Notifications extends EventEmitter {
     });
 
     this.matrixClient.on('Room.receipt', (mEvent, room) => {
-      if (mEvent.getType() === 'm.receipt') {
-        if (room.isSpaceRoom()) return;
-        const content = mEvent.getContent();
-        const readedEventId = Object.keys(content)[0];
-        const readerUserId = Object.keys(content[readedEventId]['m.read'])[0];
-        if (readerUserId !== this.matrixClient.getUserId()) return;
+      if (mEvent.getType() !== 'm.receipt' || room.isSpaceRoom()) return;
+      const content = mEvent.getContent();
+      const userId = this.matrixClient.getUserId();
 
-        this.deleteNoti(room.roomId);
-
-        this._deletePopupRoomNotis(room.roomId);
-      }
+      Object.keys(content).forEach((eventId) => {
+        Object.entries(content[eventId]).forEach(([receiptType, receipt]) => {
+          if (!cons.supportReceiptTypes.includes(receiptType)) return;
+          if (Object.keys(receipt || {}).includes(userId)) {
+            this.deleteNoti(room.roomId);
+            this._deletePopupRoomNotis(room.roomId);
+          }
+        });
+      });
     });
 
     this.matrixClient.on('Room.myMembership', (room, membership) => {
