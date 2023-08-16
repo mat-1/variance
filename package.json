@@ -7,7 +7,7 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "start": "vite",
+    "dev": "vite",
     "build": "vite build",
     "lint": "yarn check:eslint && yarn check:prettier",
     "check:eslint": "eslint src/*",

@@ -4,10 +4,10 @@ FROM node:18.12.1-alpine3.15 as builder
 WORKDIR /src
 
 COPY .npmrc package.json package-lock.json /src/
-RUN npm ci
+RUN yarn ci
 COPY . /src/
 ENV NODE_OPTIONS=--max_old_space_size=4096
-RUN npm run build
+RUN yarn build
 
 
 ## App

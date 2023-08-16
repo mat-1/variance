@@ -90,13 +90,13 @@ between multiple Node.js versions based on the needs of different projects you'r
 
 Execute the following commands to start a development server:
 ```sh
-npm ci # Installs all dependencies
-npm start # Serve a development version
+yarn # Installs all dependencies
+yarn dev # Serve a development version
 ```
 
 To build the app:
 ```sh
-npm run build # Compiles the app into the dist/ directory
+yarn build # Compiles the app into the dist/ directory
 ```
 
 ### Running with Docker
