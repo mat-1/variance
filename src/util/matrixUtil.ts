@@ -9,22 +9,37 @@ import SpaceLockIC from '../../public/res/ic/outlined/space-lock.svg';
 
 const WELL_KNOWN_URI = '/.well-known/matrix/client';
 
-export async function getBaseUrl(servername) {
+export interface WellKnown {
+  'm.homeserver': {
+    base_url: string;
+  };
+  'org.matrix.msc3575.proxy'?: {
+    url: string;
+  };
+}
+
+export async function getWellKnown(servername: string): Promise<WellKnown> {
   let protocol = 'https://';
   if (servername.match(/^https?:\/\//) !== null) protocol = '';
   const serverDiscoveryUrl = `${protocol}${servername}${WELL_KNOWN_URI}`;
   try {
-    const result = await (await fetch(serverDiscoveryUrl, { method: 'GET' })).json();
+    const result: WellKnown = await fetch(serverDiscoveryUrl, { method: 'GET' }).then((res) =>
+      res.json()
+    );
 
-    const baseUrl = result?.['m.homeserver']?.base_url;
+    const baseUrl = result['m.homeserver'].base_url;
     if (baseUrl === undefined) throw new Error();
-    return baseUrl;
+    return result;
   } catch (e) {
-    return `${protocol}${servername}`;
+    return {
+      'm.homeserver': {
+        base_url: `${protocol}${servername}`,
+      },
+    };
   }
 }
 
-export function getUsername(userId) {
+export function getUsername(userId: string): string {
   const mx = initMatrix.matrixClient;
   const user = mx.getUser(userId);
   if (user === null) return userId;
@@ -104,17 +119,21 @@ export function hasDMWith(userId) {
 }
 
 export function joinRuleToIconSrc(joinRule, isSpace) {
-  return ({
-    restricted: () => (isSpace ? SpaceIC : HashIC),
-    knock: () => (isSpace ? SpaceLockIC : HashLockIC),
-    invite: () => (isSpace ? SpaceLockIC : HashLockIC),
-    public: () => (isSpace ? SpaceGlobeIC : HashGlobeIC),
-  }[joinRule]?.() || null);
+  return (
+    {
+      restricted: () => (isSpace ? SpaceIC : HashIC),
+      knock: () => (isSpace ? SpaceLockIC : HashLockIC),
+      invite: () => (isSpace ? SpaceLockIC : HashLockIC),
+      public: () => (isSpace ? SpaceGlobeIC : HashGlobeIC),
+    }[joinRule]?.() || null
+  );
 }
 
 // NOTE: it gives userId with minimum power level 50;
 function getHighestPowerUserId(room) {
-  const userIdToPower = room.currentState.getStateEvents('m.room.power_levels', '')?.getContent().users;
+  const userIdToPower = room.currentState
+    .getStateEvents('m.room.power_levels', '')
+    ?.getContent().users;
   let powerUserId = null;
   if (!userIdToPower) return powerUserId;
 
@@ -163,7 +182,7 @@ export function genRoomVia(room) {
   }
   const serverToPop = getServerToPopulation(room);
   const sortedServers = Object.keys(serverToPop).sort(
-    (svrA, svrB) => serverToPop[svrB] - serverToPop[svrA],
+    (svrA, svrB) => serverToPop[svrB] - serverToPop[svrA]
   );
   const mostPop3 = sortedServers.slice(0, 3);
   if (via.length === 0) return mostPop3;
@@ -214,8 +233,9 @@ export async function hasDevices(userId) {
   const mx = initMatrix.matrixClient;
   try {
     const usersDeviceMap = await mx.downloadKeys([userId, mx.getUserId()]);
-    return Object.values(usersDeviceMap)
-      .every((userDevices) => (Object.keys(userDevices).length > 0));
+    return Object.values(usersDeviceMap).every(
+      (userDevices) => Object.keys(userDevices).length > 0
+    );
   } catch (e) {
     console.error("Error determining if it's possible to encrypt to all users: ", e);
     return false;

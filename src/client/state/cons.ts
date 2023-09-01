@@ -5,6 +5,7 @@ const cons = {
     DEVICE_ID: 'cinny_device_id',
     USER_ID: 'cinny_user_id',
     BASE_URL: 'cinny_hs_base_url',
+    SLIDING_SYNC_PROXY_URL: 'cinny_sliding_sync_proxy_url',
   },
   DEVICE_DISPLAY_NAME: 'Cinny Web',
   IN_CINNY_SPACES: 'in.cinny.spaces',

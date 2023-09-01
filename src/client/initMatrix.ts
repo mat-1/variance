@@ -3,6 +3,7 @@ import * as sdk from 'matrix-js-sdk';
 import Olm from '@matrix-org/olm';
 // import { logger } from 'matrix-js-sdk/lib/logger';
 
+import { SlidingSync } from 'matrix-js-sdk/lib/sliding-sync';
 import { secret } from './state/auth';
 import RoomList from './state/RoomList';
 import AccountData from './state/AccountData';
@@ -62,6 +63,7 @@ class InitMatrix extends EventEmitter {
 
     await this.matrixClient.startClient({
       lazyLoadMembers: true,
+      // slidingSync: new SlidingSync(),
     });
     this.matrixClient.setGlobalErrorOnUnknownDevices(false);
   }

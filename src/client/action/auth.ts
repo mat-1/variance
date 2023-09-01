@@ -1,11 +1,19 @@
 import * as sdk from 'matrix-js-sdk';
 import cons from '../state/cons';
+import { WellKnown, getWellKnown } from '../../util/matrixUtil';
 
-function updateLocalStore(accessToken, deviceId, userId, baseUrl) {
+function updateLocalStore(
+  accessToken: string,
+  deviceId: string,
+  userId: string,
+  baseUrl: string,
+  slidingSyncProxyUrl?: string,
+) {
   localStorage.setItem(cons.secretKey.ACCESS_TOKEN, accessToken);
   localStorage.setItem(cons.secretKey.DEVICE_ID, deviceId);
   localStorage.setItem(cons.secretKey.USER_ID, userId);
   localStorage.setItem(cons.secretKey.BASE_URL, baseUrl);
+  localStorage.setItem(cons.secretKey.SLIDING_SYNC_PROXY_URL, slidingSyncProxyUrl);
 }
 
 function createTemporaryClient(baseUrl) {
@@ -18,7 +26,7 @@ async function startSsoLogin(baseUrl, type, idpId) {
   window.location.href = client.getSsoLoginUrl(window.location.href, type, idpId);
 }
 
-async function login(baseUrl, username, email, password) {
+async function login(baseUrl: string, username: string, email: string, password: string) {
   const identifier = {};
   if (username) {
     identifier.type = 'm.id.user';
@@ -36,8 +44,13 @@ async function login(baseUrl, username, email, password) {
     initial_device_display_name: cons.DEVICE_DISPLAY_NAME,
   });
 
-  const myBaseUrl = res?.well_known?.['m.homeserver']?.base_url || client.baseUrl;
-  updateLocalStore(res.access_token, res.device_id, res.user_id, myBaseUrl);
+  // the well_known from the response doesn't include the sliding sync proxy, so we have to fetch
+  // wellKnown again
+  // const wellKnown: WellKnown | undefined = res?.well_known;
+  const wellKnown: WellKnown = await getWellKnown(baseUrl);
+  const myBaseUrl = wellKnown?.['m.homeserver']?.base_url || client.baseUrl;
+  const mySlidingSyncProxyUrl = wellKnown?.['org.matrix.msc3575.proxy'].url;
+  updateLocalStore(res.access_token, res.device_id, res.user_id, myBaseUrl, mySlidingSyncProxyUrl);
 }
 
 async function loginWithToken(baseUrl, token) {
@@ -57,7 +70,10 @@ async function verifyEmail(baseUrl, email, client_secret, send_attempt, next_lin
   const res = await fetch(`${baseUrl}/_matrix/client/r0/register/email/requestToken`, {
     method: 'POST',
     body: JSON.stringify({
-      email, client_secret, send_attempt, next_link,
+      email,
+      client_secret,
+      send_attempt,
+      next_link,
     }),
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
@@ -68,9 +84,7 @@ async function verifyEmail(baseUrl, email, client_secret, send_attempt, next_lin
   return data;
 }
 
-async function completeRegisterStage(
-  baseUrl, username, password, auth,
-) {
+async function completeRegisterStage(baseUrl, username, password, auth) {
   const tempClient = createTemporaryClient(baseUrl);
 
   try {
@@ -98,7 +112,10 @@ async function completeRegisterStage(
 }
 
 export {
-  createTemporaryClient, login, verifyEmail,
-  loginWithToken, startSsoLogin,
+  createTemporaryClient,
+  login,
+  verifyEmail,
+  loginWithToken,
+  startSsoLogin,
   completeRegisterStage,
 };
