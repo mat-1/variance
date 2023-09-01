@@ -82,7 +82,7 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     if (myRoomId !== roomId) return;
     const progressPer = Math.round((loaded * 100) / total);
     uploadProgressRef.current.textContent = `Uploading: ${bytesToSize(loaded)}/${bytesToSize(
-      total
+      total,
     )} (${progressPer}%)`;
     inputBaseRef.current.style.backgroundImage = `linear-gradient(90deg, var(--bg-surface-hover) ${progressPer}%, var(--bg-surface-low) ${progressPer}%)`;
   }
@@ -133,7 +133,7 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     textAreaRef.current.value = replaceCmdWith(
       msg,
       cmdCursorPos,
-      typeof cmdData?.replace !== 'undefined' ? cmdData.replace : ''
+      typeof cmdData?.replace !== 'undefined' ? cmdData.replace : '',
     );
     deactivateCmd();
   }
@@ -414,7 +414,7 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
                       closeMenu();
                     }}
                   />
-                )
+                ),
               );
             }}
             tooltip="Sticker"

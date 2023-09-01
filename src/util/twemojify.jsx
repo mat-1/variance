@@ -2,6 +2,7 @@
 import React, { lazy, Suspense } from 'react';
 
 import linkifyHtml from 'linkify-html';
+import * as linkify from 'linkifyjs';
 import parse from 'html-react-parser';
 import twemoji from 'twemoji';
 import { sanitizeText } from './sanitize';
@@ -28,6 +29,9 @@ const mathOptions = {
     return null;
   },
 };
+
+linkify.registerCustomProtocol('gopher');
+linkify.registerCustomProtocol('gemini');
 
 /**
  * @param {string} text - text to twemojify

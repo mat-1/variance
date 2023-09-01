@@ -44,7 +44,16 @@ const permittedHtmlTags = [
   'summary',
 ];
 
-const urlSchemes = ['https', 'http', 'ftp', 'mailto', 'magnet'];
+const urlSchemes = [
+  'https',
+  'http',
+  'ftp',
+  'mailto',
+  'magnet',
+  // these aren't mentioned in matrix spec
+  'gemini',
+  'gopher',
+];
 
 const permittedTagToAttributes = {
   font: ['style', 'data-mx-bg-color', 'data-mx-color', 'color'],
