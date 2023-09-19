@@ -1,12 +1,12 @@
 /* eslint-disable import/prefer-default-export */
 import { useEffect, useRef } from 'react';
 
-export function useStore(...args) {
+export function useStore<S>(...args: unknown[]) {
   const itemRef = useRef(null);
 
-  const getItem = () => itemRef.current;
+  const getItem = (): S => itemRef.current;
 
-  const setItem = (event) => {
+  const setItem = (event: S): S => {
     itemRef.current = event;
     return itemRef.current;
   };
