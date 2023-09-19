@@ -3,7 +3,12 @@ import * as sdk from 'matrix-js-sdk';
 import Olm from '@matrix-org/olm';
 // import { logger } from 'matrix-js-sdk/lib/logger';
 
-import { SlidingSync } from 'matrix-js-sdk/lib/sliding-sync';
+import {
+  MSC3575List,
+  MSC3575_STATE_KEY_ME,
+  MSC3575_WILDCARD,
+  SlidingSync,
+} from 'matrix-js-sdk/lib/sliding-sync';
 import { secret } from './state/auth';
 import RoomList from './state/RoomList';
 import AccountData from './state/AccountData';
@@ -18,6 +23,8 @@ global.Olm = Olm;
 
 class InitMatrix extends EventEmitter {
   matrixClient: sdk.MatrixClient;
+
+  slidingSync: SlidingSync;
 
   roomList: RoomList;
 
@@ -61,10 +68,60 @@ class InitMatrix extends EventEmitter {
 
     await this.matrixClient.initCrypto();
 
+    this.slidingSync = new SlidingSync(
+      secret.slidingSyncProxyUrl,
+      new Map(),
+      {
+        required_state: [
+          [MSC3575_WILDCARD, MSC3575_WILDCARD], // all events
+        ],
+        timeline_limit: 50,
+        // missing required_state which will change depending on the kind of room
+        include_old_rooms: {
+          timeline_limit: 0,
+          required_state: [
+            // state needed to handle space navigation and tombstone chains
+            [sdk.EventType.RoomCreate, ''],
+            [sdk.EventType.RoomTombstone, ''],
+            [sdk.EventType.SpaceChild, MSC3575_WILDCARD],
+            [sdk.EventType.SpaceParent, MSC3575_WILDCARD],
+            [sdk.EventType.RoomMember, MSC3575_STATE_KEY_ME],
+          ],
+        },
+      },
+      this.matrixClient,
+      // timeout
+      20 * 1000,
+    );
     await this.matrixClient.startClient({
       lazyLoadMembers: true,
-      // slidingSync: new SlidingSync(),
+      slidingSync: this.slidingSync,
     });
+    this.slidingSync.addCustomSubscription('room', {
+      timeline_limit: 50,
+      required_state: [[MSC3575_WILDCARD, MSC3575_WILDCARD]],
+    });
+    this.slidingSync.setList('spaces', {
+      ranges: [[0, 20]],
+      // sort: ['by_name'],
+      slow_get_all_rooms: true,
+      timeline_limit: 0,
+      required_state: [
+        [sdk.EventType.RoomJoinRules, ''], // the public icon on the room list
+        [sdk.EventType.RoomAvatar, ''], // any room avatar
+        [sdk.EventType.RoomTombstone, ''], // lets JS SDK hide rooms which are dead
+        [sdk.EventType.RoomEncryption, ''], // lets rooms be configured for E2EE correctly
+        [sdk.EventType.RoomCreate, ''], // for isSpaceRoom checks
+        [sdk.EventType.SpaceChild, MSC3575_WILDCARD], // all space children
+        [sdk.EventType.SpaceParent, MSC3575_WILDCARD], // all space parents
+        [sdk.EventType.RoomMember, MSC3575_STATE_KEY_ME], // lets the client calculate that we are in fact in the room
+      ],
+      sort: ['by_notification_level', 'by_recency'],
+      // filters: {
+      //   room_types: ['m.space'],
+      // },
+    });
+
     this.matrixClient.setGlobalErrorOnUnknownDevices(false);
   }
 
@@ -134,6 +191,13 @@ class InitMatrix extends EventEmitter {
     this.matrixClient.store.deleteAllData().then(() => {
       window.location.reload();
     });
+  }
+
+  async setVisibleRoom(roomId: string) {
+    console.log('setVisibleRoom', roomId);
+    const subscriptions = new Set<string>();
+    subscriptions.add(roomId);
+    await this.slidingSync.modifyRoomSubscriptions(subscriptions);
   }
 }
 

@@ -1,4 +1,11 @@
 import EventEmitter from 'events';
+import {
+  Direction,
+  type EventTimeline,
+  type MatrixClient,
+  type MatrixEvent,
+  type Room,
+} from 'matrix-js-sdk';
 import initMatrix from '../initMatrix';
 import cons from './cons';
 
@@ -43,7 +50,7 @@ function addToMap(myMap, mEvent) {
   return mEvent;
 }
 
-function getFirstLinkedTimeline(timeline) {
+function getFirstLinkedTimeline(timeline: EventTimeline) {
   let tm = timeline;
   while (tm.prevTimeline) {
     tm = tm.prevTimeline;
@@ -77,6 +84,30 @@ function isTimelineLinked(tm1, tm2) {
 }
 
 class RoomTimeline extends EventEmitter {
+  timeline: MatrixEvent[];
+
+  editedTimeline: Map<string, MatrixEvent[]>;
+
+  reactionTimeline: Map<string, MatrixEvent[]>;
+
+  typingMembers: Set<string>;
+
+  roomId: string;
+
+  matrixClient: MatrixClient;
+
+  room: Room;
+
+  liveTimeline: EventTimeline;
+
+  activeTimeline: EventTimeline;
+
+  isOngoingPagination: boolean;
+
+  ongoingDecryptionCount: number;
+
+  initialized: boolean;
+
   constructor(roomId) {
     super();
     // These are local timelines
@@ -141,7 +172,7 @@ class RoomTimeline extends EventEmitter {
     this.timeline.push(mEvent);
   }
 
-  _populateAllLinkedEvents(timeline) {
+  _populateAllLinkedEvents(timeline: EventTimeline) {
     const firstTimeline = getFirstLinkedTimeline(timeline);
     iterateLinkedTimelines(firstTimeline, false, (tm) => {
       tm.getEvents().forEach((mEvent) => this.addToTimeline(mEvent));
@@ -154,6 +185,8 @@ class RoomTimeline extends EventEmitter {
   }
 
   async _reset() {
+    console.trace('_reset');
+
     if (this.isEncrypted()) await this.decryptAllEventsOfTimeline(this.activeTimeline);
     this._populateTimelines();
     if (!this.initialized) {
@@ -169,10 +202,11 @@ class RoomTimeline extends EventEmitter {
     return true;
   }
 
-  async loadEventTimeline(eventId) {
+  async loadEventTimeline(eventId: string) {
     // we use first unfiltered EventTimelineSet for room pagination.
     const timelineSet = this.getUnfilteredTimelineSet();
     try {
+      console.log('loadEventTimeline', timelineSet, eventId);
       const eventTimeline = await this.matrixClient.getEventTimeline(timelineSet, eventId);
       this.activeTimeline = eventTimeline;
       await this._reset();
@@ -183,17 +217,22 @@ class RoomTimeline extends EventEmitter {
     }
   }
 
-  async paginateTimeline(backwards = false, limit = 30) {
+  async paginateTimeline(backwards: boolean = false, limit: number = 30) {
+    console.log('paginateTimeline');
+
     if (this.initialized === false) return false;
     if (this.isOngoingPagination) return false;
 
     this.isOngoingPagination = true;
 
-    const timelineToPaginate = backwards
+    const timelineToPaginate: EventTimeline = backwards
       ? getFirstLinkedTimeline(this.activeTimeline)
       : getLastLinkedTimeline(this.activeTimeline);
 
-    if (timelineToPaginate.getPaginationToken(backwards ? 'b' : 'f') === null) {
+    if (
+      timelineToPaginate.getPaginationToken(backwards ? Direction.Backward : Direction.Forward) ===
+      null
+    ) {
       this.emit(cons.events.roomTimeline.PAGINATED, backwards, 0);
       this.isOngoingPagination = false;
       return false;
@@ -217,7 +256,7 @@ class RoomTimeline extends EventEmitter {
     }
   }
 
-  decryptAllEventsOfTimeline(eventTimeline) {
+  decryptAllEventsOfTimeline(eventTimeline: EventTimeline) {
     const decryptionPromises = eventTimeline
       .getEvents()
       .filter((event) => event.isEncrypted() && !event.clearEvent)
@@ -314,6 +353,7 @@ class RoomTimeline extends EventEmitter {
 
   _listenEvents() {
     this._listenRoomTimeline = (event, room, toStartOfTimeline, removed, data) => {
+      console.log('Room.timeline', event, room, toStartOfTimeline, removed, data);
       if (room.roomId !== this.roomId) return;
       if (this.isOngoingPagination) return;
 

@@ -26,6 +26,7 @@ import { useForceUpdate } from '../../hooks/useForceUpdate';
 import { parseTimelineChange } from './common';
 import TimelineScroll from './TimelineScroll';
 import EventLimit from './EventLimit';
+import RoomTimeline from '../../../client/state/RoomTimeline';
 
 const PAG_LIMIT = 30;
 const MAX_MSG_DIFF_MINUTES = 5;
@@ -148,10 +149,18 @@ function renderEvent(roomTimeline, mEvent, prevMEvent, isFocus, isEdit, setEdit,
   );
 }
 
-function useTimeline(roomTimeline, eventId, readUptoEvtStore, eventLimitRef) {
+function useTimeline(
+  roomTimeline: RoomTimeline,
+  eventId: string | undefined,
+  readUptoEvtStore,
+  eventLimitRef,
+) {
+  console.log('usetimeline');
+  initMatrix.setVisibleRoom(roomTimeline.roomId);
+
   const [timelineInfo, setTimelineInfo] = useState(null);
 
-  const setEventTimeline = async (eId) => {
+  const setEventTimeline = async (eId: string | undefined) => {
     if (typeof eId === 'string') {
       const isLoaded = await roomTimeline.loadEventTimeline(eId);
       if (isLoaded) return;
@@ -207,7 +216,7 @@ function usePaginate(
   readUptoEvtStore,
   forceUpdateLimit,
   timelineScrollRef,
-  eventLimitRef
+  eventLimitRef,
 ) {
   const [info, setInfo] = useState(null);
 
@@ -224,7 +233,7 @@ function usePaginate(
         setInfo({
           backwards,
           loaded,
-        })
+        }),
       );
     };
     roomTimeline.on(cons.events.roomTimeline.PAGINATED, handlePaginatedFromServer);
@@ -271,7 +280,7 @@ function useHandleScroll(
   readUptoEvtStore,
   forceUpdateLimit,
   timelineScrollRef,
-  eventLimitRef
+  eventLimitRef,
 ) {
   const handleScroll = useCallback(() => {
     const timelineScroll = timelineScrollRef.current;
@@ -380,7 +389,13 @@ function useEventArrive(roomTimeline, readUptoEvtStore, timelineScrollRef, event
 
 let jumpToItemIndex = -1;
 
-function RoomViewContent({ eventId, roomTimeline }) {
+function RoomViewContent({
+  eventId,
+  roomTimeline,
+}: {
+  eventId: string;
+  roomTimeline: RoomTimeline;
+}) {
   const [throttle] = useState(new Throttle());
 
   const timelineSVRef = useRef(null);
@@ -398,7 +413,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
     readUptoEvtStore,
     forceUpdateLimit,
     timelineScrollRef,
-    eventLimitRef
+    eventLimitRef,
   );
   const [handleScroll, handleScrollToLive] = useHandleScroll(
     roomTimeline,
@@ -406,7 +421,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
     readUptoEvtStore,
     forceUpdateLimit,
     timelineScrollRef,
-    eventLimitRef
+    eventLimitRef,
   );
   const newEvent = useEventArrive(roomTimeline, readUptoEvtStore, timelineScrollRef, eventLimitRef);
 
@@ -503,7 +518,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
         }
       }
     },
-    [roomTimeline]
+    [roomTimeline],
   );
 
   useEffect(() => {
@@ -545,7 +560,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
       if (i === 0 && !roomTimeline.canPaginateBackward()) {
         if (mEvent.getType() === 'm.room.create') {
           tl.push(
-            <RoomIntroContainer key={mEvent.getId()} event={mEvent} timeline={roomTimeline} />
+            <RoomIntroContainer key={mEvent.getId()} event={mEvent} timeline={roomTimeline} />,
           );
           itemCountIndex += 1;
           // eslint-disable-next-line no-continue
@@ -575,7 +590,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
           <Divider
             key={`divider-${mEvent.getId()}`}
             text={`${dateFormat(mEvent.getDate(), 'mmmm dd, yyyy')}`}
-          />
+          />,
         );
         itemCountIndex += 1;
       }
@@ -595,8 +610,8 @@ function RoomViewContent({ eventId, roomTimeline }) {
           isFocus,
           editEventId === mEvent.getId(),
           setEditEventId,
-          cancelEdit
-        )
+          cancelEdit,
+        ),
       );
       itemCountIndex += 1;
     }

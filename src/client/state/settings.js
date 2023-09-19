@@ -167,8 +167,8 @@ class Settings extends EventEmitter {
     if (typeof this.isNotificationSounds === 'boolean') return this.isNotificationSounds;
 
     const settings = getSettings();
-    if (settings === null) return true;
-    if (typeof settings.isNotificationSounds === 'undefined') return true;
+    if (settings === null) return false;
+    if (typeof settings.isNotificationSounds === 'undefined') return false;
     return settings.isNotificationSounds;
   }
 

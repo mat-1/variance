@@ -11,6 +11,7 @@ const secret = {
   deviceId: getSecret(cons.secretKey.DEVICE_ID),
   userId: getSecret(cons.secretKey.USER_ID),
   baseUrl: getSecret(cons.secretKey.BASE_URL),
+  slidingSyncProxyUrl: getSecret(cons.secretKey.SLIDING_SYNC_PROXY_URL),
 };
 
 export { isAuthenticated, secret };
