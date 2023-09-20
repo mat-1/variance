@@ -6,6 +6,7 @@ import * as linkify from 'linkifyjs';
 import parse from 'html-react-parser';
 import twemoji from 'twemoji';
 import { sanitizeText } from './sanitize';
+import { clearUrlsFromHtml } from './clear-urls/clearUrls';
 
 export const TWEMOJI_BASE_URL = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/';
 
@@ -34,14 +35,20 @@ linkify.registerCustomProtocol('gopher');
 linkify.registerCustomProtocol('gemini');
 
 /**
- * @param {string} text - text to twemojify
- * @param {object|undefined} opts - options for tweomoji.parse
- * @param {boolean} [linkify=false] - convert links to html tags (default: false)
- * @param {boolean} [sanitize=true] - sanitize html text (default: true)
- * @param {boolean} [maths=false] - render maths (default: false)
+ * @param text text to twemojify
+ * @param opts options for tweomoji.parse
+ * @param shouldLinkify convert links to html tags (default: false)
+ * @param sanitize sanitize html text (default: true)
+ * @param maths render maths (default: false)
  * @returns React component
  */
-export function twemojify(text, opts, linkify = false, sanitize = true, maths = false) {
+export function twemojify(
+  text: string,
+  opts: { base?: string } | undefined,
+  shouldLinkify: boolean = false,
+  sanitize: boolean = true,
+  maths: boolean = false,
+): React.ReactNode {
   if (typeof text !== 'string') return text;
   let content = text;
   const options = opts ?? { base: TWEMOJI_BASE_URL };
@@ -54,11 +61,14 @@ export function twemojify(text, opts, linkify = false, sanitize = true, maths = 
   }
 
   content = twemoji.parse(content, options);
-  if (linkify) {
+  if (shouldLinkify) {
     content = linkifyHtml(content, {
       target: '_blank',
       rel: 'noreferrer noopener',
     });
   }
+
+  content = clearUrlsFromHtml(content);
+
   return parse(content, maths ? mathOptions : null);
 }

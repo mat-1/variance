@@ -7,6 +7,7 @@ import { sanitizeText } from '../../util/sanitize';
 import cons from './cons';
 import settings from './settings';
 import { markdown, plain, html } from '../../util/markdown';
+import { clearUrlsFromHtml, clearUrlsFromText } from '../../util/clear-urls/clearUrls';
 
 const blurhashField = 'xyz.amorgan.blurhash';
 
@@ -188,7 +189,7 @@ class RoomsInput extends EventEmitter {
     return this.roomIdToInput.get(roomId)?.isSending || false;
   }
 
-  getContent(roomId, options, message, reply, edit) {
+  getContent(roomId, options, message: string, reply, edit) {
     const msgType = options?.msgType || 'm.text';
     const autoMarkdown = options?.autoMarkdown ?? true;
     const isHtml = options?.isHtml ?? false;
@@ -212,13 +213,19 @@ class RoomsInput extends EventEmitter {
     }
 
     const body = output(message, { userNames, emojis });
+
     if (isHtml) {
       // the html parser might remove stuff we want, so we need to re-add it
       body.onlyPlain = false;
       body.html = message;
     }
 
-    const content = {
+    const content: {
+      body: string;
+      msgtype: string;
+      format?: string;
+      formatted_body?: string;
+    } = {
       body: body.plain,
       msgtype: msgType,
     };
@@ -226,6 +233,11 @@ class RoomsInput extends EventEmitter {
     if (!body.onlyPlain || reply) {
       content.format = 'org.matrix.custom.html';
       content.formatted_body = body.html;
+    }
+
+    content.body = clearUrlsFromText(content.body);
+    if (content.formatted_body) {
+      content.formatted_body = clearUrlsFromHtml(content.formatted_body);
     }
 
     if (edit) {
@@ -268,10 +280,10 @@ class RoomsInput extends EventEmitter {
       content.body = `> <${reply.userId}> ${reply.body.replace(/\n/g, '\n> ')}\n\n${content.body}`;
 
       const replyToLink = `<a href="https://matrix.to/#/${encodeURIComponent(
-        roomId
+        roomId,
       )}/${encodeURIComponent(reply.eventId)}">In reply to</a>`;
       const userLink = `<a href="https://matrix.to/#/${encodeURIComponent(
-        reply.userId
+        reply.userId,
       )}">${sanitizeText(reply.userId)}</a>`;
       const fallback = `<mx-reply><blockquote>${replyToLink}${userLink}<br />${
         reply.formattedBody || sanitizeText(reply.body)
@@ -361,7 +373,7 @@ class RoomsInput extends EventEmitter {
           video,
           video.videoWidth,
           video.videoHeight,
-          'image/jpeg'
+          'image/jpeg',
         );
         const thumbnailUploadData = await this.uploadFile(roomId, thumbnailData.thumbnail);
         info.thumbnail_info = thumbnailData.info;
@@ -447,7 +459,7 @@ class RoomsInput extends EventEmitter {
       { msgType: mEvent.getWireContent().msgtype },
       editedBody,
       null,
-      mEvent
+      mEvent,
     );
     this.matrixClient.sendMessage(roomId, content);
   }

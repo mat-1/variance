@@ -53,6 +53,8 @@ import { confirmDialog } from '../confirm-dialog/ConfirmDialog';
 import { getBlobSafeMimeType } from '../../../util/mimetypes';
 import { html, plain } from '../../../util/markdown';
 import { Embed } from '../media/Media';
+import { MatrixEvent } from 'matrix-js-sdk';
+import RoomTimeline from '../../../client/state/RoomTimeline';
 
 function PlaceholderMessage() {
   return (
@@ -218,7 +220,7 @@ const MessageBody = React.memo(
           undefined,
           true,
           false,
-          true
+          true,
         );
       } catch {
         console.error('Malformed custom html: ', body);
@@ -248,7 +250,7 @@ const MessageBody = React.memo(
         content.every(
           (element) =>
             (typeof element === 'object' && element.type === 'img') ||
-            (typeof element === 'string' && /^[\s\ufe0f]*$/g.test(element))
+            (typeof element === 'string' && /^[\s\ufe0f]*$/g.test(element)),
         )
       ) {
         emojiOnly = true;
@@ -279,7 +281,7 @@ const MessageBody = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 MessageBody.defaultProps = {
   isCustomHTML: false,
@@ -597,7 +599,7 @@ const MessageOptions = React.memo(({ roomTimeline, mEvent, edit, reply }) => {
                       'Delete message',
                       'Are you sure that you want to delete this message?',
                       'Delete',
-                      'danger'
+                      'danger',
                     );
                     if (!isConfirmed) return;
                     redactEvent(roomId, mEvent.getId());
@@ -743,6 +745,15 @@ function Message({
   isEdit,
   setEdit,
   cancelEdit,
+}: {
+  mEvent: MatrixEvent;
+  isBodyOnly?: boolean;
+  roomTimeline?: RoomTimeline;
+  focus?: boolean;
+  fullTime?: boolean;
+  isEdit?: boolean;
+  setEdit?: (eventId: string) => void;
+  cancelEdit?: () => void;
 }) {
   const roomId = mEvent.getRoomId();
   const { editedTimeline, reactionTimeline } = roomTimeline ?? {};
@@ -769,10 +780,10 @@ function Message({
 
   const edit = useCallback(() => {
     setEdit(eventId);
-  }, []);
+  }, [setEdit, eventId]);
   const reply = useCallback(() => {
     replyTo(senderId, mEvent.getId(), body, customHTML);
-  }, [body, customHTML]);
+  }, [body, customHTML, mEvent, senderId]);
 
   if (msgType === 'm.emote') className.push('message--type-emote');
 
