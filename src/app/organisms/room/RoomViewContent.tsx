@@ -477,23 +477,20 @@ function RoomViewContent({ eventId, roomTimeline }) {
   }, [newEvent]);
 
   const listenKeyboard = useCallback(
-    (event: KeyboardEvent) => {
-      console.log(event.target, event.target.classList);
-      if (event.ctrlKey || event.altKey || event.metaKey) return;
-      if (event.key !== 'ArrowUp') return;
-      console.log('1');
+    (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key !== 'ArrowUp') return;
       if (navigation.isRawModalVisible) return;
 
-      console.log('2');
-      if (!event.target.classList.contains('markdown-input__editable')) return;
-      if (!event.target.classList.contains('empty')) return;
-
-      console.log('4');
+      if (!e.target.classList.contains('markdown-input__editable')) return;
+      if (!e.target.classList.contains('empty')) return;
 
       const { timeline: tl, activeTimeline, liveTimeline, matrixClient: mx } = roomTimeline;
       const limit = eventLimitRef.current;
       if (activeTimeline !== liveTimeline) return;
       if (tl.length > limit.length) return;
+
+      e.preventDefault();
 
       const mTypes = ['m.text'];
       for (let i = tl.length - 1; i >= 0; i -= 1) {

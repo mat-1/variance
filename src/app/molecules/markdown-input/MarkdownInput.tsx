@@ -40,15 +40,15 @@ Leaf.propTypes = {
  * @returns The flattened string
  */
 export function flattenNodes(nodes: Descendant[]): string {
-  let flat = '';
-  for (let index = 0; index < nodes.length; index += 1) {
-    const node = nodes[index];
-    if (Text.isText(node)) {
-      flat += node.text;
-    } else {
-      flat += flattenNodes(node.children);
-    }
-  }
+  console.log('flattenNodes', nodes);
+  const flat = nodes
+    .map((node) => {
+      if (Text.isText(node)) {
+        return node.text;
+      }
+      return flattenNodes(node.children);
+    })
+    .join('\n');
   return flat;
 }
 
@@ -152,6 +152,7 @@ export function MarkdownInput({
   const [isEmpty, setIsEmpty] = useState(true);
 
   const onChangeInternal = (value: Descendant[]) => {
+    console.log('onchange:');
     const text = flattenNodes(value);
     console.log('text', text);
     setIsEmpty(text.length === 0);
