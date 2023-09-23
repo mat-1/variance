@@ -14,7 +14,7 @@ function Welcome() {
           Welcome to Variance
         </Text>
         <Text className="app-welcome__subheading" variant="s1">
-          Yet another Matrix client
+          The good Matrix client
         </Text>
       </div>
     </div>

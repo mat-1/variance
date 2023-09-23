@@ -408,7 +408,7 @@ function AboutSection() {
                 style={{ margin: '0 var(--sp-extra-tight)' }}
               >{`v${cons.version}`}</span>
             </Text>
-            <Text>Yet another Matrix client</Text>
+            <Text>The good Matrix client</Text>
 
             <div className="settings-about__btns">
               <Button onClick={() => window.open('https://github.com/mat-1/variance')}>

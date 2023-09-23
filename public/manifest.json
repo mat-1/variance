@@ -1,7 +1,7 @@
 {
   "name": "Variance",
   "short_name": "Variance",
-  "description": "Yet another Matrix client",
+  "description": "The good Matrix client",
   "dir": "auto",
   "lang": "en-US",
   "display": "standalone",
