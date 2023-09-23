@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { Text, Descendant, createEditor } from 'slate';
@@ -33,6 +33,24 @@ Leaf.propTypes = {
     classes: PropTypes.arrayOf(PropTypes.string),
   }),
 };
+
+/**
+ * Flatten Slate nodes into a single string.
+ * @param nodes Slate nodes, you can get this from ReactEditor.children
+ * @returns The flattened string
+ */
+export function flattenNodes(nodes: Descendant[]): string {
+  let flat = '';
+  for (let index = 0; index < nodes.length; index += 1) {
+    const node = nodes[index];
+    if (Text.isText(node)) {
+      flat += node.text;
+    } else {
+      flat += flattenNodes(node.children);
+    }
+  }
+  return flat;
+}
 
 export function MarkdownInput({
   onChange,
@@ -131,9 +149,18 @@ export function MarkdownInput({
     },
   ];
 
+  const [isEmpty, setIsEmpty] = useState(true);
+
+  const onChangeInternal = (value: Descendant[]) => {
+    const text = flattenNodes(value);
+    console.log('text', text);
+    setIsEmpty(text.length === 0);
+    if (onChange) onChange(value);
+  };
+
   return (
     <div className={`markdown-input${readOnly ? ' read-only' : ''}`}>
-      <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
+      <Slate editor={editor} initialValue={initialValue} onChange={onChangeInternal}>
         <Editable
           decorate={decorate}
           renderLeaf={renderLeaf}
@@ -141,7 +168,7 @@ export function MarkdownInput({
           onKeyDown={onKeyDown}
           onPaste={onPaste}
           readOnly={readOnly}
-          className="markdown-input__editable"
+          className={`markdown-input__editable${isEmpty ? ' empty' : ''}`}
         />
       </Slate>
     </div>

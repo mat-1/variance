@@ -477,14 +477,18 @@ function RoomViewContent({ eventId, roomTimeline }) {
   }, [newEvent]);
 
   const listenKeyboard = useCallback(
-    (event) => {
-      console.log(event, document.activeElement.id);
+    (event: KeyboardEvent) => {
+      console.log(event.target, event.target.classList);
       if (event.ctrlKey || event.altKey || event.metaKey) return;
       if (event.key !== 'ArrowUp') return;
+      console.log('1');
       if (navigation.isRawModalVisible) return;
 
-      if (document.activeElement.id !== 'message-textarea') return;
-      if (document.activeElement.value !== '') return;
+      console.log('2');
+      if (!event.target.classList.contains('markdown-input__editable')) return;
+      if (!event.target.classList.contains('empty')) return;
+
+      console.log('4');
 
       const { timeline: tl, activeTimeline, liveTimeline, matrixClient: mx } = roomTimeline;
       const limit = eventLimitRef.current;

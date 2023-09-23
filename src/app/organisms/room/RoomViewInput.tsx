@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import './RoomViewInput.scss';
 
 import { ReactEditor } from 'slate-react';
-import { Transforms, Text as SlateText, Descendant } from 'slate';
+import { Transforms } from 'slate';
 
 import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
@@ -19,7 +19,7 @@ import Text from '../../atoms/text/Text';
 import RawIcon from '../../atoms/system-icons/RawIcon';
 import IconButton from '../../atoms/button/IconButton';
 import { MessageReply } from '../../molecules/message/Message';
-import { MarkdownInput } from '../../molecules/markdown-input/MarkdownInput';
+import { MarkdownInput, flattenNodes } from '../../molecules/markdown-input/MarkdownInput';
 
 import StickerBoard from '../sticker-board/StickerBoard';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
@@ -69,24 +69,6 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
       viewEvent.removeListener('focus_msg_input', requestFocusInput);
     };
   }, [roomsInput, viewEvent]);
-
-  /**
-   * Flatten Slate nodes into a single string.
-   * @param nodes Slate nodes, you can get this from ReactEditor.children
-   * @returns The flattened string
-   */
-  function flattenNodes(nodes: Descendant[]): string {
-    let flat = '';
-    for (let index = 0; index < nodes.length; index += 1) {
-      const node = nodes[index];
-      if (SlateText.isText(node)) {
-        flat += node.text;
-      } else {
-        flat += flattenNodes(node.children);
-      }
-    }
-    return flat;
-  }
 
   function getEditorContent() {
     const content = editor.current.children;
