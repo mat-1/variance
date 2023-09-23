@@ -201,8 +201,6 @@ class RoomsInput extends EventEmitter {
     const parentRooms = [...parentIds].map((id) => this.matrixClient.getRoom(id));
     const emojis = getShortcodeToEmoji(this.matrixClient, [room, ...parentRooms]);
 
-    console.log('getContent', message);
-
     let output;
     if (isHtml) {
       output = html;

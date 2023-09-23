@@ -207,7 +207,7 @@ function usePaginate(
   readUptoEvtStore,
   forceUpdateLimit,
   timelineScrollRef,
-  eventLimitRef
+  eventLimitRef,
 ) {
   const [info, setInfo] = useState(null);
 
@@ -224,7 +224,7 @@ function usePaginate(
         setInfo({
           backwards,
           loaded,
-        })
+        }),
       );
     };
     roomTimeline.on(cons.events.roomTimeline.PAGINATED, handlePaginatedFromServer);
@@ -271,7 +271,7 @@ function useHandleScroll(
   readUptoEvtStore,
   forceUpdateLimit,
   timelineScrollRef,
-  eventLimitRef
+  eventLimitRef,
 ) {
   const handleScroll = useCallback(() => {
     const timelineScroll = timelineScrollRef.current;
@@ -398,7 +398,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
     readUptoEvtStore,
     forceUpdateLimit,
     timelineScrollRef,
-    eventLimitRef
+    eventLimitRef,
   );
   const [handleScroll, handleScrollToLive] = useHandleScroll(
     roomTimeline,
@@ -406,7 +406,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
     readUptoEvtStore,
     forceUpdateLimit,
     timelineScrollRef,
-    eventLimitRef
+    eventLimitRef,
   );
   const newEvent = useEventArrive(roomTimeline, readUptoEvtStore, timelineScrollRef, eventLimitRef);
 
@@ -476,19 +476,24 @@ function RoomViewContent({ eventId, roomTimeline }) {
     }
   }, [newEvent]);
 
+  // up arrow to edit previous message
   const listenKeyboard = useCallback(
-    (event) => {
-      if (event.ctrlKey || event.altKey || event.metaKey) return;
-      if (event.key !== 'ArrowUp') return;
+    (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key !== 'ArrowUp') return;
       if (navigation.isRawModalVisible) return;
 
-      if (document.activeElement.id !== 'message-textarea') return;
-      if (document.activeElement.value !== '') return;
+      const target = e.target as HTMLElement;
+
+      if (!target.classList.contains('markdown-input__editable')) return;
+      if (!target.classList.contains('empty')) return;
 
       const { timeline: tl, activeTimeline, liveTimeline, matrixClient: mx } = roomTimeline;
       const limit = eventLimitRef.current;
       if (activeTimeline !== liveTimeline) return;
       if (tl.length > limit.length) return;
+
+      e.preventDefault();
 
       const mTypes = ['m.text'];
       for (let i = tl.length - 1; i >= 0; i -= 1) {
@@ -503,7 +508,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
         }
       }
     },
-    [roomTimeline]
+    [roomTimeline],
   );
 
   useEffect(() => {
@@ -545,7 +550,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
       if (i === 0 && !roomTimeline.canPaginateBackward()) {
         if (mEvent.getType() === 'm.room.create') {
           tl.push(
-            <RoomIntroContainer key={mEvent.getId()} event={mEvent} timeline={roomTimeline} />
+            <RoomIntroContainer key={mEvent.getId()} event={mEvent} timeline={roomTimeline} />,
           );
           itemCountIndex += 1;
           // eslint-disable-next-line no-continue
@@ -575,7 +580,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
           <Divider
             key={`divider-${mEvent.getId()}`}
             text={`${dateFormat(mEvent.getDate(), 'mmmm dd, yyyy')}`}
-          />
+          />,
         );
         itemCountIndex += 1;
       }
@@ -595,8 +600,8 @@ function RoomViewContent({ eventId, roomTimeline }) {
           isFocus,
           editEventId === mEvent.getId(),
           setEditEventId,
-          cancelEdit
-        )
+          cancelEdit,
+        ),
       );
       itemCountIndex += 1;
     }

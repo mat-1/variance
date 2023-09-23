@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import './RoomViewInput.scss';
 
-import TextareaAutosize from 'react-autosize-textarea';
+import { ReactEditor } from 'slate-react';
+import { Transforms } from 'slate';
 
 import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
@@ -17,8 +18,8 @@ import colorMXID from '../../../util/colorMXID';
 import Text from '../../atoms/text/Text';
 import RawIcon from '../../atoms/system-icons/RawIcon';
 import IconButton from '../../atoms/button/IconButton';
-import ScrollView from '../../atoms/scroll/ScrollView';
 import { MessageReply } from '../../molecules/message/Message';
+import { MarkdownInput, flattenNodes } from '../../molecules/markdown-input/MarkdownInput';
 
 import StickerBoard from '../sticker-board/StickerBoard';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
@@ -43,7 +44,7 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
   const [attachment, setAttachment] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
 
-  const textAreaRef = useRef(null);
+  const editor: React.MutableRefObject<ReactEditor> = useRef(null);
   const inputBaseRef = useRef(null);
   const uploadInputRef = useRef(null);
   const uploadProgressRef = useRef(null);
@@ -53,9 +54,11 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
   const mx = initMatrix.matrixClient;
   const { roomsInput } = initMatrix;
 
+  let readOnly = false;
+
   function requestFocusInput() {
-    if (textAreaRef === null) return;
-    textAreaRef.current.focus();
+    if (editor.current === null) return;
+    ReactEditor.focus(editor.current);
   }
 
   useEffect(() => {
@@ -65,7 +68,21 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
       roomsInput.removeListener(cons.events.roomsInput.ATTACHMENT_SET, setAttachment);
       viewEvent.removeListener('focus_msg_input', requestFocusInput);
     };
-  }, []);
+  }, [roomsInput, viewEvent]);
+
+  function getEditorContent() {
+    const content = editor.current.children;
+    return flattenNodes(content);
+  }
+
+  function clearEditor() {
+    Transforms.delete(editor.current, {
+      at: {
+        anchor: editor.current.start([]),
+        focus: editor.current.end([]),
+      },
+    });
+  }
 
   const sendIsTyping = (isT) => {
     mx.sendTyping(roomId, isT, isT ? TYPING_TIMEOUT : undefined);
@@ -116,11 +133,14 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
   }
   function setCursorPosition(pos) {
     setTimeout(() => {
-      textAreaRef.current.focus();
-      textAreaRef.current.setSelectionRange(pos, pos);
+      ReactEditor.focus(editor.current);
+      editor.current.setSelection({
+        anchor: pos,
+        focus: pos,
+      });
     }, 0);
   }
-  function replaceCmdWith(msg, cursor, replacement) {
+  function replaceCmdWith(msg: string | null, cursor: number, replacement: string): string | null {
     if (msg === null) return null;
     const targetInput = msg.slice(0, cursor);
     const cmdParts = targetInput.match(CMD_REGEX);
@@ -128,19 +148,22 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     if (replacement.length > 0) setCursorPosition(leadingInput.length + replacement.length);
     return leadingInput + replacement + msg.slice(cursor);
   }
+
   function firedCmd(cmdData) {
-    const msg = textAreaRef.current.value;
-    textAreaRef.current.value = replaceCmdWith(
+    const msg = getEditorContent();
+    clearEditor();
+    const replaceWith = replaceCmdWith(
       msg,
       cmdCursorPos,
       typeof cmdData?.replace !== 'undefined' ? cmdData.replace : '',
     );
+    editor.current.insertText(replaceWith);
     deactivateCmd();
   }
 
   function focusInput() {
     if (settings.isTouchScreenDevice) return;
-    textAreaRef.current.focus();
+    ReactEditor.focus(editor.current);
   }
 
   function setUpReply(userId, eventId, body, formattedBody) {
@@ -160,9 +183,9 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     roomsInput.on(cons.events.roomsInput.FILE_UPLOADED, clearAttachment);
     viewEvent.on('cmd_fired', firedCmd);
     navigation.on(cons.events.navigation.REPLY_TO_CLICKED, setUpReply);
-    if (textAreaRef?.current !== null) {
+    if (editor?.current !== null) {
       isTyping = false;
-      textAreaRef.current.value = roomsInput.getMessage(roomId);
+      editor.current.value = roomsInput.getMessage(roomId);
       setAttachment(roomsInput.getAttachment(roomId));
       setReplyTo(roomsInput.getReplyTo(roomId));
     }
@@ -173,11 +196,10 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
       viewEvent.removeListener('cmd_fired', firedCmd);
       navigation.removeListener(cons.events.navigation.REPLY_TO_CLICKED, setUpReply);
       if (isCmdActivated) deactivateCmd();
-      if (textAreaRef?.current === null) return;
+      if (editor?.current === null) return;
 
-      const msg = textAreaRef.current.value;
-      textAreaRef.current.style.height = 'unset';
-      inputBaseRef.current.style.backgroundImage = 'unset';
+      const msg = getEditorContent();
+      // inputBaseRef.current.style.backgroundImage = 'unset';
       if (msg.trim() === '') {
         roomsInput.setMessage(roomId, '');
         return;
@@ -186,7 +208,13 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     };
   }, [roomId]);
 
-  const sendBody = async (body, options) => {
+  const sendBody = async (
+    body: string,
+    options?: {
+      msgType?: string;
+      autoMarkdown?: boolean;
+    },
+  ) => {
     const opt = options ?? {};
     if (!opt.msgType) opt.msgType = 'm.text';
     if (typeof opt.autoMarkdown !== 'boolean') opt.autoMarkdown = true;
@@ -197,15 +225,15 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     if (attachment !== null) {
       roomsInput.setAttachment(roomId, attachment);
     }
-    textAreaRef.current.disabled = true;
-    textAreaRef.current.style.cursor = 'not-allowed';
+    readOnly = true;
+
     await roomsInput.sendInput(roomId, opt);
-    textAreaRef.current.disabled = false;
-    textAreaRef.current.style.cursor = 'unset';
+    readOnly = false;
     focusInput();
 
-    textAreaRef.current.value = roomsInput.getMessage(roomId);
-    textAreaRef.current.style.height = 'unset';
+    clearEditor();
+    editor.current.insertText(roomsInput.getMessage(roomId));
+
     if (replyTo !== null) setReplyTo(null);
   };
 
@@ -226,11 +254,10 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
 
   const sendMessage = async () => {
     requestAnimationFrame(() => deactivateCmdAndEmit());
-    const msgBody = textAreaRef.current.value.trim();
+    const msgBody = getEditorContent().trim();
     if (msgBody.startsWith('/')) {
       processCommand(msgBody.trim());
-      textAreaRef.current.value = '';
-      textAreaRef.current.style.height = 'unset';
+      editor.current.deleteFragment();
       return;
     }
     if (msgBody === '' && attachment === null) return;
@@ -254,7 +281,7 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
   }
 
   function getCursorPosition() {
-    return textAreaRef.current.selectionStart;
+    return editor.current.selection.anchor.offset;
   }
 
   function recognizeCmd(rawInput) {
@@ -287,9 +314,13 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     viewEvent.emit('cmd_process', cmdPrefix, cmdSlug);
   }
 
+  const handleCreateEditor = (e: ReactEditor) => {
+    editor.current = e;
+  };
+
   const handleMsgTyping = (e) => {
-    const msg = e.target.value;
-    recognizeCmd(e.target.value);
+    const msg = flattenNodes(e);
+    recognizeCmd(msg);
     if (!isCmdActivated) processTyping(msg);
   };
 
@@ -332,8 +363,8 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
   };
 
   function addEmoji(emoji) {
-    textAreaRef.current.value += emoji.unicode;
-    textAreaRef.current.focus();
+    editor.current.insertText(emoji.unicode);
+    ReactEditor.focus(editor.current);
   }
 
   const handleUploadClick = () => {
@@ -382,19 +413,14 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
         </div>
         <div ref={inputBaseRef} className="room-input__input-container">
           {roomTimeline.isEncrypted() && <RawIcon size="extra-small" src={ShieldIC} />}
-          <ScrollView autoHide>
-            <Text className="room-input__textarea-wrapper">
-              <TextareaAutosize
-                dir="auto"
-                id="message-textarea"
-                ref={textAreaRef}
-                onChange={handleMsgTyping}
-                onPaste={handlePaste}
-                onKeyDown={handleKeyDown}
-                placeholder="Send a message..."
-              />
-            </Text>
-          </ScrollView>
+          <MarkdownInput
+            onChange={handleMsgTyping}
+            onPaste={handlePaste}
+            onKeyDown={handleKeyDown}
+            onCreateEditor={handleCreateEditor}
+            readOnly={readOnly}
+            placeholder="Send a message..."
+          />
         </div>
         <div ref={rightOptionsRef} className="room-input__option-container">
           <IconButton

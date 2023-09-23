@@ -243,7 +243,7 @@ function AccessibilitySection() {
 function NotificationsSection() {
   const [permission, setPermission] = usePermission(
     'notifications',
-    window.Notification?.permission
+    window.Notification?.permission,
   );
 
   const [, updateState] = useState({});
@@ -589,7 +589,9 @@ async function getCapabilities() {
 function Settings() {
   const [selectedTab, setSelectedTab] = useState(tabItems[0]);
   const [isOpen, requestClose] = useWindowToggle(setSelectedTab);
-  useEffect(getCapabilities, []);
+  useEffect(() => {
+    getCapabilities();
+  }, []);
 
   const handleTabChange = (tabItem) => setSelectedTab(tabItem);
   const handleLogout = async () => {
@@ -598,7 +600,7 @@ function Settings() {
         'Logout',
         'Are you sure that you want to logout your session?',
         'Logout',
-        'danger'
+        'danger',
       )
     ) {
       initMatrix.logout();
