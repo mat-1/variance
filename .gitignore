@@ -1,6 +1,8 @@
-experiment
-dist
-node_modules
-devAssets
+/experiment
+/dist
+/node_modules
+/devAssets
 
-.DS_Store
+/.DS_Store
+
+/yarn-error.log
