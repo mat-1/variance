@@ -49,7 +49,7 @@ const plainRules = {
     match: inlineRegex(idRegex('@', undefined, '^')),
     parse: (capture, _, state) => ({
       type: 'mention',
-      content: state.userNames[capture[1]] ? `@${state.userNames[capture[1]]}` : capture[1],
+      content: state.userNames?.[capture[1]] ? `@${state.userNames[capture[1]]}` : capture[1],
       id: capture[1],
     }),
   },
@@ -71,11 +71,11 @@ const plainRules = {
       if (!state.inline) return null;
       const capture = emojiRegex.exec(source);
       if (!capture) return null;
-      const emoji = state.emojis.get(capture[1]);
+      const emoji = state.emojis?.get?.(capture[1]);
       if (emoji) return capture;
       return null;
     },
-    parse: (capture, _, state) => ({ content: capture[1], emoji: state.emojis.get(capture[1]) }),
+    parse: (capture, _, state) => ({ content: capture[1], emoji: state.emojis?.get?.(capture[1]) }),
     plain: ({ emoji }) => (emoji.mxc ? `:${emoji.shortcode}:` : emoji.unicode),
     html: ({ emoji }) =>
       emoji.mxc
@@ -89,7 +89,7 @@ const plainRules = {
               title: `:${emoji.shortcode}:`,
               height: 32,
             },
-            false
+            false,
           )
         : emoji.unicode,
   },
@@ -155,7 +155,7 @@ const markdownRules = {
         'pre',
         htmlTag('code', sanitizeText(node.content), {
           class: node.lang ? `language-${node.lang}` : undefined,
-        })
+        }),
       ),
   },
   fence: {
@@ -186,7 +186,7 @@ const markdownRules = {
           `(?!\\1${LIST_BULLET} )\\n*` +
           // the \\s*$ here is so that we can parse the inside of nested
           // lists, where our content might end before we receive two `\n`s
-          `|\\s*\n*$)`
+          `|\\s*\n*$)`,
       );
       const prevCaptureStr = state.prevCapture == null ? '' : state.prevCapture[0];
       const isStartOfLineCapture = /(?:^|\n)( *)$/.exec(prevCaptureStr);
@@ -245,7 +245,7 @@ const markdownRules = {
             colWidth[i] = s.length;
           }
           return s;
-        })
+        }),
       );
 
       function pad(s, i) {
@@ -331,7 +331,7 @@ const markdownRules = {
           alt: node.alt,
           title: node.title,
         },
-        false
+        false,
       ),
   },
   reflink: undefined,
@@ -445,7 +445,7 @@ function mapElement(el) {
             Array.from(rowEl.childNodes).map((childEl, i) => {
               if (align[i] === undefined) align[i] = childEl.style['text-align'];
               return mapChildren(childEl);
-            })
+            }),
           ),
         },
       ];
@@ -573,7 +573,7 @@ const plainParser = parserFor(plainRules, { disableAutoBlockNewlines: true });
 const plainPlainOut = outputFor(plainRules, 'plain');
 const plainHtmlOut = outputFor(plainRules, 'html');
 
-const mdParser = parserFor(markdownRules, { disableAutoBlockNewlines: true });
+export const mdParser = parserFor(markdownRules, { disableAutoBlockNewlines: true });
 const mdPlainOut = outputFor(markdownRules, 'plain');
 const mdHtmlOut = outputFor(markdownRules, 'html');
 
