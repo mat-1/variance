@@ -201,8 +201,6 @@ class RoomsInput extends EventEmitter {
     const parentRooms = [...parentIds].map((id) => this.matrixClient.getRoom(id));
     const emojis = getShortcodeToEmoji(this.matrixClient, [room, ...parentRooms]);
 
-    console.log('getContent', message);
-
     let output;
     if (isHtml) {
       output = html;
@@ -212,7 +210,7 @@ class RoomsInput extends EventEmitter {
       output = plain;
     }
 
-    const body = output(message, { userNames, emojis });
+    const body = output(message, { userNames, emojis, inline: true });
 
     if (isHtml) {
       // the html parser might remove stuff we want, so we need to re-add it

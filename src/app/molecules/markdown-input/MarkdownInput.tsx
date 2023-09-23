@@ -40,7 +40,6 @@ Leaf.propTypes = {
  * @returns The flattened string
  */
 export function flattenNodes(nodes: Descendant[]): string {
-  console.log('flattenNodes', nodes);
   const flat = nodes
     .map((node) => {
       if (Text.isText(node)) {

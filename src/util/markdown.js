@@ -582,7 +582,8 @@ export function plain(source, state) {
 }
 
 export function markdown(source, state) {
-  return render(mdParser(source, state), state, mdPlainOut, mdHtmlOut);
+  const parsed = mdParser(source, state);
+  return render(parsed, state, mdPlainOut, mdHtmlOut);
 }
 
 export function html(source, state) {

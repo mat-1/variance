@@ -476,14 +476,17 @@ function RoomViewContent({ eventId, roomTimeline }) {
     }
   }, [newEvent]);
 
+  // up arrow to edit previous message
   const listenKeyboard = useCallback(
     (e: KeyboardEvent) => {
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       if (e.key !== 'ArrowUp') return;
       if (navigation.isRawModalVisible) return;
 
-      if (!e.target.classList.contains('markdown-input__editable')) return;
-      if (!e.target.classList.contains('empty')) return;
+      const target = e.target as HTMLElement;
+
+      if (!target.classList.contains('markdown-input__editable')) return;
+      if (!target.classList.contains('empty')) return;
 
       const { timeline: tl, activeTimeline, liveTimeline, matrixClient: mx } = roomTimeline;
       const limit = eventLimitRef.current;
