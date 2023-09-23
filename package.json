@@ -21,7 +21,7 @@
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "5.0.12",
     "@khanacademy/simple-markdown": "0.10.0",
-    "@matrix-org/olm": "3.2.15",
+    "@matrix-org/olm": "^3.2.15",
     "@tippyjs/react": "4.2.6",
     "blurhash": "2.0.5",
     "browser-encrypt-attachment": "0.3.0",
@@ -75,5 +75,6 @@
     "typescript": "5.2.2",
     "vite": "4.4.9",
     "vite-plugin-static-copy": "0.17.0"
-  }
+  },
+  "packageManager": "yarn@3.6.3"
 }
