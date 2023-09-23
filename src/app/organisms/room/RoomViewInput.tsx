@@ -131,13 +131,10 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     deactivateCmd();
     viewEvent.emit('cmd_deactivate');
   }
-  function setCursorPosition(pos) {
+  function setCursorPosition(pos: number) {
     setTimeout(() => {
       ReactEditor.focus(editor.current);
-      editor.current.setSelection({
-        anchor: pos,
-        focus: pos,
-      });
+      Transforms.select(editor.current, { path: [0, 0], offset: pos });
     }, 0);
   }
   function replaceCmdWith(msg: string | null, cursor: number, replacement: string): string | null {
