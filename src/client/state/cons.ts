@@ -7,7 +7,7 @@ const cons = {
     BASE_URL: 'cinny_hs_base_url',
     SLIDING_SYNC_PROXY_URL: 'cinny_sliding_sync_proxy_url',
   },
-  DEVICE_DISPLAY_NAME: 'Cinny Web',
+  DEVICE_DISPLAY_NAME: 'Variance Web',
   IN_CINNY_SPACES: 'in.cinny.spaces',
   tabs: {
     HOME: 'home',

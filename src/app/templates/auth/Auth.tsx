@@ -213,7 +213,7 @@ function Login({ loginFlow, baseUrl }) {
         userBaseUrl,
         typeIndex === 0 ? normalizeUsername(username) : undefined,
         typeIndex === 1 ? values.email : undefined,
-        values.password
+        values.password,
       )
       .then(() => {
         actions.setSubmitting(true);
@@ -716,7 +716,7 @@ function Auth() {
                 <Avatar size="extra-small" imageSrc={CinnySvg} />
                 <TitleWrapper>
                   <Text variant="h2" weight="medium">
-                    Cinny
+                    Variance
                   </Text>
                 </TitleWrapper>
               </Header>
@@ -729,21 +729,16 @@ function Auth() {
 
         <div className="auth-footer">
           <Text variant="b2">
-            <a href="https://cinny.in" target="_blank" rel="noreferrer">
+            <a href="https://github.com/mat-1/variance" target="_blank" rel="noreferrer">
               About
             </a>
           </Text>
           <Text variant="b2">
             <a
-              href="https://github.com/ajbura/cinny/releases"
+              href="https://github.com/mat-1/variance/releases"
               target="_blank"
               rel="noreferrer"
             >{`v${cons.version}`}</a>
-          </Text>
-          <Text variant="b2">
-            <a href="https://twitter.com/cinnyapp" target="_blank" rel="noreferrer">
-              Twitter
-            </a>
           </Text>
           <Text variant="b2">
             <a href="https://matrix.org" target="_blank" rel="noreferrer">

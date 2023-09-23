@@ -399,10 +399,10 @@ function AboutSection() {
       <div className="settings-about__card">
         <MenuHeader>Application</MenuHeader>
         <div className="settings-about__branding">
-          <img width="60" height="60" src={CinnySVG} alt="Cinny logo" />
+          <img width="60" height="60" src={CinnySVG} alt="Variance logo" />
           <div>
             <Text variant="h2" weight="medium">
-              Cinny
+              Variance
               <span
                 className="text text-b3"
                 style={{ margin: '0 var(--sp-extra-tight)' }}
@@ -411,10 +411,9 @@ function AboutSection() {
             <Text>Yet another Matrix client</Text>
 
             <div className="settings-about__btns">
-              <Button onClick={() => window.open('https://github.com/ajbura/cinny')}>
+              <Button onClick={() => window.open('https://github.com/mat-1/variance')}>
                 Source code
               </Button>
-              <Button onClick={() => window.open('https://cinny.in/#sponsor')}>Support</Button>
               <Button onClick={() => initMatrix.clearCacheAndReload()} variant="danger">
                 Clear cache & reload
               </Button>

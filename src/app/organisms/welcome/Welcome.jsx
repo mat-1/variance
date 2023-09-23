@@ -9,9 +9,9 @@ function Welcome() {
   return (
     <div className="app-welcome flex--center">
       <div>
-        <img className="app-welcome__logo noselect" src={CinnySvg} alt="Cinny logo" />
+        <img className="app-welcome__logo noselect" src={CinnySvg} alt="Variance logo" />
         <Text className="app-welcome__heading" variant="h1" weight="medium" primary>
-          Welcome to Cinny
+          Welcome to Variance
         </Text>
         <Text className="app-welcome__subheading" variant="s1">
           Yet another Matrix client

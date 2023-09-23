@@ -1,7 +1,7 @@
 {
-  "name": "cinny",
+  "name": "variance",
   "version": "2.2.6",
-  "description": "Yet another Matrix client",
+  "description": "The good Matrix client",
   "main": "index.js",
   "engines": {
     "node": ">=16.0.0"
@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
-  "author": "Ajay Bura",
+  "author": "Cinny and Variance contributors",
   "license": "AGPL-3.0-only",
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "5.0.9",
