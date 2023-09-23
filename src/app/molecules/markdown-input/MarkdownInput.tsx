@@ -139,8 +139,6 @@ export function MarkdownInput({
       emojis: {},
     });
 
-    console.log(content);
-
     addRanges(content);
 
     // add final syntax range
