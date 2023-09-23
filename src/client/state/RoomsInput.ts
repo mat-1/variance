@@ -210,7 +210,7 @@ class RoomsInput extends EventEmitter {
       output = plain;
     }
 
-    const body = output(message, { userNames, emojis, inline: true });
+    const body = output(message, { userNames, emojis });
 
     if (isHtml) {
       // the html parser might remove stuff we want, so we need to re-add it

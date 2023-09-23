@@ -101,16 +101,9 @@ const plainRules = {
   },
   paragraph: {
     ...defaultRules.paragraph,
-    match: (source, state) => {
-      const endMatch = blockRegex(/^([^\n]*)\n*$/);
-      if (endMatch) {
-        state.end = true;
-        return endMatch(source, state);
-      }
-      return blockRegex(/^([^\n]*)\n?/)(source, state);
-    },
-    plain: (node, output, state) => `${output(node.content, state)}${state.end ? '' : '\n'}`,
-    html: (node, output, state) => `${output(node.content, state)}${state.end ? '' : '<br>'}`,
+    match: blockRegex(/^([^\n]*)\n?/),
+    plain: (node, output, state) => `${output(node.content, state)}\n`,
+    html: (node, output, state) => `${output(node.content, state)}<br>`,
   },
   escape: {
     ...defaultRules.escape,
@@ -338,6 +331,34 @@ const markdownRules = {
   refimage: undefined,
   em: {
     ...defaultRules.em,
+    match: inlineRegex(
+      new RegExp(
+        // only match _s surrounding words.
+        '^\\b_' +
+          '((?:__|\\\\[\\s\\S]|[^\\\\_])+?)_' +
+          '\\b' +
+          // Or match *s:
+          '|' +
+          // Only match *s that are followed by a non-space:
+          '^\\*(?=\\S)(' +
+          // Match at least one of:
+          '(?:' +
+          //  - `**`: so that bolds inside italics don't close the
+          //          italics
+          '\\*\\*|' +
+          //  - escape sequence: so escaped *s don't close us
+          '\\\\[\\s\\S]|' +
+          //  - whitespace: followed by a non-* (we don't
+          //          want ' *' to close an italics--it might
+          //          start a list)
+          '\\s+(?:\\\\[\\s\\S]|[^\\s\\*\\\\]|\\*\\*)|' +
+          //  - non-whitespace, non-*, non-backslash characters
+          '[^\\s\\*\\\\]' +
+          ')+?' +
+          // followed by a non-space, non-* then *
+          ')\\*(?!\\*)',
+      ),
+    ),
     plain: (node, output, state) => `_${output(node.content, state)}_`,
   },
   strong: {
@@ -583,6 +604,7 @@ export function plain(source, state) {
 
 export function markdown(source, state) {
   const parsed = mdParser(source, state);
+  // console.log('parsed', parsed);
   return render(parsed, state, mdPlainOut, mdHtmlOut);
 }
 

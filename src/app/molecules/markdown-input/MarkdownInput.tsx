@@ -77,47 +77,57 @@ export function MarkdownInput({
     }
 
     let position = 0;
-    let bold = false;
-    let italic = false;
 
-    function addRanges(content: SingleASTNode[]) {
+    // let bold = false;
+    // let italic = false;
+    const enabledStyles = new Set<string>();
+
+    function readSyntax(text: string) {
+      const start = position;
+      // read bytes until the first character of item.content is found
+      let prefix = '';
+      while (position < node.text.length && node.text[position] !== text[0]) {
+        prefix += node.text[position];
+        position += 1;
+      }
+      if (start !== position) {
+        ranges.push({
+          anchor: { path, offset: start },
+          focus: { path, offset: start + prefix.length },
+          classes: ['syntax'],
+        });
+      }
+    }
+
+    function addRanges(content: SingleASTNode[] | string) {
+      if (typeof content === 'string') {
+        const start = position;
+        readSyntax(content);
+        const prefixLength = position - start;
+        position += content.length;
+        if (enabledStyles.size > 0) {
+          ranges.push({
+            anchor: { path, offset: start + prefixLength },
+            focus: { path, offset: position },
+            classes: [...enabledStyles],
+          });
+        }
+        return;
+      }
+
       for (let i = 0; i < content.length; i += 1) {
         const item = content[i];
-        if (item.type === 'text') {
-          const start = position;
+        if (item.content) {
+          let style: string | undefined;
+          if (item.type === 'strong') style = 'bold';
+          if (item.type === 'em') style = 'italic';
+          if (item.type === 'inlineCode') style = 'inline-code';
+          if (item.type === 'del') style = 'strikethrough';
+          if (item.type === 'u') style = 'underline';
 
-          // read bytes until the first character of item.content is found
-          let prefix = '';
-          while (position < node.text.length && node.text[position] !== item.content[0]) {
-            prefix += node.text[position];
-            position += 1;
-          }
-
-          if (start !== position) {
-            ranges.push({
-              anchor: { path, offset: start },
-              focus: { path, offset: start + prefix.length },
-              classes: ['syntax'],
-            });
-          }
-
-          const classes = [];
-          if (bold) classes.push('bold');
-          if (italic) classes.push('italic');
-          if (classes.length > 0) {
-            ranges.push({
-              anchor: { path, offset: start + prefix.length },
-              focus: { path, offset: start + prefix.length + item.content.length },
-              classes,
-            });
-          }
-          position += item.content.length;
-        } else if (item.content) {
-          if (item.type === 'strong') bold = true;
-          if (item.type === 'em') italic = true;
+          if (style) enabledStyles.add(style);
           addRanges(item.content);
-          if (item.type === 'strong') bold = false;
-          if (item.type === 'em') italic = false;
+          if (style) enabledStyles.delete(style);
         }
       }
     }
@@ -128,6 +138,9 @@ export function MarkdownInput({
       userNames: [],
       emojis: {},
     });
+
+    console.log(content);
+
     addRanges(content);
 
     // add final syntax range
@@ -151,9 +164,7 @@ export function MarkdownInput({
   const [isEmpty, setIsEmpty] = useState(true);
 
   const onChangeInternal = (value: Descendant[]) => {
-    console.log('onchange:');
     const text = flattenNodes(value);
-    console.log('text', text);
     setIsEmpty(text.length === 0);
     if (onChange) onChange(value);
   };

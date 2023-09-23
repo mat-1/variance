@@ -28,6 +28,16 @@
 .italic {
   font-style: italic;
 }
+.strikethrough {
+  text-decoration: line-through;
+}
+.underline {
+  text-decoration: underline;
+}
+.inline-code {
+  font-family: monospace;
+  color: var(--tc-code) !important;
+}
 
 .syntax {
   color: var(--tc-surface-low);

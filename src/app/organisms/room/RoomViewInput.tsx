@@ -314,9 +314,9 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     viewEvent.emit('cmd_process', cmdPrefix, cmdSlug);
   }
 
-  function handleCreateEditor(e: ReactEditor) {
+  const handleCreateEditor = (e: ReactEditor) => {
     editor.current = e;
-  }
+  };
 
   const handleMsgTyping = (e) => {
     const msg = flattenNodes(e);
