@@ -522,7 +522,6 @@ function RoomViewContent({
     (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       if (editEventId !== null) return;
-      // cons.events.roomTimeline.SCROLL_TO_LIVE
       roomTimeline.emit(cons.events.roomTimeline.SCROLL_TO_LIVE);
       // hide "scroll to bottom"
       roomTimeline.emit(cons.events.roomTimeline.AT_BOTTOM, true);

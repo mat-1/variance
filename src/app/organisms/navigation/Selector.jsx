@@ -19,9 +19,7 @@ import VerticalMenuIC from '../../../../public/res/ic/outlined/vertical-menu.svg
 import { useForceUpdate } from '../../hooks/useForceUpdate';
 import settings from '../../../client/state/settings';
 
-function Selector({
-  roomId, isDM, drawerPostie, onClick,
-}) {
+function Selector({ roomId, isDM, drawerPostie, onClick }) {
   const mx = initMatrix.matrixClient;
   const noti = initMatrix.notifications;
   const room = mx.getRoom(roomId);
@@ -59,7 +57,11 @@ function Selector({
       name={room.name}
       roomId={roomId}
       imageSrc={isDM || settings.showRoomListAvatar ? imageSrc : null}
-      iconSrc={isDM || settings.showRoomListAvatar ? null : joinRuleToIconSrc(room.getJoinRule(), room.isSpaceRoom())}
+      iconSrc={
+        isDM || settings.showRoomListAvatar
+          ? null
+          : joinRuleToIconSrc(room.getJoinRule(), room.isSpaceRoom())
+      }
       isSelected={navigation.selectedRoomId === roomId}
       isMuted={isMuted}
       isUnread={!isMuted && noti.hasNoti(roomId)}
@@ -67,7 +69,7 @@ function Selector({
       isAlert={noti.getHighlightNoti(roomId) !== 0}
       onClick={onClick}
       onContextMenu={openOptions}
-      options={(
+      options={
         <IconButton
           size="extra-small"
           tooltip="Options"
@@ -75,7 +77,7 @@ function Selector({
           src={VerticalMenuIC}
           onClick={openOptions}
         />
-      )}
+      }
     />
   );
 }

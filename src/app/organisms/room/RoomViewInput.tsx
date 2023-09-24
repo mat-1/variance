@@ -35,12 +35,21 @@ import FileIC from '../../../../public/res/ic/outlined/file.svg';
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
 import commands from './commands';
+import RoomTimeline from '../../../client/state/RoomTimeline';
 
 const CMD_REGEX = /(^\/|:|@)(\S*)$/;
 let isTyping = false;
 let isCmdActivated = false;
 let cmdCursorPos = null;
-function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
+function RoomViewInput({
+  roomId,
+  roomTimeline,
+  viewEvent,
+}: {
+  roomId: string;
+  roomTimeline: RoomTimeline;
+  viewEvent: string;
+}) {
   const [attachment, setAttachment] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
 
@@ -376,16 +385,13 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     if (file !== null) roomsInput.setAttachment(roomId, file);
   }
 
-  const listenKeyEscape = (e) => {
-    if (e.key !== 'Escape') return;
-    if (document.activeElement.tagName === 'INPUT') return;
-    ReactEditor.focus(editor.current);
-  };
   useEffect(() => {
-    // focus editor when escape is pressed
-    document.addEventListener('keydown', listenKeyEscape);
+    const focusOnLive = () => {
+      ReactEditor.focus(editor.current);
+    };
+    roomTimeline.addListener(cons.events.roomTimeline.SCROLL_TO_LIVE, focusOnLive);
     return () => {
-      document.removeEventListener('keydown', listenKeyEscape);
+      roomTimeline.removeListener(cons.events.roomTimeline.SCROLL_TO_LIVE, focusOnLive);
     };
   });
 
