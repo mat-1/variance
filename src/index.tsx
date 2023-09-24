@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDom from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './font';
 import './index.scss';
 
@@ -9,4 +9,6 @@ import App from './app/pages/App';
 
 settings.applyTheme();
 
-ReactDom.render(<App />, document.getElementById('root'));
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App />);
