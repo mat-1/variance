@@ -4,17 +4,17 @@ import { withHistory } from 'slate-history';
 import { Text, Descendant, createEditor } from 'slate';
 import './MarkdownInput.scss';
 import { SingleASTNode } from '@khanacademy/simple-markdown';
-import PropTypes from 'prop-types';
+import * as linkify from 'linkifyjs';
+
 import { mdParser } from '../../../util/markdown';
-import { getShortcodeToEmoji } from '../../organisms/emoji-board/custom-emoji';
 
 function Leaf({
   attributes,
   children,
   leaf,
 }: {
-  attributes: string[];
-  children: string[];
+  attributes: React.HTMLAttributes<HTMLSpanElement>;
+  children: React.ReactElement;
   leaf: {
     classes?: string[];
   };
@@ -25,14 +25,6 @@ function Leaf({
     </span>
   );
 }
-
-Leaf.propTypes = {
-  attributes: PropTypes.arrayOf(PropTypes.string),
-  children: PropTypes.arrayOf(PropTypes.string),
-  leaf: PropTypes.shape({
-    classes: PropTypes.arrayOf(PropTypes.string),
-  }),
-};
 
 /**
  * Flatten Slate nodes into a single string.
@@ -99,7 +91,7 @@ export function MarkdownInput({
       }
     }
 
-    function addRanges(content: SingleASTNode[] | string) {
+    function addMarkdownRanges(content: SingleASTNode[] | string) {
       if (typeof content === 'string') {
         const start = position;
         readSyntax(content);
@@ -118,15 +110,17 @@ export function MarkdownInput({
       for (let i = 0; i < content.length; i += 1) {
         const item = content[i];
         if (item.content) {
-          let style: string | undefined;
-          if (item.type === 'strong') style = 'bold';
-          if (item.type === 'em') style = 'italic';
-          if (item.type === 'inlineCode') style = 'inline-code';
-          if (item.type === 'del') style = 'strikethrough';
-          if (item.type === 'u') style = 'underline';
+          const style: string | undefined = {
+            strong: 'bold',
+            em: 'italic',
+            inlineCode: 'inline-code',
+            del: 'strikethrough',
+            u: 'underline',
+            link: 'link',
+          }[item.type];
 
           if (style) enabledStyles.add(style);
-          addRanges(item.content);
+          addMarkdownRanges(item.content);
           if (style) enabledStyles.delete(style);
         }
       }
@@ -138,15 +132,27 @@ export function MarkdownInput({
       userNames: [],
       emojis: {},
     });
-
-    addRanges(content);
-
+    addMarkdownRanges(content);
     // add final syntax range
     if (position < node.text.length) {
       ranges.push({
         anchor: { path, offset: position },
         focus: { path, offset: node.text.length },
         classes: ['syntax'],
+      });
+    }
+
+    // add linkify ranges
+    const linkified = linkify.find(node.text, {
+      target: '_blank',
+      rel: 'noreferrer noopener',
+    });
+    for (let i = 0; i < linkified.length; i += 1) {
+      const link = linkified[i];
+      ranges.push({
+        anchor: { path, offset: link.start },
+        focus: { path, offset: link.end },
+        classes: ['link'],
       });
     }
 
@@ -169,11 +175,11 @@ export function MarkdownInput({
 
   return (
     <div className={`markdown-input${readOnly ? ' read-only' : ''}`}>
+      {isEmpty && <div className="markdown-input__placeholder">{placeholder}</div>}
       <Slate editor={editor} initialValue={initialValue} onChange={onChangeInternal}>
         <Editable
           decorate={decorate}
           renderLeaf={renderLeaf}
-          placeholder={placeholder}
           onKeyDown={onKeyDown}
           onPaste={onPaste}
           readOnly={readOnly}
