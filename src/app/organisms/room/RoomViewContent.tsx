@@ -26,6 +26,7 @@ import { useForceUpdate } from '../../hooks/useForceUpdate';
 import { parseTimelineChange } from './common';
 import TimelineScroll from './TimelineScroll';
 import EventLimit from './EventLimit';
+import RoomTimeline from '../../../client/state/RoomTimeline';
 
 const PAG_LIMIT = 30;
 const MAX_MSG_DIFF_MINUTES = 5;
@@ -380,7 +381,13 @@ function useEventArrive(roomTimeline, readUptoEvtStore, timelineScrollRef, event
 
 let jumpToItemIndex = -1;
 
-function RoomViewContent({ eventId, roomTimeline }) {
+function RoomViewContent({
+  eventId,
+  roomTimeline,
+}: {
+  eventId: string;
+  roomTimeline: RoomTimeline;
+}) {
   const [throttle] = useState(new Throttle());
 
   const timelineSVRef = useRef(null);
@@ -477,7 +484,7 @@ function RoomViewContent({ eventId, roomTimeline }) {
   }, [newEvent]);
 
   // up arrow to edit previous message
-  const listenKeyboard = useCallback(
+  const listenKeyArrowUp = useCallback(
     (e: KeyboardEvent) => {
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       if (e.key !== 'ArrowUp') return;
@@ -510,13 +517,27 @@ function RoomViewContent({ eventId, roomTimeline }) {
     },
     [roomTimeline],
   );
+  // escape to scroll down and mark as read
+  const listenKeyEscape = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (editEventId !== null) return;
+      // cons.events.roomTimeline.SCROLL_TO_LIVE
+      roomTimeline.emit(cons.events.roomTimeline.SCROLL_TO_LIVE);
+      // hide "scroll to bottom"
+      roomTimeline.emit(cons.events.roomTimeline.AT_BOTTOM, true);
+    },
+    [editEventId, roomTimeline],
+  );
 
   useEffect(() => {
-    document.body.addEventListener('keydown', listenKeyboard);
+    document.body.addEventListener('keydown', listenKeyArrowUp);
+    document.body.addEventListener('keydown', listenKeyEscape);
     return () => {
-      document.body.removeEventListener('keydown', listenKeyboard);
+      document.body.removeEventListener('keydown', listenKeyArrowUp);
+      document.body.removeEventListener('keydown', listenKeyEscape);
     };
-  }, [listenKeyboard]);
+  }, [listenKeyArrowUp, listenKeyEscape]);
 
   const handleTimelineScroll = (event) => {
     const timelineScroll = timelineScrollRef.current;

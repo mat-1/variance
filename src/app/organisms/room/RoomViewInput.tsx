@@ -376,6 +376,19 @@ function RoomViewInput({ roomId, roomTimeline, viewEvent }) {
     if (file !== null) roomsInput.setAttachment(roomId, file);
   }
 
+  const listenKeyEscape = (e) => {
+    if (e.key !== 'Escape') return;
+    if (document.activeElement.tagName === 'INPUT') return;
+    ReactEditor.focus(editor.current);
+  };
+  useEffect(() => {
+    // focus editor when escape is pressed
+    document.addEventListener('keydown', listenKeyEscape);
+    return () => {
+      document.removeEventListener('keydown', listenKeyEscape);
+    };
+  });
+
   function renderInputs() {
     const canISend = roomTimeline.room.currentState.maySendMessage(mx.getUserId());
     const tombstoneEvent = roomTimeline.room.currentState.getStateEvents('m.room.tombstone')[0];
