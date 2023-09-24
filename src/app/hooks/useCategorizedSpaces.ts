@@ -19,7 +19,7 @@ export function useCategorizedSpaces() {
         handleCategorizedSpaces,
       );
     };
-  }, []);
+  }, [accountData]);
 
   return [categorizedSpaces];
 }
