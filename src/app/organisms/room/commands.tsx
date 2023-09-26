@@ -232,7 +232,7 @@ function openHelpDialog() {
           />
         ))}
       </div>
-    )
+    ),
   );
 }
 

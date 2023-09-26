@@ -41,7 +41,11 @@ class ImagePack {
 
       if (!mxc) return;
       const image = {
-        shortcode, mxc, body, usage, info,
+        shortcode,
+        mxc,
+        body,
+        usage,
+        info,
       };
 
       this.images.set(shortcode, image);
@@ -156,15 +160,17 @@ function getGlobalImagePacks(mx) {
     if (!room) return [];
     const stateKeys = Object.keys(rooms[roomId]);
 
-    return stateKeys.map((stateKey) => {
-      const data = room.currentState.getStateEvents('im.ponies.room_emotes', stateKey);
-      const pack = ImagePack.parsePack(data?.getId(), data?.getContent());
-      if (pack) {
-        pack.displayName ??= room.name;
-        pack.avatarUrl ??= room.getMxcAvatarUrl();
-      }
-      return pack;
-    }).filter((pack) => pack !== null);
+    return stateKeys
+      .map((stateKey) => {
+        const data = room.currentState.getStateEvents('im.ponies.room_emotes', stateKey);
+        const pack = ImagePack.parsePack(data?.getId(), data?.getContent());
+        if (pack) {
+          pack.displayName ??= room.name;
+          pack.avatarUrl ??= room.getMxcAvatarUrl();
+        }
+        return pack;
+      })
+      .filter((pack) => pack !== null);
   });
 
   return packs;
@@ -261,7 +267,11 @@ function getEmojiForCompletion(mx, rooms) {
 
 export {
   ImagePack,
-  getUserImagePack, getGlobalImagePacks, getRoomImagePacks,
-  getShortcodeToEmoji, getShortcodeToCustomEmoji,
-  getRelevantPacks, getEmojiForCompletion,
+  getUserImagePack,
+  getGlobalImagePacks,
+  getRoomImagePacks,
+  getShortcodeToEmoji,
+  getShortcodeToCustomEmoji,
+  getRelevantPacks,
+  getEmojiForCompletion,
 };

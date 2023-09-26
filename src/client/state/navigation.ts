@@ -83,7 +83,7 @@ class Navigation extends EventEmitter {
       cons.events.navigation.ROOM_SELECTED,
       this.selectedRoomId,
       prevSelectedRoomId,
-      eventId
+      eventId,
     );
   }
 
@@ -295,7 +295,7 @@ class Navigation extends EventEmitter {
         this.emit(
           cons.events.navigation.ROOM_SETTINGS_TOGGLED,
           this.isRoomSettings,
-          action.tabText
+          action.tabText,
         );
       },
       [cons.actions.navigation.OPEN_SHORTCUT_SPACES]: () => {
@@ -329,7 +329,7 @@ class Navigation extends EventEmitter {
         this.emit(
           cons.events.navigation.EMOJIBOARD_OPENED,
           action.cords,
-          action.requestEmojiCallback
+          action.requestEmojiCallback,
         );
       },
       [cons.actions.navigation.OPEN_READRECEIPTS]: () => {
@@ -344,7 +344,7 @@ class Navigation extends EventEmitter {
           action.userId,
           action.eventId,
           action.body,
-          action.formattedBody
+          action.formattedBody,
         );
       },
       [cons.actions.navigation.OPEN_SEARCH]: () => {
@@ -356,7 +356,7 @@ class Navigation extends EventEmitter {
           action.placement,
           action.cords,
           action.render,
-          action.afterClose
+          action.afterClose,
         );
       },
       [cons.actions.navigation.OPEN_REUSABLE_DIALOG]: () => {
@@ -364,14 +364,14 @@ class Navigation extends EventEmitter {
           cons.events.navigation.REUSABLE_DIALOG_OPENED,
           action.title,
           action.render,
-          action.afterClose
+          action.afterClose,
         );
       },
       [cons.actions.navigation.OPEN_EMOJI_VERIFICATION]: () => {
         this.emit(
           cons.events.navigation.EMOJI_VERIFICATION_OPENED,
           action.request,
-          action.targetDevice
+          action.targetDevice,
         );
       },
     };

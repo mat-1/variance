@@ -124,7 +124,7 @@ function RoomProfile({ roomId }) {
         'Remove avatar',
         'Are you sure that you want to remove room avatar?',
         'Remove',
-        'caution'
+        'caution',
       );
       if (isConfirmed) {
         await mx.sendStateEvent(roomId, 'm.room.avatar', { url }, '');

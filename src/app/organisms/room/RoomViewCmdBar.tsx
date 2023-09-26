@@ -60,7 +60,7 @@ function renderSuggestions({ prefix, option, suggestions }, fireCmd) {
             shortcodes: emoji.shortcodes?.toString(),
           }),
           base: TWEMOJI_BASE_URL,
-        })
+        }),
       );
     }
 

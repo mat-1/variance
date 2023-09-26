@@ -253,7 +253,7 @@ class Notifications extends EventEmitter {
           this.matrixClient.baseUrl,
           iconSize,
           iconSize,
-          'crop'
+          'crop',
         ),
         size: iconSize,
         borderRadius: 8,

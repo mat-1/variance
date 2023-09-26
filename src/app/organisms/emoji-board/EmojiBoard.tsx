@@ -58,7 +58,7 @@ const EmojiGroup = React.memo(({ name, groupEmojis }) => {
                     loading: 'lazy',
                   }),
                   base: TWEMOJI_BASE_URL,
-                })
+                }),
               )
             ) : (
               // This is a custom emoji, and should be render as an mxc
@@ -73,13 +73,13 @@ const EmojiGroup = React.memo(({ name, groupEmojis }) => {
                 data-mx-emoticon={emoji.mxc}
               />
             )}
-          </span>
+          </span>,
         );
       }
       emojiBoard.push(
         <div key={r} className="emoji-row">
           {emojiRow}
-        </div>
+        </div>,
       );
     }
     return emojiBoard;
@@ -105,7 +105,7 @@ EmojiGroup.propTypes = {
       mxc: PropTypes.string,
       shortcode: PropTypes.string,
       shortcodes: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-    })
+    }),
   ).isRequired,
 };
 
@@ -200,7 +200,7 @@ function EmojiBoard({ onSelect, searchRef }) {
     searchRef.current.setAttribute('placeholder', shortcodes[0]);
     setEmojiInfo({ shortcode: shortcodes[0], src, unicode });
   }
-  
+
   function handleSearchChange() {
     const term = searchRef.current.value;
     asyncSearch.search(term);
@@ -225,7 +225,7 @@ function EmojiBoard({ onSelect, searchRef }) {
       const parentRooms = [...parentIds].map((id) => mx.getRoom(id));
       if (room) {
         const packs = getRelevantPacks(room.client, [room, ...parentRooms]).filter(
-          (pack) => pack.getEmojis().length !== 0
+          (pack) => pack.getEmojis().length !== 0,
         );
 
         // Set an index for each pack so that we know where to jump when the user uses the nav
@@ -277,7 +277,7 @@ function EmojiBoard({ onSelect, searchRef }) {
           <div className="emoji-board__nav-custom">
             {availableEmojis.map((pack) => {
               const src = initMatrix.matrixClient.mxcUrlToHttp(
-                pack.avatarUrl ?? pack.getEmojis()[0].mxc
+                pack.avatarUrl ?? pack.getEmojis()[0].mxc,
               );
               return (
                 <IconButton

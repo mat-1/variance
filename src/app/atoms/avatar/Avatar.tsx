@@ -22,7 +22,7 @@ const Avatar = React.forwardRef(({ text, bgColor, iconSrc, iconColor, imageSrc, 
   const { onlyAnimateOnHover } = settings;
 
   const [activeImageSrc, setActiveImageSrc] = React.useState(
-    onlyAnimateOnHover ? pausedImageSrc : imageSrc
+    onlyAnimateOnHover ? pausedImageSrc : imageSrc,
   );
 
   // also update when imageSrc changes

@@ -24,7 +24,7 @@ export async function getWellKnown(servername: string): Promise<WellKnown> {
   const serverDiscoveryUrl = `${protocol}${servername}${WELL_KNOWN_URI}`;
   try {
     const result: WellKnown = await fetch(serverDiscoveryUrl, { method: 'GET' }).then((res) =>
-      res.json()
+      res.json(),
     );
 
     const baseUrl = result['m.homeserver'].base_url;
@@ -131,9 +131,8 @@ export function joinRuleToIconSrc(joinRule, isSpace) {
 
 // NOTE: it gives userId with minimum power level 50;
 function getHighestPowerUserId(room) {
-  const userIdToPower = room.currentState
-    .getStateEvents('m.room.power_levels', '')
-    ?.getContent().users;
+  const userIdToPower = room.currentState.getStateEvents('m.room.power_levels', '')?.getContent()
+    .users;
   let powerUserId = null;
   if (!userIdToPower) return powerUserId;
 
@@ -182,7 +181,7 @@ export function genRoomVia(room) {
   }
   const serverToPop = getServerToPopulation(room);
   const sortedServers = Object.keys(serverToPop).sort(
-    (svrA, svrB) => serverToPop[svrB] - serverToPop[svrA]
+    (svrA, svrB) => serverToPop[svrB] - serverToPop[svrA],
   );
   const mostPop3 = sortedServers.slice(0, 3);
   if (via.length === 0) return mostPop3;
@@ -234,7 +233,7 @@ export async function hasDevices(userId) {
   try {
     const usersDeviceMap = await mx.downloadKeys([userId, mx.getUserId()]);
     return Object.values(usersDeviceMap).every(
-      (userDevices) => Object.keys(userDevices).length > 0
+      (userDevices) => Object.keys(userDevices).length > 0,
     );
   } catch (e) {
     console.error("Error determining if it's possible to encrypt to all users: ", e);

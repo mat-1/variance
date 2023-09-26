@@ -29,7 +29,10 @@ function ReusableContextMenu() {
         return;
       }
       setData({
-        placement, cords, render, afterClose,
+        placement,
+        cords,
+        render,
+        afterClose,
       });
     };
     navigation.on(cons.events.navigation.REUSABLE_CONTEXT_MENU_OPENED, handleContextMenuOpen);
