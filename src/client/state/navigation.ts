@@ -1,12 +1,31 @@
 import EventEmitter from 'events';
 import appDispatcher from '../dispatcher';
 import cons from './cons';
+import { InitMatrix } from '../initMatrix';
 
 class Navigation extends EventEmitter {
+  initMatrix: InitMatrix;
+
+  selectedTab: string;
+
+  selectedSpaceId: string | null;
+
+  selectedSpacePath: string[];
+
+  selectedRoomId: string | null;
+
+  isRoomSettings: boolean;
+
+  recentRooms: string[];
+
+  spaceToRoom: Map<string, { roomId: string; timestamp: number }>;
+
+  rawModelStack: boolean[];
+
   constructor() {
     super();
     // this will attached by initMatrix
-    this.initMatrix = {};
+    this.initMatrix = {} as InitMatrix;
 
     this.selectedTab = cons.tabs.HOME;
     this.selectedSpaceId = null;
@@ -21,7 +40,7 @@ class Navigation extends EventEmitter {
     this.rawModelStack = [];
   }
 
-  _addToSpacePath(roomId, asRoot) {
+  _addToSpacePath(roomId: string, asRoot: boolean) {
     if (typeof roomId !== 'string') {
       this.selectedSpacePath = [cons.tabs.HOME];
       return;
@@ -38,7 +57,7 @@ class Navigation extends EventEmitter {
     this.selectedSpacePath.push(roomId);
   }
 
-  _mapRoomToSpace(roomId) {
+  _mapRoomToSpace(roomId: string) {
     const { roomList } = this.initMatrix;
     if (
       this.selectedTab === cons.tabs.HOME &&
@@ -65,7 +84,7 @@ class Navigation extends EventEmitter {
     });
   }
 
-  _selectRoom(roomId, eventId) {
+  _selectRoom(roomId: string, eventId: string | undefined = undefined) {
     const prevSelectedRoomId = this.selectedRoomId;
     this.selectedRoomId = roomId;
     if (prevSelectedRoomId !== roomId) this._mapRoomToSpace(roomId);
@@ -185,7 +204,7 @@ class Navigation extends EventEmitter {
     this.emit(cons.events.navigation.SPACE_SELECTED, this.selectedSpaceId);
   }
 
-  _selectRoomWithSpace(spaceId) {
+  _selectRoomWithSpace(spaceId: string) {
     if (!spaceId) return;
     const { roomList, accountData, matrixClient } = this.initMatrix;
     const { categorizedSpaces } = accountData;

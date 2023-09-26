@@ -49,5 +49,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'error',
 
     '@typescript-eslint/no-unused-vars': 'error',
+
+    'no-console': 'off',
   },
 };

@@ -14,9 +14,14 @@ const {
   sanitizeUrl,
 } = SimpleMarkdown;
 
-function htmlTag(tagName, content, attributes, isClosed) {
+function htmlTag(
+  tagName: string,
+  content: string,
+  attributes: Record<string, string | number | boolean | null | undefined> | undefined = undefined,
+  isClosed: boolean | undefined = undefined,
+) {
   let s = '';
-  Object.entries(attributes || {}).forEach(([k, v]) => {
+  Object.entries(attributes ?? {}).forEach(([k, v]) => {
     if (v !== undefined) {
       s += ` ${sanitizeText(k)}`;
       if (v !== null) s += `="${sanitizeText(v)}"`;
@@ -31,7 +36,7 @@ function htmlTag(tagName, content, attributes, isClosed) {
   return `${s}${content}</${tagName}>`;
 }
 
-function mathHtml(wrap, node) {
+function mathHtml(wrap: string, node) {
   return htmlTag(wrap, htmlTag('code', sanitizeText(node.content)), {
     'data-mx-maths': node.content,
   });
@@ -408,7 +413,7 @@ const markdownRules = {
   },
 };
 
-function mapElement(el) {
+function mapElement(el: HTMLElement) {
   switch (el.tagName) {
     case 'MX-REPLY':
       return [];
@@ -429,8 +434,9 @@ function mapElement(el) {
       return [{ type: 'hr' }];
     case 'PRE': {
       let lang;
-      if (el.firstChild) {
-        Array.from(el.firstChild.classList).some((c) => {
+      const firstChild: HTMLElement | null = el.firstChild as HTMLElement | null;
+      if (firstChild) {
+        Array.from(firstChild.classList).some((c: string) => {
           const langPrefix = 'language-';
           if (c.startsWith(langPrefix)) {
             lang = c.slice(langPrefix.length);
@@ -456,14 +462,14 @@ function mapElement(el) {
       ];
     case 'TABLE': {
       const headerEl = Array.from(el.querySelector('thead > tr').childNodes);
-      const align = headerEl.map((childE) => childE.style['text-align']);
+      const align = headerEl.map((childE: HTMLElement) => childE.style['text-align']);
       return [
         {
           type: 'table',
           header: headerEl.map(mapChildren),
           align,
           cells: Array.from(el.querySelectorAll('tbody > tr')).map((rowEl) =>
-            Array.from(rowEl.childNodes).map((childEl, i) => {
+            Array.from(rowEl.childNodes).map((childEl: HTMLElement, i) => {
               if (align[i] === undefined) align[i] = childEl.style['text-align'];
               return mapChildren(childEl);
             }),
@@ -559,7 +565,7 @@ function mapNode(n) {
   }
 }
 
-function mapChildren(n) {
+function mapChildren(n: HTMLElement) {
   return Array.from(n.childNodes).reduce((ast, childN) => {
     ast.push(...mapNode(childN));
     return ast;
@@ -603,12 +609,10 @@ export function plain(source, state) {
 }
 
 export function markdown(source, state) {
-  const parsed = mdParser(source, state);
-  // console.log('parsed', parsed);
-  return render(parsed, state, mdPlainOut, mdHtmlOut);
+  return render(mdParser(source, state), state, mdPlainOut, mdHtmlOut);
 }
 
-export function html(source, state) {
+export function html(source: string, state) {
   const el = document.createElement('template');
   el.innerHTML = source;
   return render(mapChildren(el.content), state, mdPlainOut, mdHtmlOut);

@@ -1,9 +1,7 @@
 import EventEmitter from 'events';
 import * as sdk from 'matrix-js-sdk';
 import Olm from '@matrix-org/olm';
-// import { logger } from 'matrix-js-sdk/lib/logger';
 
-import { SlidingSync } from 'matrix-js-sdk/lib/sliding-sync';
 import { secret } from './state/auth';
 import RoomList from './state/RoomList';
 import AccountData from './state/AccountData';
@@ -16,7 +14,7 @@ global.Olm = Olm;
 
 // logger.disableAll();
 
-class InitMatrix extends EventEmitter {
+export class InitMatrix extends EventEmitter {
   matrixClient: sdk.MatrixClient;
 
   roomList: RoomList;

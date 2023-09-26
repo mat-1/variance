@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import { ClientEvent, MatrixClient, RoomEvent, RoomStateEvent } from 'matrix-js-sdk';
 import appDispatcher from '../dispatcher';
 import cons from './cons';
 
@@ -11,7 +12,7 @@ function isMEventSpaceChild(mEvent) {
  * @param {number} timeout timeout to callback
  * @param {number} maxTry maximum callback try > 0. -1 means no limit
  */
-async function waitFor(callback, timeout = 400, maxTry = -1) {
+async function waitFor(callback: () => void, timeout: number = 400, maxTry: number = -1) {
   if (maxTry === 0) return false;
   const isOver = async () =>
     new Promise((resolve) => {
@@ -23,7 +24,27 @@ async function waitFor(callback, timeout = 400, maxTry = -1) {
 }
 
 class RoomList extends EventEmitter {
-  constructor(matrixClient) {
+  matrixClient: MatrixClient;
+
+  mDirects: Set<string>;
+
+  roomIdToParents: Map<string, Set<string>>;
+
+  inviteDirects: Set<string>;
+
+  inviteSpaces: Set<string>;
+
+  inviteRooms: Set<string>;
+
+  directs: Set<string>;
+
+  spaces: Set<string>;
+
+  rooms: Set<string>;
+
+  processingRooms: Map<string, { roomId: string; isDM: boolean; task: string }>;
+
+  constructor(matrixClient: MatrixClient) {
     super();
     this.matrixClient = matrixClient;
     this.mDirects = this.getMDirects();
@@ -196,8 +217,8 @@ class RoomList extends EventEmitter {
     actions[action.type]?.();
   }
 
-  getMDirects() {
-    const mDirectsId = new Set();
+  getMDirects(): Set<string> {
+    const mDirectsId = new Set<string>();
     const mDirect = this.matrixClient.getAccountData('m.direct')?.getContent();
 
     if (typeof mDirect === 'undefined') return mDirectsId;
@@ -250,7 +271,7 @@ class RoomList extends EventEmitter {
 
   _listenEvents() {
     // Update roomList when m.direct changes
-    this.matrixClient.on('accountData', (event) => {
+    this.matrixClient.on(ClientEvent.AccountData, (event) => {
       if (event.getType() !== 'm.direct') return;
 
       const latestMDirects = this.getMDirects();
@@ -282,12 +303,12 @@ class RoomList extends EventEmitter {
       });
     });
 
-    this.matrixClient.on('Room.name', (room) => {
+    this.matrixClient.on(RoomEvent.Name, (room) => {
       this.emit(cons.events.roomList.ROOMLIST_UPDATED);
       this.emit(cons.events.roomList.ROOM_PROFILE_UPDATED, room.roomId);
     });
 
-    this.matrixClient.on('RoomState.events', (mEvent, state) => {
+    this.matrixClient.on(RoomStateEvent.Events, (mEvent, state) => {
       if (mEvent.getType() === 'm.space.child') {
         const roomId = mEvent.event.room_id;
         const childId = mEvent.event.state_key;
@@ -315,7 +336,7 @@ class RoomList extends EventEmitter {
       }
     });
 
-    this.matrixClient.on('Room.myMembership', async (room, membership, prevMembership) => {
+    this.matrixClient.on(RoomEvent.MyMembership, async (room, membership, prevMembership) => {
       // room => prevMembership = null | invite | join | leave | kick | ban | unban
       // room => membership = invite | join | leave | kick | ban | unban
       const { roomId } = room;

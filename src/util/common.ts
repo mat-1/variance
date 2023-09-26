@@ -1,8 +1,9 @@
 /* eslint-disable max-classes-per-file */
-export function bytesToSize(bytes) {
+
+export function bytesToSize(bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   if (bytes === 0) return 'n/a';
-  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
   if (i === 0) return `${bytes} ${sizes[i]}`;
   return `${(bytes / 1024 ** i).toFixed(1)} ${sizes[i]}`;
 }
@@ -45,50 +46,52 @@ export function getEventCords(ev, targetSelector) {
   };
 }
 
-export function abbreviateNumber(number) {
+export function abbreviateNumber(number: number): string {
   if (number > 99) return '99+';
-  return number;
+  return number.toString();
 }
 
 export class Debounce {
+  timeoutId: ReturnType<typeof setTimeout> | null;
+
   constructor() {
     this.timeoutId = null;
   }
 
   /**
-   * @param {function} func - callback function
-   * @param {number} wait - wait in milliseconds to call func
-   * @returns {func} debounceCallback - to pass arguments to func callback
+   * @param func - callback function
+   * @param wait - wait in milliseconds to call func
+   * @returns debounceCallback - to pass arguments to func callback
    */
-  _(func, wait) {
-    const that = this;
-    return function debounceCallback(...args) {
-      clearTimeout(that.timeoutId);
-      that.timeoutId = setTimeout(() => {
+  _(func: () => void, wait: number): (...args: unknown[]) => void {
+    return (...args) => {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = setTimeout(() => {
         func.apply(this, args);
-        that.timeoutId = null;
+        this.timeoutId = null;
       }, wait);
     };
   }
 }
 
 export class Throttle {
+  timeoutId: ReturnType<typeof setTimeout> | null;
+
   constructor() {
     this.timeoutId = null;
   }
 
   /**
-   * @param {function} func - callback function
-   * @param {number} wait - wait in milliseconds to call func
-   * @returns {function} throttleCallback - to pass arguments to func callback
+   * @param func - callback function
+   * @param wait - wait in milliseconds to call func
+   * @returns throttleCallback - to pass arguments to func callback
    */
-  _(func, wait) {
-    const that = this;
-    return function throttleCallback(...args) {
-      if (that.timeoutId !== null) return;
-      that.timeoutId = setTimeout(() => {
+  _(func: () => void, wait: number): (...args: unknown[]) => void {
+    return (...args) => {
+      if (this.timeoutId !== null) return;
+      this.timeoutId = setTimeout(() => {
         func.apply(this, args);
-        that.timeoutId = null;
+        this.timeoutId = null;
       }, wait);
     };
   }
@@ -100,13 +103,24 @@ export function getUrlPrams(paramName) {
   return urlParams.get(paramName);
 }
 
-export function getScrollInfo(target) {
-  const scroll = {};
-  scroll.top = Math.round(target.scrollTop);
-  scroll.height = Math.round(target.scrollHeight);
-  scroll.viewHeight = Math.round(target.offsetHeight);
-  scroll.isScrollable = scroll.height > scroll.viewHeight;
-  return scroll;
+interface ScrollInfo {
+  top: number;
+  height: number;
+  viewHeight: number;
+  isScrollable: boolean;
+}
+
+export function getScrollInfo(target: HTMLElement): ScrollInfo {
+  const top = Math.round(target.scrollTop);
+  const height = Math.round(target.scrollHeight);
+  const viewHeight = Math.round(target.offsetHeight);
+  const isScrollable = height > viewHeight;
+  return {
+    top,
+    height,
+    viewHeight,
+    isScrollable,
+  };
 }
 
 export function avatarInitials(text) {

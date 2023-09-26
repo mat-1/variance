@@ -3,7 +3,7 @@ FROM node:18.12.1-alpine3.15 as builder
 
 WORKDIR /src
 
-COPY .npmrc package.json package-lock.json /src/
+COPY .yarnrc.yml package.json yarn.lock /src/
 RUN yarn ci
 COPY . /src/
 ENV NODE_OPTIONS=--max_old_space_size=4096
