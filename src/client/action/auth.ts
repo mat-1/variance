@@ -49,7 +49,7 @@ async function login(baseUrl: string, username: string, email: string, password:
   // const wellKnown: WellKnown | undefined = res?.well_known;
   const wellKnown: WellKnown = await getWellKnown(baseUrl);
   const myBaseUrl = wellKnown?.['m.homeserver']?.base_url || client.baseUrl;
-  const mySlidingSyncProxyUrl = wellKnown?.['org.matrix.msc3575.proxy'].url;
+  const mySlidingSyncProxyUrl = wellKnown?.['org.matrix.msc3575.proxy']?.url;
   updateLocalStore(res.access_token, res.device_id, res.user_id, myBaseUrl, mySlidingSyncProxyUrl);
 }
 
