@@ -1,5 +1,5 @@
 {
-  "defaultHomeserver": 3,
-  "homeserverList": ["converser.eu", "envs.net", "halogen.city", "matrix.org", "mozilla.org"],
+  "defaultHomeserver": 0,
+  "homeserverList": ["matrix.org", "converser.eu", "envs.net", "halogen.place", "mozilla.org"],
   "allowCustomHomeservers": true
 }

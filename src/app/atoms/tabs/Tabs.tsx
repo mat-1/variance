@@ -35,16 +35,16 @@ TabItem.propTypes = {
   disabled: PropTypes.bool,
 };
 
-function Tabs<D>({
+function Tabs<D = undefined>({
   items,
   defaultSelected,
   onSelect,
   data,
 }: {
-  items: { iconSrc: string; text: string; disabled: boolean; render?: (d: D) => Element }[];
+  items: { iconSrc: string; text: string; disabled: boolean; render?: (d?: D) => Element }[];
   defaultSelected: number;
   onSelect: (item: { iconSrc: string; text: string; disabled: boolean }, index: number) => void;
-  data: D;
+  data?: D;
 }) {
   const [selectedItem, setSelectedItem] = useState(items[defaultSelected]);
 

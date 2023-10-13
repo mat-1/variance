@@ -646,7 +646,7 @@ function Settings() {
         </>
       }
       onRequestClose={requestClose}
-      fullscreen={true}
+      fullscreen
     >
       {isOpen && (
         <div className="settings-window__content">
