@@ -31,9 +31,8 @@ const BAD_LOCALPART_ERROR = "Username can only contain characters a-z, 0-9, or '
 const USER_ID_TOO_LONG_ERROR =
   "Your user ID, including the hostname, can't be more than 255 characters long.";
 
-const PASSWORD_STRENGHT_REGEX = /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\w\d\s:])([^\s]){8,127}$/;
-const BAD_PASSWORD_ERROR =
-  'Password must contain at least 1 lowercase, 1 uppercase, 1 number, 1 non-alphanumeric character, 8-127 characters with no space.';
+const PASSWORD_STRENGTH_REGEX = /.{8,}$/;
+const BAD_PASSWORD_ERROR = 'Password must be at least 8 characters.';
 const CONFIRM_PASSWORD_ERROR = "Passwords don't match.";
 
 const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -193,7 +192,7 @@ function Login({ loginFlow, baseUrl }) {
   };
 
   const validator = (values) => {
-    const errors = {};
+    const errors: { email?: string } = {};
     if (typeIndex === 1 && values.email.length > 0 && !isValidInput(values.email, EMAIL_REGEX)) {
       errors.email = BAD_EMAIL_ERROR;
     }
@@ -393,7 +392,7 @@ function Register({ registerInfo, loginFlow, baseUrl }) {
     if (values.username.length > 0 && !isValidInput(values.username, LOCALPART_SIGNUP_REGEX)) {
       errors.username = BAD_LOCALPART_ERROR;
     }
-    if (values.password.length > 0 && !isValidInput(values.password, PASSWORD_STRENGHT_REGEX)) {
+    if (values.password.length > 0 && !isValidInput(values.password, PASSWORD_STRENGTH_REGEX)) {
       errors.password = BAD_PASSWORD_ERROR;
     }
     if (
@@ -688,22 +687,24 @@ function AuthCard() {
 function Auth() {
   const [loginToken, setLoginToken] = useState(getUrlPrams('loginToken'));
 
-  useEffect(async () => {
-    if (!loginToken) return;
-    if (localStorage.getItem(cons.secretKey.BASE_URL) === undefined) {
-      setLoginToken(null);
-      return;
-    }
-    const baseUrl = localStorage.getItem(cons.secretKey.BASE_URL);
-    try {
-      await auth.loginWithToken(baseUrl, loginToken);
+  useEffect(() => {
+    (async () => {
+      if (!loginToken) return;
+      if (localStorage.getItem(cons.secretKey.BASE_URL) === undefined) {
+        setLoginToken(null);
+        return;
+      }
+      const baseUrl = localStorage.getItem(cons.secretKey.BASE_URL);
+      try {
+        await auth.loginWithToken(baseUrl, loginToken);
 
-      const { href } = window.location;
-      window.location.replace(href.slice(0, href.indexOf('?')));
-    } catch {
-      setLoginToken(null);
-    }
-  }, []);
+        const { href } = window.location;
+        window.location.replace(href.slice(0, href.indexOf('?')));
+      } catch {
+        setLoginToken(null);
+      }
+    })();
+  }, [loginToken]);
 
   return (
     <ScrollView invisible>
