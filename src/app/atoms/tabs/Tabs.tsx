@@ -35,7 +35,17 @@ TabItem.propTypes = {
   disabled: PropTypes.bool,
 };
 
-function Tabs({ items, defaultSelected, onSelect }) {
+function Tabs<D>({
+  items,
+  defaultSelected,
+  onSelect,
+  data,
+}: {
+  items: { iconSrc: string; text: string; disabled: boolean; render?: (d: D) => Element }[];
+  defaultSelected: number;
+  onSelect: (item: { iconSrc: string; text: string; disabled: boolean }, index: number) => void;
+  data: D;
+}) {
   const [selectedItem, setSelectedItem] = useState(items[defaultSelected]);
 
   const handleTabSelection = (item, index) => {
@@ -45,22 +55,25 @@ function Tabs({ items, defaultSelected, onSelect }) {
   };
 
   return (
-    <div className="tabs">
-      <ScrollView horizontal={false} vertical invisible>
-        <div className="tabs__content">
-          {items.map((item, index) => (
-            <TabItem
-              key={item.text}
-              selected={selectedItem.text === item.text}
-              iconSrc={item.iconSrc}
-              disabled={item.disabled}
-              onClick={() => handleTabSelection(item, index)}
-            >
-              {item.text}
-            </TabItem>
-          ))}
-        </div>
-      </ScrollView>
+    <div className="tabs-container">
+      <div className="tabs">
+        <ScrollView horizontal={false} vertical invisible>
+          <div className="tabs__content">
+            {items.map((item, index) => (
+              <TabItem
+                key={item.text}
+                selected={selectedItem.text === item.text}
+                iconSrc={item.iconSrc}
+                disabled={item.disabled}
+                onClick={() => handleTabSelection(item, index)}
+              >
+                {item.text}
+              </TabItem>
+            ))}
+          </div>
+        </ScrollView>
+      </div>
+      <ScrollView autohide>{selectedItem.render(data)}</ScrollView>
     </div>
   );
 }

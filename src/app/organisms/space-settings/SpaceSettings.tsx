@@ -49,29 +49,6 @@ const tabText = {
   PERMISSIONS: 'Permissions',
 };
 
-const tabItems = [
-  {
-    iconSrc: SettingsIC,
-    text: tabText.GENERAL,
-    disabled: false,
-  },
-  {
-    iconSrc: UserIC,
-    text: tabText.MEMBERS,
-    disabled: false,
-  },
-  {
-    iconSrc: EmojiIC,
-    text: tabText.EMOJIS,
-    disabled: false,
-  },
-  {
-    iconSrc: ShieldUserIC,
-    text: tabText.PERMISSIONS,
-    disabled: false,
-  },
-];
-
 function GeneralSettings({ roomId }) {
   const isPinned = initMatrix.accountData.spaceShortcut.has(roomId);
   const isCategorized = initMatrix.accountData.categorizedSpaces.has(roomId);
@@ -137,6 +114,33 @@ GeneralSettings.propTypes = {
   roomId: PropTypes.string.isRequired,
 };
 
+const tabItems = [
+  {
+    text: tabText.GENERAL,
+    iconSrc: SettingsIC,
+    disabled: false,
+    render: (roomId) => <GeneralSettings roomId={roomId} />,
+  },
+  {
+    text: tabText.MEMBERS,
+    iconSrc: UserIC,
+    disabled: false,
+    render: (roomId) => <RoomMembers roomId={roomId} />,
+  },
+  {
+    text: tabText.EMOJIS,
+    iconSrc: EmojiIC,
+    disabled: false,
+    render: (roomId) => <RoomEmojis roomId={roomId} />,
+  },
+  {
+    text: tabText.PERMISSIONS,
+    iconSrc: ShieldUserIC,
+    disabled: false,
+    render: (roomId) => <RoomPermissions roomId={roomId} />,
+  },
+];
+
 function useWindowToggle(setSelectedTab) {
   const [window, setWindow] = useState(null);
 
@@ -190,15 +194,8 @@ function SpaceSettings() {
             items={tabItems}
             defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab.text)}
             onSelect={handleTabChange}
+            data={roomId}
           />
-          <div className="space-settings__cards-wrapper">
-            <ScrollView autohide>
-              {selectedTab.text === tabText.GENERAL && <GeneralSettings roomId={roomId} />}
-              {selectedTab.text === tabText.MEMBERS && <RoomMembers roomId={roomId} />}
-              {selectedTab.text === tabText.EMOJIS && <RoomEmojis roomId={roomId} />}
-              {selectedTab.text === tabText.PERMISSIONS && <RoomPermissions roomId={roomId} />}
-            </ScrollView>
-          </div>
         </div>
       )}
     </PopupWindow>

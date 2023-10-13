@@ -655,9 +655,6 @@ function Settings() {
             defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab.text)}
             onSelect={handleTabChange}
           />
-          <div className="settings-window__cards-wrapper">
-            <ScrollView autohide>{selectedTab.render()}</ScrollView>
-          </div>
         </div>
       )}
     </PopupWindow>

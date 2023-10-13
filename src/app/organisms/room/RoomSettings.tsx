@@ -49,39 +49,6 @@ const tabText = {
   SECURITY: 'Security',
 };
 
-const tabItems = [
-  {
-    iconSrc: SettingsIC,
-    text: tabText.GENERAL,
-    disabled: false,
-  },
-  {
-    iconSrc: SearchIC,
-    text: tabText.SEARCH,
-    disabled: false,
-  },
-  {
-    iconSrc: UserIC,
-    text: tabText.MEMBERS,
-    disabled: false,
-  },
-  {
-    iconSrc: EmojiIC,
-    text: tabText.EMOJIS,
-    disabled: false,
-  },
-  {
-    iconSrc: ShieldUserIC,
-    text: tabText.PERMISSIONS,
-    disabled: false,
-  },
-  {
-    iconSrc: LockIC,
-    text: tabText.SECURITY,
-    disabled: false,
-  },
-];
-
 function GeneralSettings({ roomId }) {
   const mx = initMatrix.matrixClient;
   const room = mx.getRoom(roomId);
@@ -151,6 +118,45 @@ SecuritySettings.propTypes = {
   roomId: PropTypes.string.isRequired,
 };
 
+const tabItems = [
+  {
+    text: tabText.GENERAL,
+    iconSrc: SettingsIC,
+    disabled: false,
+    render: (roomId) => <GeneralSettings roomId={roomId} />,
+  },
+  {
+    text: tabText.SEARCH,
+    iconSrc: SearchIC,
+    disabled: false,
+    render: (roomId) => <RoomSearch roomId={roomId} />,
+  },
+  {
+    text: tabText.MEMBERS,
+    iconSrc: UserIC,
+    disabled: false,
+    render: (roomId) => <RoomMembers roomId={roomId} />,
+  },
+  {
+    text: tabText.EMOJIS,
+    iconSrc: EmojiIC,
+    disabled: false,
+    render: (roomId) => <RoomEmojis roomId={roomId} />,
+  },
+  {
+    text: tabText.PERMISSIONS,
+    iconSrc: ShieldUserIC,
+    disabled: false,
+    render: (roomId) => <RoomPermissions roomId={roomId} />,
+  },
+  {
+    text: tabText.SECURITY,
+    iconSrc: LockIC,
+    disabled: false,
+    render: (roomId) => <SecuritySettings roomId={roomId} />,
+  },
+];
+
 function RoomSettings({ roomId }) {
   const [, forceUpdate] = useForceUpdate();
   const [selectedTab, setSelectedTab] = useState(tabItems[0]);
@@ -202,17 +208,8 @@ function RoomSettings({ roomId }) {
           items={tabItems}
           defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab.text)}
           onSelect={handleTabChange}
+          data={roomId}
         />
-        <div className="room-settings__cards-wrapper">
-          <ScrollView autohide>
-            {selectedTab.text === tabText.GENERAL && <GeneralSettings roomId={roomId} />}
-            {selectedTab.text === tabText.SEARCH && <RoomSearch roomId={roomId} />}
-            {selectedTab.text === tabText.MEMBERS && <RoomMembers roomId={roomId} />}
-            {selectedTab.text === tabText.EMOJIS && <RoomEmojis roomId={roomId} />}
-            {selectedTab.text === tabText.PERMISSIONS && <RoomPermissions roomId={roomId} />}
-            {selectedTab.text === tabText.SECURITY && <SecuritySettings roomId={roomId} />}
-          </ScrollView>
-        </div>
       </div>
     </div>
   );

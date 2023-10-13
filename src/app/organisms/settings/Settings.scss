@@ -27,10 +27,17 @@
   }
 
   &__content {
-    // put tabs on the left
-    display: flex;
-    flex-direction: row;
     height: 100%;
+
+    & .setting-tile {
+      margin: 0 var(--sp-normal);
+      margin-top: var(--sp-normal);
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--bg-surface-border);
+      &:last-child {
+        border-bottom: none;
+      }
+    }
   }
 }
 .settings-window__card {
@@ -56,18 +63,6 @@
 .settings-about__card,
 .settings-emoji__card {
   @extend .settings-window__card;
-}
-
-.settings-window__cards-wrapper {
-  & .setting-tile {
-    margin: 0 var(--sp-normal);
-    margin-top: var(--sp-normal);
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--bg-surface-border);
-    &:last-child {
-      border-bottom: none;
-    }
-  }
 }
 
 .settings-notifications {
