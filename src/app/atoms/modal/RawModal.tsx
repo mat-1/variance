@@ -21,6 +21,9 @@ function RawModal({
 }) {
   let modalClass = className !== null ? `${className} ` : '';
   switch (size) {
+    case 'fullscreen':
+      modalClass += 'raw-modal__fullscreen ';
+      break;
     case 'large':
       modalClass += 'raw-modal__large ';
       break;

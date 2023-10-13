@@ -51,9 +51,19 @@ function PopupWindow({
   onAfterClose,
   onRequestClose,
   children,
+  fullscreen,
 }) {
   const haveDrawer = drawer !== null;
   const cTitle = contentTitle !== null ? contentTitle : title;
+
+  let size: string;
+  if (fullscreen) {
+    size = 'fullscreen';
+  } else if (haveDrawer) {
+    size = 'large';
+  } else {
+    size = 'medium';
+  }
 
   return (
     <RawModal
@@ -62,7 +72,7 @@ function PopupWindow({
       isOpen={isOpen}
       onAfterClose={onAfterClose}
       onRequestClose={onRequestClose}
-      size={haveDrawer ? 'large' : 'medium'}
+      size={size}
     >
       <div className="pw">
         {haveDrawer && (
@@ -137,6 +147,8 @@ PopupWindow.propTypes = {
   onAfterClose: PropTypes.func,
   onRequestClose: PropTypes.func,
   children: PropTypes.node.isRequired,
+  fullscreen: PropTypes.bool,
 };
 
-export { PopupWindow as default, PWContentSelector };
+export default PopupWindow;
+export { PWContentSelector };
