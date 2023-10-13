@@ -1,11 +1,10 @@
 ## Builder
-FROM node:18.12.1-alpine3.15 as builder
+FROM node:20-alpine as builder
 
 WORKDIR /src
 
-COPY .yarnrc.yml package.json yarn.lock /src/
-RUN yarn ci
 COPY . /src/
+RUN yarn install
 ENV NODE_OPTIONS=--max_old_space_size=4096
 RUN yarn build
 
