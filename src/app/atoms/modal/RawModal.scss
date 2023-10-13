@@ -11,10 +11,6 @@
   outline: none;
   overflow: hidden;
 
-  &__fullscreen {
-    max-width: 100%;
-    max-height: 100%;
-  }
   &__small {
     max-width: var(--small-modal-width);
   }
@@ -23,6 +19,10 @@
   }
   &__large {
     max-width: var(--large-modal-width);
+  }
+  &__fullscreen {
+    max-width: var(--large-modal-width);
+    max-height: 100%;
   }
 
   &__overlay {

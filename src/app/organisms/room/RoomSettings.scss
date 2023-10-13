@@ -39,13 +39,17 @@
     & .room-profile {
       margin: var(--sp-extra-loose);
     }
+
+    // put tabs on the left
+    display: flex;
+    flex-direction: row;
+    height: calc(100% - calc(2 * var(--sp-extra-loose)));
   }
 
   & .tabs {
     position: sticky;
     top: 0;
     z-index: 999;
-    width: 100%;
     background-color: var(--bg-surface-low);
     box-shadow:
       0 -4px 0 var(--bg-surface-low),
@@ -58,6 +62,7 @@
 
   &__cards-wrapper {
     padding: 0 var(--sp-normal);
+    flex: 1;
     @include dir.side(padding, var(--sp-normal), var(--sp-extra-tight));
   }
 }

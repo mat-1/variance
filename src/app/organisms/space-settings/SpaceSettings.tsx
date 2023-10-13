@@ -40,6 +40,7 @@ import EmojiIC from '../../../../public/res/ic/outlined/emoji.svg';
 
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
 import { useForceUpdate } from '../../hooks/useForceUpdate';
+import ScrollView from '../../atoms/scroll/ScrollView';
 
 const tabText = {
   GENERAL: 'General',
@@ -79,6 +80,9 @@ function GeneralSettings({ roomId }) {
 
   return (
     <>
+      <div className="room-settings__card">
+        <RoomProfile roomId={roomId} />
+      </div>
       <div className="room-settings__card">
         <MenuHeader>Options</MenuHeader>
         <MenuItem
@@ -178,20 +182,22 @@ function SpaceSettings() {
       }
       contentOptions={<IconButton src={CrossIC} onClick={requestClose} tooltip="Close" />}
       onRequestClose={requestClose}
+      fullscreen
     >
       {isOpen && (
         <div className="space-settings__content">
-          <RoomProfile roomId={roomId} />
           <Tabs
             items={tabItems}
             defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab.text)}
             onSelect={handleTabChange}
           />
           <div className="space-settings__cards-wrapper">
-            {selectedTab.text === tabText.GENERAL && <GeneralSettings roomId={roomId} />}
-            {selectedTab.text === tabText.MEMBERS && <RoomMembers roomId={roomId} />}
-            {selectedTab.text === tabText.EMOJIS && <RoomEmojis roomId={roomId} />}
-            {selectedTab.text === tabText.PERMISSIONS && <RoomPermissions roomId={roomId} />}
+            <ScrollView autohide>
+              {selectedTab.text === tabText.GENERAL && <GeneralSettings roomId={roomId} />}
+              {selectedTab.text === tabText.MEMBERS && <RoomMembers roomId={roomId} />}
+              {selectedTab.text === tabText.EMOJIS && <RoomEmojis roomId={roomId} />}
+              {selectedTab.text === tabText.PERMISSIONS && <RoomPermissions roomId={roomId} />}
+            </ScrollView>
           </div>
         </div>
       )}

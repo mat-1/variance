@@ -91,6 +91,8 @@ function GeneralSettings({ roomId }) {
     <>
       <div className="room-settings__card">
         <MenuHeader>Options</MenuHeader>
+        <RoomProfile roomId={roomId} />
+
         <MenuItem disabled={!canInvite} onClick={() => openInviteUser(roomId)} iconSrc={AddUserIC}>
           Invite
         </MenuItem>
@@ -179,40 +181,39 @@ function RoomSettings({ roomId }) {
 
   return (
     <div className="room-settings">
-      <ScrollView autoHide>
-        <div className="room-settings__content">
-          <Header>
-            <button
-              className="room-settings__header-btn"
-              onClick={() => toggleRoomSettings()}
-              type="button"
-              onMouseUp={(e) => blurOnBubbling(e, '.room-settings__header-btn')}
-            >
-              <TitleWrapper>
-                <Text variant="s1" weight="medium" primary>
-                  {`${room.name}`}
-                  <span style={{ color: 'var(--tc-surface-low)' }}> — room settings</span>
-                </Text>
-              </TitleWrapper>
-              <RawIcon size="small" src={ChevronTopIC} />
-            </button>
-          </Header>
-          <RoomProfile roomId={roomId} />
-          <Tabs
-            items={tabItems}
-            defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab.text)}
-            onSelect={handleTabChange}
-          />
-          <div className="room-settings__cards-wrapper">
+      <Header>
+        <button
+          className="room-settings__header-btn"
+          onClick={() => toggleRoomSettings()}
+          type="button"
+          onMouseUp={(e) => blurOnBubbling(e, '.room-settings__header-btn')}
+        >
+          <TitleWrapper>
+            <Text variant="s1" weight="medium" primary>
+              {`${room.name}`}
+              <span style={{ color: 'var(--tc-surface-low)' }}> — room settings</span>
+            </Text>
+          </TitleWrapper>
+          <RawIcon size="small" src={ChevronTopIC} />
+        </button>
+      </Header>
+      <div className="room-settings__content">
+        <Tabs
+          items={tabItems}
+          defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab.text)}
+          onSelect={handleTabChange}
+        />
+        <div className="room-settings__cards-wrapper">
+          <ScrollView autohide>
             {selectedTab.text === tabText.GENERAL && <GeneralSettings roomId={roomId} />}
             {selectedTab.text === tabText.SEARCH && <RoomSearch roomId={roomId} />}
             {selectedTab.text === tabText.MEMBERS && <RoomMembers roomId={roomId} />}
             {selectedTab.text === tabText.EMOJIS && <RoomEmojis roomId={roomId} />}
             {selectedTab.text === tabText.PERMISSIONS && <RoomPermissions roomId={roomId} />}
             {selectedTab.text === tabText.SECURITY && <SecuritySettings roomId={roomId} />}
-          </div>
+          </ScrollView>
         </div>
-      </ScrollView>
+      </div>
     </div>
   );
 }

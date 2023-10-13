@@ -46,7 +46,7 @@ function Tabs({ items, defaultSelected, onSelect }) {
 
   return (
     <div className="tabs">
-      <ScrollView horizontal vertical={false} invisible>
+      <ScrollView horizontal={false} vertical invisible>
         <div className="tabs__content">
           {items.map((item, index) => (
             <TabItem

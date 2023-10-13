@@ -51,13 +51,28 @@ import BellIC from '../../../../public/res/ic/outlined/bell.svg';
 import InfoIC from '../../../../public/res/ic/outlined/info.svg';
 import PowerIC from '../../../../public/res/ic/outlined/power.svg';
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
+import AccessibilityIC from '../../../../public/res/ic/outlined/accessibility.svg';
 
 import CinnySVG from '../../../../public/res/svg/cinny.svg';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
+import ScrollView from '../../atoms/scroll/ScrollView';
 
 let capabilities = {
   privateReadReceipts: false,
 };
+
+function AccountSection() {
+  const [, updateState] = useState({});
+
+  return (
+    <div className="settings-account">
+      <div className="settings-account__card">
+        <MenuHeader>Profile</MenuHeader>
+        <ProfileEditor userId={initMatrix.matrixClient.getUserId()} />
+      </div>
+    </div>
+  );
+}
 
 function AppearanceSection() {
   const [, updateState] = useState({});
@@ -507,6 +522,7 @@ function AboutSection() {
 }
 
 export const tabText = {
+  ACCOUNT: 'Account',
   APPEARANCE: 'Appearance',
   ACCESSIBILITY: 'Accessibility',
   NOTIFICATIONS: 'Notifications',
@@ -516,6 +532,12 @@ export const tabText = {
 };
 const tabItems = [
   {
+    text: tabText.ACCOUNT,
+    iconSrc: UserIC,
+    disabled: false,
+    render: () => <AccountSection />,
+  },
+  {
     text: tabText.APPEARANCE,
     iconSrc: SunIC,
     disabled: false,
@@ -523,7 +545,7 @@ const tabItems = [
   },
   {
     text: tabText.ACCESSIBILITY,
-    iconSrc: UserIC,
+    iconSrc: AccessibilityIC,
     disabled: false,
     render: () => <AccessibilitySection />,
   },
@@ -628,13 +650,14 @@ function Settings() {
     >
       {isOpen && (
         <div className="settings-window__content">
-          <ProfileEditor userId={initMatrix.matrixClient.getUserId()} />
           <Tabs
             items={tabItems}
             defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab.text)}
             onSelect={handleTabChange}
           />
-          <div className="settings-window__cards-wrapper">{selectedTab.render()}</div>
+          <div className="settings-window__cards-wrapper">
+            <ScrollView autohide>{selectedTab.render()}</ScrollView>
+          </div>
         </div>
       )}
     </PopupWindow>

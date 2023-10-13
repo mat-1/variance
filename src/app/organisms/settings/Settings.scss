@@ -22,7 +22,15 @@
 
   &__cards-wrapper {
     padding: 0 var(--sp-normal);
+    flex: 1;
     @include dir.side(padding, var(--sp-normal), var(--sp-normal));
+  }
+
+  &__content {
+    // put tabs on the left
+    display: flex;
+    flex-direction: row;
+    height: 100%;
   }
 }
 .settings-window__card {
@@ -36,6 +44,7 @@
     margin-top: 2px;
   }
 }
+.settings-account__card,
 .settings-appearance__card,
 .settings-accessibility__card,
 .settings-notifications,
