@@ -17,6 +17,38 @@ function setSettings(key, value) {
 }
 
 class Settings extends EventEmitter {
+  themes: string[];
+
+  themeIndex: number;
+
+  useSystemTheme: boolean;
+
+  isMarkdown: boolean;
+
+  isPeopleDrawer: boolean;
+
+  hideMembershipEvents: boolean;
+
+  hideNickAvatarEvents: boolean;
+
+  sendMessageOnEnter: boolean;
+
+  onlyAnimateOnHover: boolean;
+
+  _showNotifications: boolean;
+
+  isNotificationSounds: boolean;
+
+  showRoomListAvatar: boolean;
+
+  showYoutubeEmbedPlayer: boolean;
+
+  showUrlPreview: boolean;
+
+  sendReadReceipts: boolean;
+
+  isTouchScreenDevice: boolean;
+
   constructor() {
     super();
 
@@ -37,8 +69,7 @@ class Settings extends EventEmitter {
     this.showUrlPreview = this.getShowUrlPreview();
     this.sendReadReceipts = this.getSendReadReceipts();
 
-    this.isTouchScreenDevice =
-      'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+    this.isTouchScreenDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
   getThemeIndex() {

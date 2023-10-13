@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import './RoomViewInput.scss';
 
 import { ReactEditor } from 'slate-react';
-import { Transforms } from 'slate';
+import { Editor, Transforms } from 'slate';
 
 import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
@@ -85,6 +85,7 @@ function RoomViewInput({
   }
 
   function clearEditor() {
+    console.log('clear editor');
     Transforms.delete(editor.current, {
       at: {
         anchor: editor.current.start([]),
@@ -155,21 +156,27 @@ function RoomViewInput({
     return leadingInput + replacement + msg.slice(cursor);
   }
 
+  function focusInput() {
+    if (settings.isTouchScreenDevice) return;
+    ReactEditor.focus(editor.current);
+    Transforms.select(editor.current, Editor.end(editor.current, []));
+  }
+
+  function setEditorContent(replaceWith: string) {
+    clearEditor();
+    editor.current.insertText(replaceWith);
+    deactivateCmd();
+    focusInput();
+  }
+
   function firedCmd(cmdData) {
     const msg = getEditorContent();
-    clearEditor();
     const replaceWith = replaceCmdWith(
       msg,
       cmdCursorPos,
       typeof cmdData?.replace !== 'undefined' ? cmdData.replace : '',
     );
-    editor.current.insertText(replaceWith);
-    deactivateCmd();
-  }
-
-  function focusInput() {
-    if (settings.isTouchScreenDevice) return;
-    ReactEditor.focus(editor.current);
+    setEditorContent(replaceWith);
   }
 
   function setUpReply(userId, eventId, body, formattedBody) {
@@ -191,7 +198,7 @@ function RoomViewInput({
     navigation.on(cons.events.navigation.REPLY_TO_CLICKED, setUpReply);
     if (editor?.current !== null) {
       isTyping = false;
-      editor.current.value = roomsInput.getMessage(roomId);
+      setEditorContent(roomsInput.getMessage(roomId));
       setAttachment(roomsInput.getAttachment(roomId));
       setReplyTo(roomsInput.getReplyTo(roomId));
     }

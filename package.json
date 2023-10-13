@@ -76,5 +76,5 @@
     "vite": "4.4.9",
     "vite-plugin-static-copy": "0.17.0"
   },
-  "packageManager": "yarn@3.6.3"
+  "packageManager": "yarn@3.6.4"
 }
