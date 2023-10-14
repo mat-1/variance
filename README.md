@@ -8,6 +8,8 @@ A web app is available at https://variance.matdoes.dev and is updated on every c
 
 To host Variance on your own, build it with `yarn build` and serve the `dist/` directory. To set default Homeserver on login and register page, place a customized [`config.json`](config.json) in webroot of your choice.
 
+If you'd like to chat about Variance, you can join the Matrix space at [#variance:matdoes.dev](https://matrix.to/#/#variance:matdoes.dev).
+
 ## Local development
 > We recommend using a version manager as versions change very quickly. You will likely need to switch
 > between multiple Node.js versions based on the needs of different projects you're working on.
@@ -39,3 +41,4 @@ docker run -p 8080:80 variance:latest
 ```
 
 This will forward your `localhost` port 8080 to the container's port 80. You can visit the app in your browser by navigating to `http://localhost:8080`.
+
