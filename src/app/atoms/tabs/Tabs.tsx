@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import './Tabs.scss';
 
@@ -35,18 +35,28 @@ TabItem.propTypes = {
   disabled: PropTypes.bool,
 };
 
+interface ITabItem<D> {
+  iconSrc: string;
+  text: string;
+  disabled: boolean;
+  render?: (d?: D) => ReactElement;
+}
+
 function Tabs<D = undefined>({
   items,
   defaultSelected,
   onSelect,
   data,
 }: {
-  items: { iconSrc: string; text: string; disabled: boolean; render?: (d?: D) => Element }[];
+  items: ITabItem<D>[];
   defaultSelected: number;
   onSelect: (item: { iconSrc: string; text: string; disabled: boolean }, index: number) => void;
   data?: D;
 }) {
   const [selectedItem, setSelectedItem] = useState(items[defaultSelected]);
+  useEffect(() => {
+    setSelectedItem(items[defaultSelected]);
+  }, [defaultSelected, items]);
 
   const handleTabSelection = (item, index) => {
     if (selectedItem === item) return;
@@ -55,14 +65,14 @@ function Tabs<D = undefined>({
   };
 
   return (
-    <div className="tabs-container">
+    <div className={`tabs-container${selectedItem === undefined ? ' tabs__none-selected' : ''}`}>
       <div className="tabs">
-        <ScrollView horizontal={false} vertical invisible>
+        <ScrollView invisible>
           <div className="tabs__content">
             {items.map((item, index) => (
               <TabItem
                 key={item.text}
-                selected={selectedItem.text === item.text}
+                selected={selectedItem?.text === item.text}
                 iconSrc={item.iconSrc}
                 disabled={item.disabled}
                 onClick={() => handleTabSelection(item, index)}
@@ -73,7 +83,9 @@ function Tabs<D = undefined>({
           </div>
         </ScrollView>
       </div>
-      <ScrollView autohide>{selectedItem.render(data)}</ScrollView>
+      <div className="tabs__rendered">
+        <ScrollView autoHide>{(selectedItem ?? items[0])?.render(data)}</ScrollView>
+      </div>
     </div>
   );
 }

@@ -39,6 +39,21 @@
       }
     }
   }
+
+  // only show back button on mobile and only when a tab is selected
+  &__back-btn {
+    display: none;
+  }
+  @include screen.smallerThan(mobileBreakpoint) {
+    &__back-btn {
+      display: block;
+      margin-right: var(--sp-tight);
+      margin-left: calc(var(--sp-extra-tight) - var(--sp-normal));
+    }
+    &__back-btn-hidden {
+      display: none;
+    }
+  }
 }
 .settings-window__card {
   margin: var(--sp-normal) 0;

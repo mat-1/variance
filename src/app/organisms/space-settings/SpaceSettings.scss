@@ -1,4 +1,5 @@
 @use '../../partials/dir.scss';
+@use '../../partials/screen';
 
 .space-settings {
   & .pw {
@@ -24,6 +25,21 @@
     display: flex;
     flex-direction: row;
     height: 100%;
+  }
+
+  // only show back button on mobile and only when a tab is selected
+  &__back-btn {
+    display: none;
+  }
+  @include screen.smallerThan(mobileBreakpoint) {
+    &__back-btn {
+      display: block;
+      margin-right: var(--sp-tight);
+      margin-left: calc(var(--sp-extra-tight) - var(--sp-normal));
+    }
+    &__back-btn-hidden {
+      display: none;
+    }
   }
 }
 

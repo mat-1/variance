@@ -1,9 +1,26 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import PropTypes from 'prop-types';
 import './ScrollView.scss';
 
 const ScrollView = React.forwardRef(
-  ({ horizontal, vertical, autoHide, invisible, onScroll, children }, ref) => {
+  (
+    {
+      horizontal,
+      vertical,
+      autoHide,
+      invisible,
+      onScroll,
+      children,
+    }: {
+      horizontal?: boolean;
+      vertical?: boolean;
+      autoHide?: boolean;
+      invisible?: boolean;
+      onScroll?: (e: React.UIEvent<HTMLDivElement, UIEvent>) => void;
+      children: ReactElement;
+    },
+    ref: React.Ref<HTMLDivElement>,
+  ) => {
     let scrollbarClasses = '';
     if (horizontal) scrollbarClasses += ' scrollbar__h';
     if (vertical) scrollbarClasses += ' scrollbar__v';

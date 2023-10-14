@@ -52,10 +52,10 @@ import InfoIC from '../../../../public/res/ic/outlined/info.svg';
 import PowerIC from '../../../../public/res/ic/outlined/power.svg';
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 import AccessibilityIC from '../../../../public/res/ic/outlined/accessibility.svg';
+import BackArrowIC from '../../../../public/res/ic/outlined/chevron-left.svg';
 
 import CinnySVG from '../../../../public/res/svg/cinny.svg';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
-import ScrollView from '../../atoms/scroll/ScrollView';
 
 let capabilities = {
   privateReadReceipts: false,
@@ -610,6 +610,7 @@ async function getCapabilities() {
 function Settings() {
   const [selectedTab, setSelectedTab] = useState(tabItems[0]);
   const [isOpen, requestClose] = useWindowToggle(setSelectedTab);
+
   useEffect(() => {
     getCapabilities();
   }, []);
@@ -633,9 +634,19 @@ function Settings() {
       isOpen={isOpen}
       className="settings-window"
       title={
-        <Text variant="s1" weight="medium" primary>
-          Settings
-        </Text>
+        <>
+          <IconButton
+            src={BackArrowIC}
+            className={`settings-window__back-btn${
+              selectedTab === undefined ? ' settings-window__back-btn-hidden' : ''
+            }`}
+            tooltip="Return to list"
+            onClick={() => setSelectedTab(undefined)}
+          />
+          <Text variant="s1" weight="medium" primary>
+            Settings
+          </Text>
+        </>
       }
       contentOptions={
         <>
@@ -652,7 +663,7 @@ function Settings() {
         <div className="settings-window__content">
           <Tabs
             items={tabItems}
-            defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab.text)}
+            defaultSelected={tabItems.findIndex((item) => item.text === selectedTab?.text)}
             onSelect={handleTabChange}
           />
         </div>

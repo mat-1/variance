@@ -1,5 +1,6 @@
 @use '../../partials/dir';
 @use '../../partials/flex';
+@use '../../partials/screen';
 
 .room-settings {
   height: 100%;
@@ -60,6 +61,20 @@
     padding: 0 var(--sp-normal);
     flex: 1;
     @include dir.side(padding, var(--sp-normal), var(--sp-extra-tight));
+  }
+
+  // only show back button on mobile
+  &__back-btn {
+    display: none;
+  }
+  @include screen.smallerThan(mobileBreakpoint) {
+    &__back-btn {
+      display: block;
+      margin-right: var(--sp-extra-tight);
+    }
+    &__back-btn-hidden {
+      display: none;
+    }
   }
 }
 

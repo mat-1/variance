@@ -71,7 +71,7 @@ RawModal.propTypes = {
   className: PropTypes.string,
   overlayClassName: PropTypes.string,
   isOpen: PropTypes.bool.isRequired,
-  size: PropTypes.oneOf(['large', 'medium', 'small']),
+  size: PropTypes.oneOf(['fullscreen', 'large', 'medium', 'small']),
   onAfterOpen: PropTypes.func,
   onAfterClose: PropTypes.func,
   onRequestClose: PropTypes.func,

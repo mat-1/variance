@@ -37,10 +37,10 @@ import PinFilledIC from '../../../../public/res/ic/filled/pin.svg';
 import CategoryIC from '../../../../public/res/ic/outlined/category.svg';
 import CategoryFilledIC from '../../../../public/res/ic/filled/category.svg';
 import EmojiIC from '../../../../public/res/ic/outlined/emoji.svg';
+import BackArrowIC from '../../../../public/res/ic/outlined/chevron-left.svg';
 
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
 import { useForceUpdate } from '../../hooks/useForceUpdate';
-import ScrollView from '../../atoms/scroll/ScrollView';
 
 const tabText = {
   GENERAL: 'General',
@@ -179,10 +179,20 @@ function SpaceSettings() {
       isOpen={isOpen}
       className="space-settings"
       title={
-        <Text variant="s1" weight="medium" primary>
-          {isOpen && twemojify(room.name)}
-          <span style={{ color: 'var(--tc-surface-low)' }}> — space settings</span>
-        </Text>
+        <>
+          <IconButton
+            src={BackArrowIC}
+            className={`space-settings__back-btn${
+              selectedTab === undefined ? ' space-settings__back-btn-hidden' : ''
+            }`}
+            tooltip="Return to list"
+            onClick={() => setSelectedTab(undefined)}
+          />
+          <Text variant="s1" weight="medium" primary>
+            {isOpen && twemojify(room.name)}
+            <span style={{ color: 'var(--tc-surface-low)' }}> — space settings</span>
+          </Text>
+        </>
       }
       contentOptions={<IconButton src={CrossIC} onClick={requestClose} tooltip="Close" />}
       onRequestClose={requestClose}
@@ -192,7 +202,7 @@ function SpaceSettings() {
         <div className="space-settings__content">
           <Tabs
             items={tabItems}
-            defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab.text)}
+            defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab?.text)}
             onSelect={handleTabChange}
             data={roomId}
           />

@@ -13,7 +13,6 @@ import * as roomActions from '../../../client/action/room';
 import Text from '../../atoms/text/Text';
 import RawIcon from '../../atoms/system-icons/RawIcon';
 import Header, { TitleWrapper } from '../../atoms/header/Header';
-import ScrollView from '../../atoms/scroll/ScrollView';
 import Tabs from '../../atoms/tabs/Tabs';
 import { MenuHeader, MenuItem } from '../../atoms/context-menu/ContextMenu';
 import RoomProfile from '../../molecules/room-profile/RoomProfile';
@@ -36,9 +35,11 @@ import LockIC from '../../../../public/res/ic/outlined/lock.svg';
 import AddUserIC from '../../../../public/res/ic/outlined/add-user.svg';
 import LeaveArrowIC from '../../../../public/res/ic/outlined/leave-arrow.svg';
 import ChevronTopIC from '../../../../public/res/ic/outlined/chevron-top.svg';
+import BackArrowIC from '../../../../public/res/ic/outlined/chevron-left.svg';
 
 import { useForceUpdate } from '../../hooks/useForceUpdate';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
+import IconButton from '../../atoms/button/IconButton';
 
 const tabText = {
   GENERAL: 'General',
@@ -181,16 +182,26 @@ function RoomSettings({ roomId }) {
       mounted = false;
       navigation.removeListener(cons.events.navigation.ROOM_SETTINGS_TOGGLED, settingsToggle);
     };
-  }, []);
+  }, [forceUpdate]);
 
   if (!navigation.isRoomSettings) return null;
 
   return (
     <div className="room-settings">
       <Header>
+        <IconButton
+          src={BackArrowIC}
+          className={`room-settings__back-btn${
+            selectedTab === undefined ? ' room-settings__back-btn-hidden' : ''
+          }`}
+          tooltip="Return to list"
+          onClick={() => setSelectedTab(undefined)}
+        />
         <button
           className="room-settings__header-btn"
-          onClick={() => toggleRoomSettings()}
+          onClick={() => {
+            toggleRoomSettings();
+          }}
           type="button"
           onMouseUp={(e) => blurOnBubbling(e, '.room-settings__header-btn')}
         >
@@ -206,7 +217,7 @@ function RoomSettings({ roomId }) {
       <div className="room-settings__content">
         <Tabs
           items={tabItems}
-          defaultSelected={tabItems.findIndex((tab) => tab.text === selectedTab.text)}
+          defaultSelected={tabItems.findIndex((item) => item.text === selectedTab?.text)}
           onSelect={handleTabChange}
           data={roomId}
         />
