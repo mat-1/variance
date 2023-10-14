@@ -558,7 +558,7 @@ function YoutubeEmbed({ link }) {
       <div className="embed-container">
         <IframePlayer
           link={link}
-          sitename="Youtube"
+          sitename="YouTube"
           title={urlPreviewInfo['og:title']}
           thumbnail={mx.mxcUrlToHttp(urlPreviewInfo['og:image'])}
         >

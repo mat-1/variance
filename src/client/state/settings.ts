@@ -17,6 +17,8 @@ function setSettings(key, value) {
 }
 
 class Settings extends EventEmitter {
+  isTouchScreenDevice: boolean;
+
   themes: string[];
 
   themeIndex: number;
@@ -49,10 +51,10 @@ class Settings extends EventEmitter {
 
   clearUrls: boolean;
 
-  isTouchScreenDevice: boolean;
-
   constructor() {
     super();
+
+    this.isTouchScreenDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     this.themes = ['', 'silver-theme', 'dark-theme', 'butter-theme', 'ayu-theme'];
     this.themeIndex = this.getThemeIndex();
@@ -71,8 +73,6 @@ class Settings extends EventEmitter {
     this.showUrlPreview = this.getShowUrlPreview();
     this.sendReadReceipts = this.getSendReadReceipts();
     this.clearUrls = this.getClearUrls();
-
-    this.isTouchScreenDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
   getThemeIndex() {
@@ -160,8 +160,11 @@ class Settings extends EventEmitter {
     if (typeof this.sendMessageOnEnter === 'boolean') return this.sendMessageOnEnter;
 
     const settings = getSettings();
-    if (settings === null) return true;
-    if (typeof settings.sendMessageOnEnter === 'undefined') return true;
+
+    const defaultSendOnEnter = !this.isTouchScreenDevice;
+
+    if (settings === null) return defaultSendOnEnter;
+    if (typeof settings.sendMessageOnEnter === 'undefined') return defaultSendOnEnter;
     return settings.sendMessageOnEnter;
   }
 

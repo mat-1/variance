@@ -144,7 +144,7 @@ function AppearanceSection() {
           content={<Text variant="b3">Show additional info about URLs.</Text>}
         />
         <SettingTile
-          title="Show Youtube embed player"
+          title="Show YouTube embed player"
           options={
             <Toggle
               isActive={settings.showYoutubeEmbedPlayer}
