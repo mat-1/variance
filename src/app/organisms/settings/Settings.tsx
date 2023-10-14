@@ -18,6 +18,7 @@ import {
   toggleShowYoutubeEmbedPlayer,
   toggleShowUrlPreview,
   toggleReadReceipts,
+  toggleClearUrls,
 } from '../../../client/action/settings';
 import { usePermission } from '../../hooks/usePermission';
 
@@ -53,6 +54,7 @@ import PowerIC from '../../../../public/res/ic/outlined/power.svg';
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 import AccessibilityIC from '../../../../public/res/ic/outlined/accessibility.svg';
 import BackArrowIC from '../../../../public/res/ic/outlined/chevron-left.svg';
+import ShieldUserIC from '../../../../public/res/ic/outlined/shield-user.svg';
 
 import CinnySVG from '../../../../public/res/svg/cinny.svg';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
@@ -337,7 +339,6 @@ function EmojiSection() {
 }
 
 function SecuritySection() {
-  const [, updateState] = useState({});
   return (
     <div className="settings-security">
       <div className="settings-security__card">
@@ -375,6 +376,14 @@ function SecuritySection() {
           }
         />
       </div>
+    </div>
+  );
+}
+
+function PrivacySection() {
+  const [, updateState] = useState({});
+  return (
+    <div className="settings-privacy">
       <div className="settings-security__card">
         <MenuHeader>Presence</MenuHeader>
         <SettingTile
@@ -399,6 +408,28 @@ function SecuritySection() {
                 </Text>
               )}
             </>
+          }
+        />
+      </div>
+
+      <div className="settings-security__card">
+        <MenuHeader>Messages</MenuHeader>
+        <SettingTile
+          title="Clear URLs"
+          options={
+            <Toggle
+              /** Always allow to switch receipts on. */
+              isActive={settings.clearUrls}
+              onToggle={() => {
+                toggleClearUrls();
+                updateState({});
+              }}
+            />
+          }
+          content={
+            <Text variant="b3">
+              Automatically remove tracking parameters from links you send and receive.
+            </Text>
           }
         />
       </div>
@@ -551,6 +582,7 @@ export const tabText = {
   NOTIFICATIONS: 'Notifications',
   EMOJI: 'Emoji',
   SECURITY: 'Security',
+  PRIVACY: 'Privacy',
   ABOUT: 'About',
 };
 const tabItems = [
@@ -589,6 +621,12 @@ const tabItems = [
     iconSrc: LockIC,
     disabled: false,
     render: () => <SecuritySection />,
+  },
+  {
+    text: tabText.PRIVACY,
+    iconSrc: ShieldUserIC,
+    disabled: false,
+    render: () => <PrivacySection />,
   },
   {
     text: tabText.ABOUT,

@@ -78,3 +78,9 @@ export function toggleReadReceipts() {
     type: cons.actions.settings.TOGGLE_READ_RECEIPTS,
   });
 }
+
+export function toggleClearUrls() {
+  appDispatcher.dispatch({
+    type: cons.actions.settings.TOGGLE_CLEAR_URLS,
+  });
+}

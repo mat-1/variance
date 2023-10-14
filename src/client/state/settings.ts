@@ -47,6 +47,8 @@ class Settings extends EventEmitter {
 
   sendReadReceipts: boolean;
 
+  clearUrls: boolean;
+
   isTouchScreenDevice: boolean;
 
   constructor() {
@@ -68,6 +70,7 @@ class Settings extends EventEmitter {
     this.showYoutubeEmbedPlayer = this.getShowYoutubeEmbedPlayer();
     this.showUrlPreview = this.getShowUrlPreview();
     this.sendReadReceipts = this.getSendReadReceipts();
+    this.clearUrls = this.getClearUrls();
 
     this.isTouchScreenDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
@@ -260,6 +263,15 @@ class Settings extends EventEmitter {
     return settings.sendReadReceipts;
   }
 
+  getClearUrls() {
+    if (typeof this.clearUrls === 'boolean') return this.clearUrls;
+
+    const settings = getSettings();
+    if (settings === null) return true;
+    if (typeof settings.clearUrls === 'undefined') return true;
+    return settings.clearUrls;
+  }
+
   setter(action) {
     const actions = {
       [cons.actions.settings.TOGGLE_SYSTEM_THEME]: () => {
@@ -322,6 +334,11 @@ class Settings extends EventEmitter {
         this.sendReadReceipts = !this.sendReadReceipts;
         setSettings('sendReadReceipts', this.sendReadReceipts);
         this.emit(cons.events.settings.READ_RECEIPTS_TOGGLED, this.sendReadReceipts);
+      },
+      [cons.actions.settings.TOGGLE_CLEAR_URLS]: () => {
+        this.clearUrls = !this.clearUrls;
+        setSettings('clearUrls', this.clearUrls);
+        this.emit(cons.events.settings.CLEAR_URLS_TOGGLED, this.clearUrls);
       },
     };
 

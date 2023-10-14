@@ -233,9 +233,11 @@ class RoomsInput extends EventEmitter {
       content.formatted_body = body.html;
     }
 
-    content.body = clearUrlsFromText(content.body);
-    if (content.formatted_body) {
-      content.formatted_body = clearUrlsFromHtml(content.formatted_body);
+    if (settings.clearUrls) {
+      content.body = clearUrlsFromText(content.body);
+      if (content.formatted_body) {
+        content.formatted_body = clearUrlsFromHtml(content.formatted_body);
+      }
     }
 
     if (edit) {

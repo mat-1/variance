@@ -43,7 +43,7 @@ function Room() {
     return () => {
       navigation.removeListener(cons.events.navigation.ROOM_SELECTED, handleRoomSelected);
     };
-  }, [roomInfo]);
+  }, [mx, roomInfo]);
 
   useEffect(() => {
     const handleDrawerToggling = (visiblity) => setIsDrawer(visiblity);
