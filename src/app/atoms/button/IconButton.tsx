@@ -21,8 +21,20 @@ const IconButton = React.forwardRef(
       disabled,
       isImage,
       className,
+    }: {
+      variant?: string;
+      size?: string;
+      type?: 'button' | 'submit' | 'reset';
+      tooltip?: string;
+      tooltipPlacement?: string;
+      src: string;
+      onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+      tabIndex?: number;
+      disabled?: boolean;
+      isImage?: boolean;
+      className?: string;
     },
-    ref,
+    ref: React.Ref<HTMLButtonElement>,
   ) => {
     const btn = (
       <button

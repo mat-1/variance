@@ -62,8 +62,6 @@ let capabilities = {
 };
 
 function AccountSection() {
-  const [, updateState] = useState({});
-
   return (
     <div className="settings-account">
       <div className="settings-account__card">
@@ -441,7 +439,34 @@ function AboutSection() {
         <div className="settings-about__credits">
           <ul>
             <li>
-              {/* eslint-disable-next-line react/jsx-one-expression-per-line */}
+              <Text>
+                <a
+                  href="https://github.com/cinnyapp/cinny"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  Cinny
+                </a>{' '}
+                is ©{' '}
+                <a
+                  href="https://github.com/cinnyapp/cinny/graphs/contributors"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  Cinny contributors
+                </a>{' '}
+                used under the terms of{' '}
+                <a
+                  href="https://www.gnu.org/licenses/agpl-3.0.en.html"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  AGPL-3.0
+                </a>
+                .
+              </Text>
+            </li>
+            <li>
               <Text>
                 The{' '}
                 <a
@@ -467,7 +492,6 @@ function AboutSection() {
               </Text>
             </li>
             <li>
-              {/* eslint-disable-next-line react/jsx-one-expression-per-line */}
               <Text>
                 The{' '}
                 <a href="https://twemoji.twitter.com" target="_blank" rel="noreferrer noopener">
@@ -489,7 +513,6 @@ function AboutSection() {
               </Text>
             </li>
             <li>
-              {/* eslint-disable-next-line react/jsx-one-expression-per-line */}
               <Text>
                 The{' '}
                 <a
@@ -575,7 +598,7 @@ const tabItems = [
   },
 ];
 
-function useWindowToggle(setSelectedTab) {
+function useWindowToggle(setSelectedTab): [boolean, () => void] {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -588,7 +611,7 @@ function useWindowToggle(setSelectedTab) {
     return () => {
       navigation.removeListener(cons.events.navigation.SETTINGS_OPENED, openSettings);
     };
-  }, []);
+  }, [setSelectedTab]);
 
   const requestClose = () => setIsOpen(false);
 

@@ -7,7 +7,28 @@ import RawIcon from '../system-icons/RawIcon';
 import { blurOnBubbling } from './script';
 
 const Button = React.forwardRef(
-  ({ id, className, variant, iconSrc, type, onClick, children, disabled }, ref) => {
+  (
+    {
+      id,
+      className,
+      variant,
+      iconSrc,
+      type,
+      onClick,
+      children,
+      disabled,
+    }: {
+      id?: string;
+      className?: string;
+      variant?: string;
+      iconSrc?: string;
+      type?: 'button' | 'submit' | 'reset';
+      onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+      children: React.ReactNode;
+      disabled?: boolean;
+    },
+    ref: React.Ref<HTMLButtonElement>,
+  ) => {
     const iconClass = iconSrc === null ? '' : `btn-${variant}--icon`;
     return (
       <button
