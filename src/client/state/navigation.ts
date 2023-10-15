@@ -108,7 +108,7 @@ class Navigation extends EventEmitter {
 
   _selectTabWithRoom(roomId) {
     const { roomList, accountData } = this.initMatrix;
-    const { categorizedSpaces } = accountData;
+
 
     if (roomList.isOrphan(roomId)) {
       this._selectSpace(null, true, false);
@@ -126,14 +126,14 @@ class Navigation extends EventEmitter {
       return;
     }
 
-    if (categorizedSpaces.has(this.selectedSpaceId)) {
-      const categories = roomList.getCategorizedSpaces([this.selectedSpaceId]);
+    
+    const categories = roomList.getCategorizedSpaces([this.selectedSpaceId]);
       if ([...parents].find((pId) => categories.has(pId))) {
         // No need to select tab
         // As one of parent is child of selected categorized space.
         return;
       }
-    }
+    
 
     const spaceInPath = [...this.selectedSpacePath].reverse().find((sId) => parents.has(sId));
     if (spaceInPath) {
@@ -207,7 +207,7 @@ class Navigation extends EventEmitter {
   _selectRoomWithSpace(spaceId: string) {
     if (!spaceId) return;
     const { roomList, accountData, matrixClient } = this.initMatrix;
-    const { categorizedSpaces } = accountData;
+
 
     const data = this.spaceToRoom.get(spaceId);
     if (data) {
@@ -217,21 +217,15 @@ class Navigation extends EventEmitter {
 
     const children = [];
 
-    if (categorizedSpaces.has(spaceId)) {
-      const categories = roomList.getCategorizedSpaces([spaceId]);
+    
+    const categories = roomList.getCategorizedSpaces([spaceId]);
 
-      categories?.forEach((categoryId) => {
-        categoryId?.forEach((childId) => {
-          children.push(childId);
-        });
+    categories?.forEach((categoryId) => {
+      categoryId?.forEach((childId) => {
+        children.push(childId);
       });
-    } else {
-      roomList.getSpaceChildren(spaceId).forEach((id) => {
-        if (matrixClient.getRoom(id)?.isSpaceRoom() === false) {
-          children.push(id);
-        }
-      });
-    }
+    });
+    
 
     if (!children) {
       this._selectRoom(null);

@@ -11,12 +11,6 @@ import {
 } from '../../../client/action/navigation';
 import { markAsRead } from '../../../client/action/notifications';
 import { leave } from '../../../client/action/room';
-import {
-  createSpaceShortcut,
-  deleteSpaceShortcut,
-  categorizeSpace,
-  unCategorizeSpace,
-} from '../../../client/action/accountData';
 
 import { MenuHeader, MenuItem } from '../../atoms/context-menu/ContextMenu';
 
@@ -37,8 +31,6 @@ function SpaceOptions({ roomId, afterOptionSelect }) {
   const { roomList } = initMatrix;
   const room = mx.getRoom(roomId);
   const canInvite = room?.canInvite(mx.getUserId());
-  const isPinned = initMatrix.accountData.spaceShortcut.has(roomId);
-  const isCategorized = initMatrix.accountData.categorizedSpaces.has(roomId);
 
   const handleMarkAsRead = () => {
     const spaceChildren = roomList.getCategorizedSpaces([roomId]);
@@ -50,21 +42,11 @@ function SpaceOptions({ roomId, afterOptionSelect }) {
     afterOptionSelect();
   };
   const handleInviteClick = () => {
-    openInviteUser(roomId);
-    afterOptionSelect();
-  };
-  const handlePinClick = () => {
-    if (isPinned) deleteSpaceShortcut(roomId);
-    else createSpaceShortcut(roomId);
-    afterOptionSelect();
-  };
-  const handleCategorizeClick = () => {
-    if (isCategorized) unCategorizeSpace(roomId);
-    else categorizeSpace(roomId);
+    openInviteUser(roomId, null);
     afterOptionSelect();
   };
   const handleSettingsClick = () => {
-    openSpaceSettings(roomId);
+    openSpaceSettings(roomId, null);
     afterOptionSelect();
   };
   const handleManageRoom = () => {
@@ -91,15 +73,6 @@ function SpaceOptions({ roomId, afterOptionSelect }) {
       </MenuHeader>
       <MenuItem iconSrc={TickMarkIC} onClick={handleMarkAsRead}>
         Mark as read
-      </MenuItem>
-      <MenuItem
-        onClick={handleCategorizeClick}
-        iconSrc={isCategorized ? CategoryFilledIC : CategoryIC}
-      >
-        {isCategorized ? 'Uncategorize subspaces' : 'Categorize subspaces'}
-      </MenuItem>
-      <MenuItem onClick={handlePinClick} iconSrc={isPinned ? PinFilledIC : PinIC}>
-        {isPinned ? 'Unpin from sidebar' : 'Pin to sidebar'}
       </MenuItem>
       <MenuItem iconSrc={AddUserIC} onClick={handleInviteClick} disabled={!canInvite}>
         Invite

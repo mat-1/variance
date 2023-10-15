@@ -59,11 +59,7 @@ export function toggleRoomSettings(tabText) {
   });
 }
 
-export function openShortcutSpaces() {
-  appDispatcher.dispatch({
-    type: cons.actions.navigation.OPEN_SHORTCUT_SPACES,
-  });
-}
+
 
 export function openInviteList() {
   appDispatcher.dispatch({

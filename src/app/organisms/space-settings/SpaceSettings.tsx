@@ -8,12 +8,6 @@ import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
 import navigation from '../../../client/state/navigation';
 import { leave } from '../../../client/action/room';
-import {
-  createSpaceShortcut,
-  deleteSpaceShortcut,
-  categorizeSpace,
-  unCategorizeSpace,
-} from '../../../client/action/accountData';
 
 import Text from '../../atoms/text/Text';
 import IconButton from '../../atoms/button/IconButton';
@@ -50,8 +44,6 @@ const tabText = {
 };
 
 function GeneralSettings({ roomId }) {
-  const isPinned = initMatrix.accountData.spaceShortcut.has(roomId);
-  const isCategorized = initMatrix.accountData.categorizedSpaces.has(roomId);
   const roomName = initMatrix.matrixClient.getRoom(roomId)?.name;
   const [, forceUpdate] = useForceUpdate();
 
@@ -62,26 +54,6 @@ function GeneralSettings({ roomId }) {
       </div>
       <div className="room-settings__card">
         <MenuHeader>Options</MenuHeader>
-        <MenuItem
-          onClick={() => {
-            if (isCategorized) unCategorizeSpace(roomId);
-            else categorizeSpace(roomId);
-            forceUpdate();
-          }}
-          iconSrc={isCategorized ? CategoryFilledIC : CategoryIC}
-        >
-          {isCategorized ? 'Uncategorize subspaces' : 'Categorize subspaces'}
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            if (isPinned) deleteSpaceShortcut(roomId);
-            else createSpaceShortcut(roomId);
-            forceUpdate();
-          }}
-          iconSrc={isPinned ? PinFilledIC : PinIC}
-        >
-          {isPinned ? 'Unpin from sidebar' : 'Pin to sidebar'}
-        </MenuItem>
         <MenuItem
           variant="danger"
           onClick={async () => {
