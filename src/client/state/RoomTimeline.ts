@@ -1,4 +1,15 @@
 import EventEmitter from 'events';
+import {
+  EventTimeline,
+  IRoomTimelineData,
+  MatrixClient,
+  MatrixEvent,
+  MatrixEventEvent,
+  Room,
+  RoomEvent,
+  RoomMember,
+  RoomMemberEvent,
+} from 'matrix-js-sdk';
 import initMatrix from '../initMatrix';
 import cons from './cons';
 
@@ -77,6 +88,30 @@ function isTimelineLinked(tm1, tm2) {
 }
 
 class RoomTimeline extends EventEmitter {
+  timeline: MatrixEvent[];
+
+  editedTimeline: Map<string, MatrixEvent[]>;
+
+  reactionTimeline: Map<string, MatrixEvent[]>;
+
+  typingMembers: Set<string>;
+
+  matrixClient: MatrixClient;
+
+  roomId: string;
+
+  room: Room;
+
+  liveTimeline: EventTimeline;
+
+  activeTimeline: EventTimeline;
+
+  isOngoingPagination: boolean;
+
+  ongoingDecryptionCount: number;
+
+  initialized: boolean;
+
   constructor(roomId) {
     super();
     // These are local timelines
@@ -97,9 +132,6 @@ class RoomTimeline extends EventEmitter {
     this.initialized = false;
 
     setTimeout(() => this.room.loadMembersIfNeeded());
-
-    // TODO: remove below line
-    window.selectedRoom = this;
   }
 
   isServingLiveTimeline() {
@@ -124,7 +156,7 @@ class RoomTimeline extends EventEmitter {
     this.timeline = [];
   }
 
-  addToTimeline(mEvent) {
+  addToTimeline(mEvent: MatrixEvent) {
     if (mEvent.getType() === 'm.room.member' && hideMemberEvents(mEvent)) {
       return;
     }
@@ -312,8 +344,30 @@ class RoomTimeline extends EventEmitter {
     return this.timeline.splice(i, 1)[0];
   }
 
+  _listenRoomTimeline: (
+    event: MatrixEvent,
+    room: Room,
+    toStartOfTimeline: boolean,
+    removed: boolean,
+    data: IRoomTimelineData,
+  ) => void;
+
+  _listenDecryptEvent: (event: MatrixEvent) => void;
+
+  _listenRedaction: (mEvent: MatrixEvent, room: Room) => void;
+
+  _listenTypingEvent: (event: MatrixEvent, member: RoomMember) => void;
+
+  _listenReciptEvent: (event: MatrixEvent, room: Room) => void;
+
   _listenEvents() {
-    this._listenRoomTimeline = (event, room, toStartOfTimeline, removed, data) => {
+    this._listenRoomTimeline = (
+      event: MatrixEvent,
+      room: Room,
+      toStartOfTimeline: boolean,
+      removed: boolean,
+      data: IRoomTimelineData,
+    ) => {
       if (room.roomId !== this.roomId) return;
       if (this.isOngoingPagination) return;
 
@@ -342,7 +396,7 @@ class RoomTimeline extends EventEmitter {
       this.emit(cons.events.roomTimeline.EVENT, event);
     };
 
-    this._listenDecryptEvent = (event) => {
+    this._listenDecryptEvent = (event: MatrixEvent) => {
       if (event.getRoomId() !== this.roomId) return;
       if (this.isOngoingPagination) return;
 
@@ -357,7 +411,7 @@ class RoomTimeline extends EventEmitter {
       this.emit(cons.events.roomTimeline.EVENT, event);
     };
 
-    this._listenRedaction = (mEvent, room) => {
+    this._listenRedaction = (mEvent: MatrixEvent, room: Room) => {
       if (room.roomId !== this.roomId) return;
       const rEvent = this.deleteFromTimeline(mEvent.event.redacts);
       this.editedTimeline.delete(mEvent.event.redacts);
@@ -365,7 +419,7 @@ class RoomTimeline extends EventEmitter {
       this.emit(cons.events.roomTimeline.EVENT_REDACTED, rEvent, mEvent);
     };
 
-    this._listenTypingEvent = (event, member) => {
+    this._listenTypingEvent = (event: MatrixEvent, member: RoomMember) => {
       if (member.roomId !== this.roomId) return;
 
       const isTyping = member.typing;
@@ -373,7 +427,7 @@ class RoomTimeline extends EventEmitter {
       else this.typingMembers.delete(member.userId);
       this.emit(cons.events.roomTimeline.TYPING_MEMBERS_UPDATED, new Set([...this.typingMembers]));
     };
-    this._listenReciptEvent = (event, room) => {
+    this._listenReciptEvent = (event: MatrixEvent, room: Room) => {
       // we only process receipt for latest message here.
       if (room.roomId !== this.roomId) return;
       const receiptContent = event.getContent();
@@ -389,20 +443,20 @@ class RoomTimeline extends EventEmitter {
       }
     };
 
-    this.matrixClient.on('Room.timeline', this._listenRoomTimeline);
-    this.matrixClient.on('Room.redaction', this._listenRedaction);
-    this.matrixClient.on('Event.decrypted', this._listenDecryptEvent);
-    this.matrixClient.on('RoomMember.typing', this._listenTypingEvent);
-    this.matrixClient.on('Room.receipt', this._listenReciptEvent);
+    this.matrixClient.on(RoomEvent.Timeline, this._listenRoomTimeline);
+    this.matrixClient.on(RoomEvent.Redaction, this._listenRedaction);
+    this.matrixClient.on(MatrixEventEvent.Decrypted, this._listenDecryptEvent);
+    this.matrixClient.on(RoomMemberEvent.Typing, this._listenTypingEvent);
+    this.matrixClient.on(RoomEvent.Receipt, this._listenReciptEvent);
   }
 
   removeInternalListeners() {
     if (!this.initialized) return;
-    this.matrixClient.removeListener('Room.timeline', this._listenRoomTimeline);
-    this.matrixClient.removeListener('Room.redaction', this._listenRedaction);
-    this.matrixClient.removeListener('Event.decrypted', this._listenDecryptEvent);
-    this.matrixClient.removeListener('RoomMember.typing', this._listenTypingEvent);
-    this.matrixClient.removeListener('Room.receipt', this._listenReciptEvent);
+    this.matrixClient.removeListener(RoomEvent.Timeline, this._listenRoomTimeline);
+    this.matrixClient.removeListener(RoomEvent.Redaction, this._listenRedaction);
+    this.matrixClient.removeListener(MatrixEventEvent.Decrypted, this._listenDecryptEvent);
+    this.matrixClient.removeListener(RoomMemberEvent.Typing, this._listenTypingEvent);
+    this.matrixClient.removeListener(RoomEvent.Receipt, this._listenReciptEvent);
   }
 }
 

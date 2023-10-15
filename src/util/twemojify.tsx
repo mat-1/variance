@@ -36,7 +36,7 @@ linkify.registerCustomProtocol('gemini');
 
 /**
  * @param text text to twemojify
- * @param opts options for tweomoji.parse
+ * @param opts options for twemoji.parse
  * @param shouldLinkify convert links to html tags (default: false)
  * @param sanitize sanitize html text (default: true)
  * @param maths render maths (default: false)
@@ -44,7 +44,7 @@ linkify.registerCustomProtocol('gemini');
  */
 export function twemojify(
   text: string,
-  opts?: { base?: string },
+  opts?: { base?: string; className?: string },
   shouldLinkify: boolean = false,
   sanitize: boolean = true,
   maths: boolean = false,

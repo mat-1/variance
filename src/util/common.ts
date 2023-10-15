@@ -1,5 +1,7 @@
 /* eslint-disable max-classes-per-file */
 
+import React from 'react';
+
 export function bytesToSize(bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   if (bytes === 0) return 'n/a';
@@ -23,19 +25,20 @@ export function isInSameDay(dt2, dt1) {
 }
 
 /**
- * @param {Event} ev
- * @param {string} [targetSelector] element selector for Element.matches([selector])
+ * @param ev
+ * @param targetSelector element selector for Element.matches([selector])
  */
-export function getEventCords(ev, targetSelector) {
-  let boxInfo;
-
+export function getEventCords(
+  ev: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  targetSelector?: string,
+) {
   const path = ev.nativeEvent.composedPath();
-  const target = targetSelector ? path.find((element) => element.matches?.(targetSelector)) : null;
-  if (target) {
-    boxInfo = target.getBoundingClientRect();
-  } else {
-    boxInfo = ev.target.getBoundingClientRect();
-  }
+  const target = (
+    targetSelector
+      ? path.find((element: HTMLElement) => element.matches?.(targetSelector))
+      : ev.target
+  ) as HTMLElement;
+  const boxInfo = target.getBoundingClientRect();
 
   return {
     x: boxInfo.x,

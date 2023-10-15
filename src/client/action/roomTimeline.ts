@@ -1,6 +1,7 @@
+import { IContent } from 'matrix-js-sdk';
 import initMatrix from '../initMatrix';
 
-async function redactEvent(roomId, eventId, reason) {
+async function redactEvent(roomId: string, eventId: string, reason?: string) {
   const mx = initMatrix.matrixClient;
 
   try {
@@ -16,9 +17,14 @@ async function redactEvent(roomId, eventId, reason) {
   }
 }
 
-async function sendReaction(roomId, toEventId, reaction, shortcode) {
+async function sendReaction(
+  roomId: string,
+  toEventId: string,
+  reaction: string,
+  shortcode?: string,
+) {
   const mx = initMatrix.matrixClient;
-  const content = {
+  const content: IContent = {
     'm.relates_to': {
       event_id: toEventId,
       key: reaction,
