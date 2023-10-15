@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import { ClientEvent, MatrixClient, RoomEvent, RoomStateEvent } from 'matrix-js-sdk';
 import appDispatcher from '../dispatcher';
 import cons from './cons';
+import { updateAboutMe } from '../../util/variance-proto';
 
 function isMEventSpaceChild(mEvent) {
   return mEvent.getType() === 'm.space.child' && Object.keys(mEvent.getContent()).length > 0;
@@ -188,6 +189,7 @@ class RoomList extends EventEmitter {
         if (addRoom(action.roomId, action.isDM)) {
           setTimeout(() => {
             this.emit(cons.events.roomList.ROOM_JOINED, action.roomId);
+            updateAboutMe(roomId)
             this.emit(cons.events.roomList.ROOMLIST_UPDATED);
           }, 100);
         } else {
@@ -240,6 +242,7 @@ class RoomList extends EventEmitter {
     this.inviteRooms.clear();
     this.matrixClient.getRooms().forEach((room) => {
       const { roomId } = room;
+      updateAboutMe(roomId)
       const tombstone = room.currentState.events.get('m.room.tombstone');
       if (tombstone?.get('') !== undefined) {
         const repRoomId = tombstone.get('').getContent().replacement_room;
@@ -259,6 +262,7 @@ class RoomList extends EventEmitter {
       if (this.mDirects.has(roomId)) this.directs.add(roomId);
       else if (room.isSpaceRoom()) this.addToSpaces(roomId);
       else this.rooms.add(roomId);
+      
     });
   }
 
@@ -386,6 +390,7 @@ class RoomList extends EventEmitter {
         this.emit(cons.events.roomList.ROOM_JOINED, roomId);
         this.emit(cons.events.roomList.ROOMLIST_UPDATED);
 
+        updateAboutMe(roomId)
         this.processingRooms.delete(roomId);
         return;
       }
@@ -393,6 +398,7 @@ class RoomList extends EventEmitter {
       if (this.mDirects.has(roomId) && membership === 'join') {
         this.directs.add(roomId);
         this.emit(cons.events.roomList.ROOM_JOINED, roomId);
+        updateAboutMe(roomId)
         this.emit(cons.events.roomList.ROOMLIST_UPDATED);
         return;
       }
@@ -401,6 +407,7 @@ class RoomList extends EventEmitter {
         if (room.isSpaceRoom()) this.addToSpaces(roomId);
         else this.rooms.add(roomId);
         this.emit(cons.events.roomList.ROOM_JOINED, roomId);
+        updateAboutMe(roomId)
         this.emit(cons.events.roomList.ROOMLIST_UPDATED);
       }
     });

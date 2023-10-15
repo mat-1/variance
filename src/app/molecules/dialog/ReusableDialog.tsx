@@ -40,6 +40,7 @@ function ReusableDialog() {
       onRequestClose={handleRequestClose}
       contentOptions={<IconButton src={CrossIC} onClick={handleRequestClose} tooltip="Close" />}
       invisibleScroll
+      raw={false}
     >
       {data?.render(handleRequestClose) || <div />}
     </Dialog>

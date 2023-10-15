@@ -28,7 +28,7 @@ function RoomsCategory({ spaceId, name, hideHeader, roomIds, drawerPostie }) {
 
   const openSpaceOptions = (e) => {
     e.preventDefault();
-    openReusableContextMenu('bottom', getEventCords(e, '.header'), (closeMenu) => (
+    openReusableContextMenu('bottom', getEventCords(e, '.room-category__header'), (closeMenu) => (
       <SpaceOptions roomId={spaceId} afterOptionSelect={closeMenu} />
     ));
   };

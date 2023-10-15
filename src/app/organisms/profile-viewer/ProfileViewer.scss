@@ -2,40 +2,82 @@
 @use '../../partials/dir';
 
 .profile-viewer__dialog {
-  & .dialog__content__wrapper {
-    position: relative;
-  }
-  & .dialog__content-container {
-    padding-top: var(--sp-normal);
-    padding-bottom: 89px;
-    @include dir.side(padding, var(--sp-normal), var(--sp-extra-tight));
-  }
+  
+  display: flex;
+
+    min-height: 200px;
+    max-width: min(-20px + 100vw, 560px);
+    max-height: min(-20px + 100vh, 650px);
+
+    margin: 20px;
+    flex-direction: column;
+    
 }
 
 .profile-viewer {
-  &__user {
-    display: flex;
-    padding-bottom: var(--sp-normal);
+  flex-direction: column;
+  display: flex;
+  font-size: 0.9375rem;  
 
-    &__info {
-      align-self: center;
-      flex: 1;
-      min-width: 0;
+  height: 100%;
+  overflow-y: scroll;
+  
+ 
+  &__about-me {
+    background-color: var(--bg-surface);
+    color: var(--tc-surface-normal);
+    height: 100%;
+    padding: 1rem;
+  }
+  &__info {
+    background-color: var(--bg-primary);
 
-      margin: 0 var(--sp-normal);
+    &__profile {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      width: 560px;
+      max-width: 100%;
+      padding: 20px;
 
-      & .text {
-        white-space: pre-wrap;
-        word-break: break-word;
+      align-items: center;
+
+      & .avatar-container {
+        flex-shrink: 0;
       }
-    }
-    &__role {
-      align-self: center;
-      & > .text {
-        margin-bottom: var(--sp-ultra-tight);
+
+      & :last-child {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 4px;
         
+        & :last-child {
+          color: var(--tc-surface-low);
+        }
       }
     }
+
+    &__badges {
+      margin-left: 20px;
+      background-color: var(--bg-surface);
+      border-radius: 8px;
+      
+      width: fit-content;
+
+      margin-bottom: 1rem;
+
+    }
+    & .text {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  }
+  &__role {
+    align-self: center;
+    & > .text {
+      margin-bottom: var(--sp-ultra-tight); 
+    }
+    
   }
 
   & .session-info {

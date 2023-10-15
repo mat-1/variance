@@ -20,6 +20,7 @@ function Dialog({
   closeFromOutside,
   children,
   invisibleScroll,
+  raw
 }) {
   return (
     <RawModal
@@ -31,9 +32,9 @@ function Dialog({
       closeFromOutside={closeFromOutside}
       size="small"
     >
-      <div className="dialog">
+      { raw ? <div className="dialog__content-container">{children}</div> : <div className="dialog">
         <div className="dialog__content">
-          <Header>
+          {title && <Header>
             <TitleWrapper>
               {typeof title === 'string' ? (
                 <Text variant="h2" weight="medium" primary>
@@ -44,7 +45,7 @@ function Dialog({
               )}
             </TitleWrapper>
             {contentOptions}
-          </Header>
+          </Header>}
           <div className="dialog__content__wrapper">
             <ScrollView autoHide={!invisibleScroll} invisible={invisibleScroll}>
               <div className="dialog__content-container">{children}</div>
@@ -52,6 +53,7 @@ function Dialog({
           </div>
         </div>
       </div>
+      }
     </RawModal>
   );
 }

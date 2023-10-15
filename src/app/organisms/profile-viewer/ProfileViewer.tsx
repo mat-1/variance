@@ -32,11 +32,18 @@ import Dialog from '../../molecules/dialog/Dialog';
 
 import ShieldEmptyIC from '../../../../public/res/ic/outlined/shield-empty.svg';
 import ChevronRightIC from '../../../../public/res/ic/outlined/chevron-right.svg';
+import CmdIC from '../../../../public/res/ic/outlined/cmd.svg';
 import ChevronBottomIC from '../../../../public/res/ic/outlined/chevron-bottom.svg';
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
 import { useForceUpdate } from '../../hooks/useForceUpdate';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
+import RawModal from '../../atoms/modal/RawModal';
+import { getBadges } from '../../../util/badges';
+import Tooltip from '../../atoms/tooltip/Tooltip';
+import { MatrixEvent } from 'matrix-js-sdk';
+import { getAboutMe } from '../../../util/variance-proto';
+import { markdown } from '../../../util/markdown';
 
 function ModerationTools({ roomId, userId }) {
   const mx = initMatrix.matrixClient;
@@ -333,6 +340,7 @@ function useRerenderOnProfileChange(roomId, userId) {
 
 function ProfileViewer() {
   const [isOpen, roomId, userId, closeDialog, handleAfterClose] = useToggleDialog();
+  const [aboutMe, setAboutMe] = useState<{aboutMe: string, userId: string} | null>(null)
   useRerenderOnProfileChange(roomId, userId);
 
   const mx = initMatrix.matrixClient;
@@ -340,14 +348,22 @@ function ProfileViewer() {
 
   const renderProfile = () => {
     const roomMember = room.getMember(userId);
+      
     const username = roomMember ? getUsernameOfRoomMember(roomMember) : getUsername(userId);
     const avatarMxc = roomMember?.getMxcAvatarUrl?.() || mx.getUser(userId)?.avatarUrl;
     const avatarUrl =
       avatarMxc && avatarMxc !== 'null' ? mx.mxcUrlToHttp(avatarMxc, 80, 80, 'crop') : null;
 
+    if(aboutMe && aboutMe.userId != roomMember.userId) setAboutMe(null)
+
+    getAboutMe(roomMember.userId, roomId).then((about) => setAboutMe({aboutMe: about, userId: roomMember.userId}))
+    
+    const badges = getBadges(userId)
     const powerLevel = roomMember?.powerLevel || 0;
     const myPowerLevel = room.getMember(mx.getUserId())?.powerLevel || 0;
 
+    // @ts-ignore
+    roomMember.profile
     const canChangeRole =
       room.currentState.maySendEvent('m.room.power_levels', mx.getUserId()) &&
       (powerLevel < myPowerLevel || userId === mx.getUserId());
@@ -387,18 +403,8 @@ function ProfileViewer() {
         />
       ));
     };
-
-    return (
-      <div className="profile-viewer">
-        <div className="profile-viewer__user">
-          <Avatar imageSrc={avatarUrl} text={username} bgColor={colorMXID(userId)} size="large" />
-          <div className="profile-viewer__user__info">
-            <Text variant="s1" weight="medium">
-              {twemojify(username)}
-            </Text>
-            <Text variant="b2">{twemojify(userId)}</Text>
-          </div>
-          <div className="profile-viewer__user__role">
+    /*
+    <div className="profile-viewer__user__role">
             <Text variant="b3">Role</Text>
             <Button
               onClick={canChangeRole ? handlePowerSelector : null}
@@ -407,27 +413,62 @@ function ProfileViewer() {
               {`${getPowerLabel(powerLevel) || 'Member'} - ${powerLevel}`}
             </Button>
           </div>
-        </div>
-        <ModerationTools roomId={roomId} userId={userId} />
+          */
+
+          /*
+          <ModerationTools roomId={roomId} userId={userId} />
         <SessionInfo userId={userId} />
         {userId !== mx.getUserId() && (
           <ProfileFooter roomId={roomId} userId={userId} onRequestClose={closeDialog} />
         )}
+          */
+
+    return (
+      <div className="profile-viewer">
+        
+          <div className="profile-viewer__info">
+            <div className="profile-viewer__info__profile">
+              <Avatar imageSrc={avatarUrl} text={username} bgColor={colorMXID(userId)} size="large" />
+          
+              <div>
+                <Text variant="s1" weight="medium">
+                  {twemojify(username)}
+                </Text>
+                <Text variant="b2">{twemojify(userId)}</Text>
+              </div>
+            </div>
+            {badges.length > 0 && 
+            <div className="profile-viewer__info__badges">
+              {badges.includes("dev") && <IconButton tooltip="Variance Developer" src={CmdIC} size='extra-small'></IconButton>}
+            </div>
+            }
+            
+          </div>
+          <div className='profile-viewer__about-me'>
+            <Text primary={false} variant="b3" weight="light">ABOUT</Text>
+              {(aboutMe && aboutMe.aboutMe) ? <p style={{whiteSpace: "pre-wrap"}} dangerouslySetInnerHTML={{__html: markdown(aboutMe.aboutMe, {}).html}} /> :  <p>No about me.</p>}
+            <Text>
+              
+            </Text>
+          </div>
+          
+        
+        
       </div>
     );
   };
 
   return (
-    <Dialog
+    <RawModal
       className="profile-viewer__dialog"
       isOpen={isOpen}
-      title={room?.name ?? ''}
+
       onAfterClose={handleAfterClose}
       onRequestClose={closeDialog}
-      contentOptions={<IconButton src={CrossIC} onClick={closeDialog} tooltip="Close" />}
+      
     >
       {roomId ? renderProfile() : <div />}
-    </Dialog>
+    </RawModal>
   );
 }
 

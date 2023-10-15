@@ -9,6 +9,7 @@ const cons = {
   },
   DEVICE_DISPLAY_NAME: 'Variance Web',
   IN_CINNY_SPACES: 'in.cinny.spaces',
+  VARIANCE_ABOUT_ME: "variance.profiles.about_me",
   tabs: {
     HOME: 'home',
     DIRECTS: 'dm',

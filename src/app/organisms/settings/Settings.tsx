@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Settings.scss';
 
 import initMatrix from '../../../client/initMatrix';
@@ -58,17 +58,51 @@ import ShieldUserIC from '../../../../public/res/ic/outlined/shield-user.svg';
 
 import CinnySVG from '../../../../public/res/svg/cinny.svg';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
+import { getAboutMe, setAboutMe } from '../../../util/variance-proto';
+import Input from '../../atoms/input/Input';
+import { InferProps } from 'prop-types';
 
 let capabilities = {
   privateReadReceipts: false,
 };
 
 function AccountSection() {
+  const aboutMeRef = useRef(null)
+  const aboutMe = initMatrix.matrixClient.getAccountData(cons.VARIANCE_ABOUT_ME)?.getContent()["value"] ?? "None"
+
+  const renderForm = () => (
+    <form
+      className="profile-editor__form"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        await setAboutMe(aboutMeRef.current.value);
+
+      }}
+    >
+      <Input
+        label={`About me`}
+        value={aboutMe}
+        resizable={true}
+        forwardRef={aboutMeRef}
+      />
+      <Button variant="primary" type="submit" disabled={false}>
+        Save
+      </Button>
+      
+    </form>
+  );
+
   return (
     <div className="settings-account">
       <div className="settings-account__card">
         <MenuHeader>Profile</MenuHeader>
         <ProfileEditor userId={initMatrix.matrixClient.getUserId()} />
+      </div>
+      <div className="settings-account__card">
+        <MenuHeader>Variance Profile</MenuHeader>
+        <div className="profile-editor">
+          {renderForm()}
+        </div>
       </div>
     </div>
   );

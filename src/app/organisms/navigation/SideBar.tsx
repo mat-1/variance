@@ -87,7 +87,7 @@ function ProfileAvatarMenu() {
         <Avatar
           text={profile.displayName}
           bgColor={colorMXID(mx.getUserId())}
-          size="normal"
+          size="medium"
           imageSrc={
             profile.avatarUrl !== null ? mx.mxcUrlToHttp(profile.avatarUrl, 42, 42, 'crop') : null
           }
