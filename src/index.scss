@@ -90,12 +90,14 @@
 
   /* system icon size | -ic-[size]: value */
   --ic-large: 38px;
+  --ic-medium: 31px;
   --ic-normal: 24px;
   --ic-small: 20px;
   --ic-extra-small: 18px;
 
   /* avatar size */
   --av-large: 80px;
+  --av-medium: 52px;
   --av-normal: 42px;
   --av-small: 36px;
   --av-extra-small: 24px;
@@ -123,6 +125,7 @@
 
   /* border */
   --bo-radius: 8px;
+  --av-border-radius: 9999px;
 
   /* font styles: font-size, letter-spacing, line-hight */
   --fs-h1: 36px;
@@ -167,7 +170,7 @@
   /* other */
   --border-width: 1px;
   --header-height: 54px;
-  --navigation-sidebar-width: calc(64px + var(--border-width));
+  --navigation-sidebar-width: calc(71px + var(--border-width));
   --navigation-drawer-width: calc(280px + var(--border-width));
   --navigation-width: calc(var(--navigation-sidebar-width) + var(--navigation-drawer-width));
   --people-drawer-width: calc(268px - var(--border-width));

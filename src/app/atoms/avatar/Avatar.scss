@@ -4,13 +4,18 @@
   display: inline-flex;
   width: 42px;
   height: 42px;
-  border-radius: var(--bo-radius);
+  border-radius: var(--av-border-radius);
   position: relative;
 
   &__large {
     width: var(--av-large);
     height: var(--av-large);
   }
+  &__medium {
+    width: var(--av-medium);
+    height: var(--av-medium);
+  }
+
   &__normal {
     width: var(--av-normal);
     height: var(--av-normal);

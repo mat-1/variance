@@ -26,7 +26,7 @@ const Avatar = React.forwardRef(
       iconSrc?: string;
       iconColor?: string;
       imageSrc?: string;
-      size?: 'large' | 'normal' | 'small' | 'extra-small';
+      size?: 'large' | 'medium' | 'normal' | 'small' | 'extra-small';
     },
     ref: React.Ref<HTMLDivElement>,
   ) => {

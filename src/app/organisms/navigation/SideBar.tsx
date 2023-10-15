@@ -157,7 +157,7 @@ function FeaturedTab() {
         tooltip="Home"
         active={selectedTab === cons.tabs.HOME}
         onClick={() => selectTab(cons.tabs.HOME)}
-        avatar={<Avatar iconSrc={HomeIC} size="normal" />}
+        avatar={<Avatar iconSrc={HomeIC} size="medium" />}
         notificationBadge={
           homeNoti ? (
             <NotificationBadge
@@ -171,7 +171,7 @@ function FeaturedTab() {
         tooltip="People"
         active={selectedTab === cons.tabs.DIRECTS}
         onClick={() => selectTab(cons.tabs.DIRECTS)}
-        avatar={<Avatar iconSrc={UserIC} size="normal" />}
+        avatar={<Avatar iconSrc={UserIC} size="medium" />}
         notificationBadge={
           dmsNoti ? (
             <NotificationBadge
@@ -260,7 +260,7 @@ function DraggableSpaceShortcut({ isActive, spaceId, index, moveShortcut, onDrop
           ref={avatarRef}
           text={room.name}
           bgColor={colorMXID(room.roomId)}
-          size="normal"
+          size="medium"
           imageSrc={room.getAvatarUrl(initMatrix.matrixClient.baseUrl, 42, 42, 'crop') || null}
         />
       }
@@ -360,11 +360,6 @@ function SideBar() {
             <div className="sidebar-divider" />
             <div className="space-container">
               <SpaceShortcut />
-              <SidebarAvatar
-                tooltip="Pin spaces"
-                onClick={() => openShortcutSpaces()}
-                avatar={<Avatar iconSrc={AddPinIC} size="normal" />}
-              />
             </div>
           </div>
         </ScrollView>
@@ -374,8 +369,8 @@ function SideBar() {
         <div className="sticky-container">
           <SidebarAvatar
             tooltip="Search"
-            onClick={() => openSearch()}
-            avatar={<Avatar iconSrc={SearchIC} size="normal" />}
+            onClick={() => openSearch(null)}
+            avatar={<Avatar iconSrc={SearchIC} size="medium" />}
           />
           {totalInvites !== 0 && (
             <SidebarAvatar

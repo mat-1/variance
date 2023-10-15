@@ -17,6 +17,9 @@
 .ic-raw-large {
   @include icSize(var(--ic-large));
 }
+.ic-raw-medium {
+  @include icSize(var(--ic-medium));
+}
 .ic-raw-normal {
   @include icSize(var(--ic-normal));
 }
