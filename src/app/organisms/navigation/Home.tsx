@@ -30,6 +30,7 @@ function Home({ spaceId }) {
   } else {
     spaceIds = roomList.getOrphanSpaces().filter((id) => !accountData.spaceShortcut.has(id));
     roomIds = roomList.getOrphanRooms();
+    directIds = [...directs]
   }
 
   

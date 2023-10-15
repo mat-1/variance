@@ -11,7 +11,6 @@ import ScrollView from '../../atoms/scroll/ScrollView';
 import DrawerHeader from './DrawerHeader';
 import DrawerBreadcrumb from './DrawerBreadcrumb';
 import Home from './Home';
-import Directs from './Directs';
 
 import { useForceUpdate } from '../../hooks/useForceUpdate';
 import { useSelectedTab } from '../../hooks/useSelectedTab';
@@ -66,17 +65,13 @@ function Drawer() {
     <div className="drawer">
       <DrawerHeader selectedTab={selectedTab} spaceId={spaceId} />
       <div className="drawer__content-wrapper">
-        {navigation.selectedSpacePath.length > 1 && selectedTab !== cons.tabs.DIRECTS && (
+        {navigation.selectedSpacePath.length > 1 && (
           <DrawerBreadcrumb spaceId={spaceId} />
         )}
         <div className="rooms__wrapper">
           <ScrollView ref={scrollRef} autoHide>
             <div className="rooms-container">
-              {selectedTab !== cons.tabs.DIRECTS ? (
-                <Home spaceId={spaceId} />
-              ) : (
-                <Directs size={roomList.directs.size} />
-              )}
+              <Home spaceId={spaceId} />
             </div>
           </ScrollView>
         </div>

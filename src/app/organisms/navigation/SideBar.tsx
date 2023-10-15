@@ -167,20 +167,7 @@ function FeaturedTab() {
           ) : null
         }
       />
-      <SidebarAvatar
-        tooltip="People"
-        active={selectedTab === cons.tabs.DIRECTS}
-        onClick={() => selectTab(cons.tabs.DIRECTS)}
-        avatar={<Avatar iconSrc={UserIC} size="medium" />}
-        notificationBadge={
-          dmsNoti ? (
-            <NotificationBadge
-              alert={dmsNoti?.highlight > 0}
-              content={abbreviateNumber(dmsNoti.total) || null}
-            />
-          ) : null
-        }
-      />
+      
     </>
   );
 }

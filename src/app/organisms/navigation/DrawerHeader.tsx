@@ -97,6 +97,18 @@ export function HomeSpaceOptions({ spaceId, afterOptionSelect }) {
           Add existing
         </MenuItem>
       )}
+      {!spaceId && (
+        <MenuItem
+          iconSrc={PlusIC}
+          onClick={() => {
+            afterOptionSelect()
+            openInviteUser(null, null)
+          }}
+          disabled={!canManage}
+        >
+          DM user
+        </MenuItem>
+      )}
       {spaceId && (
         <MenuItem
           onClick={() => {
@@ -121,11 +133,10 @@ HomeSpaceOptions.propTypes = {
 
 function DrawerHeader({ selectedTab, spaceId }) {
   const mx = initMatrix.matrixClient;
-  const tabName = selectedTab !== cons.tabs.DIRECTS ? 'Home' : 'Direct messages';
+  const tabName = "Home";
 
-  const isDMTab = selectedTab === cons.tabs.DIRECTS;
   const room = mx.getRoom(spaceId);
-  const spaceName = isDMTab ? null : room?.name || null;
+  const spaceName = room?.name
 
   const openSpaceOptions = (e) => {
     e.preventDefault();
@@ -164,18 +175,14 @@ function DrawerHeader({ selectedTab, spaceId }) {
           </Text>
         </TitleWrapper>
       )}
-
-      {isDMTab && (
-        <IconButton onClick={() => openInviteUser()} tooltip="Start DM" src={PlusIC} size="small" />
-      )}
-      {!isDMTab && (
+      
         <IconButton
           onClick={openHomeSpaceOptions}
-          tooltip="Add rooms/spaces"
+          tooltip="Add rooms/spaces or Start DMs"
           src={PlusIC}
           size="small"
         />
-      )}
+      
     </Header>
   );
 }
