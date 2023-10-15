@@ -472,6 +472,34 @@ function AboutSection() {
             <li>
               <Text>
                 <a
+                  href="https://github.com/mat-1/variance"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  Variance
+                </a>{' '}
+                is ©{' '}
+                <a
+                  href="https://github.com/mat-1/variance/graphs/contributors"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  Variance contributors
+                </a>{' '}
+                used under the terms of{' '}
+                <a
+                  href="https://www.gnu.org/licenses/agpl-3.0.en.html"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  AGPL-3.0
+                </a>
+                .
+              </Text>
+            </li>
+            <li>
+              <Text>
+                <a
                   href="https://github.com/cinnyapp/cinny"
                   rel="noreferrer noopener"
                   target="_blank"
