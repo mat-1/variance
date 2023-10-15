@@ -51,14 +51,14 @@ function PopupWindow({
   onAfterClose,
   onRequestClose,
   children,
-  fullscreen,
+  extraLarge,
 }) {
   const haveDrawer = drawer !== null;
   const cTitle = contentTitle !== null ? contentTitle : title;
 
   let size: string;
-  if (fullscreen) {
-    size = 'fullscreen';
+  if (extraLarge) {
+    size = 'extra-large';
   } else if (haveDrawer) {
     size = 'large';
   } else {
@@ -147,7 +147,7 @@ PopupWindow.propTypes = {
   onAfterClose: PropTypes.func,
   onRequestClose: PropTypes.func,
   children: PropTypes.node.isRequired,
-  fullscreen: PropTypes.bool,
+  extraLarge: PropTypes.bool,
 };
 
 export default PopupWindow;

@@ -22,8 +22,8 @@ function RawModal({
 }) {
   let modalClass = className !== null ? `${className} ` : '';
   switch (size) {
-    case 'fullscreen':
-      modalClass += 'raw-modal__fullscreen ';
+    case 'extra-large':
+      modalClass += 'raw-modal__extra-large ';
       break;
     case 'large':
       modalClass += 'raw-modal__large ';
@@ -72,7 +72,7 @@ RawModal.propTypes = {
   className: PropTypes.string,
   overlayClassName: PropTypes.string,
   isOpen: PropTypes.bool.isRequired,
-  size: PropTypes.oneOf(['fullscreen', 'large', 'medium', 'small']),
+  size: PropTypes.oneOf(['extra-large', 'large', 'medium', 'small']),
   onAfterOpen: PropTypes.func,
   onAfterClose: PropTypes.func,
   onRequestClose: PropTypes.func,

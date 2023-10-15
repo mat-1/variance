@@ -196,7 +196,7 @@ function SpaceSettings() {
       }
       contentOptions={<IconButton src={CrossIC} onClick={requestClose} tooltip="Close" />}
       onRequestClose={requestClose}
-      fullscreen
+      extraLarge
     >
       {isOpen && (
         <div className="space-settings__content">
