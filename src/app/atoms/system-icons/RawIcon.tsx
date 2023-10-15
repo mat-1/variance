@@ -24,7 +24,7 @@ RawIcon.defaultProps = {
 
 RawIcon.propTypes = {
   color: PropTypes.string,
-  size: PropTypes.oneOf(['large', 'normal', 'small', 'extra-small']),
+  size: PropTypes.oneOf(['large', 'medium', 'normal', 'small', 'extra-small']),
   src: PropTypes.string.isRequired,
   isImage: PropTypes.bool,
 };
