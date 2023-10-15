@@ -7,6 +7,8 @@
   align-items: center;
   cursor: pointer;
 
+  --ic-surface-normal: white;
+
   & .notification-badge {
     position: absolute;
     @include dir.prop(left, unset, 0);
@@ -17,12 +19,12 @@
 
     margin: 0 !important;
   }
-  & .avatar-container,
-  & .notification-badge {
-    transition: transform 200ms var(--fluid-push);
-  }
+  
   &:hover .avatar-container {
-    @include dir.prop(transform, translateX(4px), translateX(-4px));
+    background-color: var(--bg-primary-hover);
+    --av-border-radius: 1rem;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
   }
   &:hover .notification-badge {
     --ltr: translate(calc(20% + 4px), -20%);
