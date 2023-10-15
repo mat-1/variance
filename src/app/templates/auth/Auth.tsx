@@ -746,6 +746,11 @@ function Auth() {
               Powered by Matrix
             </a>
           </Text>
+          <Text variant="b2">
+            <a href="https://unsplash.com/photos/a-close-up-of-a-cell-phone-with-a-black-background-H5yUrPB1bBM" target="_blank" rel="noreferrer">
+              Background by @fakurian - unsplash.com
+            </a>
+          </Text>
         </div>
         <div className="auth__bg"></div>
       </div>
