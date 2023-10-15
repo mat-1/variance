@@ -1,36 +1,44 @@
 @use '../../partials/flex';
 @use '../../partials/dir';
+.auth__bg {
+  position: absolute;
+  z-index: -1;
+  min-height: 100%; 
+  min-width: 100%;
 
+  filter: blur(10px);
+  transform: scale(1.1); 
+  background-image: url("public/res/jpg/login-bg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 .auth__base {
-  --pattern-size: 48px;
-  min-height: 100%;
-  background-color: var(--bg-surface-low);
-
-  background-image: radial-gradient(rgba(0, 0, 0, 6%) 2px, rgba(0, 0, 0, 0%) 2px);
-  background-size: var(--pattern-size) var(--pattern-size);
-
+  z-index: 1;
   display: flex;
   flex-direction: column;
 }
 .auth__wrapper {
   flex: 1;
+  min-height: 100%;
+  min-width: 100%;  
   padding: var(--sp-loose);
   padding-bottom: 0;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
 }
 .auth-footer {
   padding: var(--sp-normal) 0;
   display: flex;
   justify-content: center;
-  align-items: center;
+  height: 100%;
+  align-items: end;
 
   & > *:nth-child(2n) {
     margin: 0 var(--sp-loose);
   }
   & a {
-    color: var(--tc-surface-normal);
+    color: white;
     &:hover {
       text-decoration: underline;
     }
@@ -38,7 +46,22 @@
 }
 .auth-card {
   width: 462px;
-  background-color: var(--bg-surface);
+  background-color: rgba(0,0,0, 0.4);
+  color: white; 
+  --tc-surface-high: white;
+  --tc-surface-low: white;
+  --tc-surface-normal: white;
+
+  --bg-surface-border: rgba(255, 255, 255, 0.2);
+
+  --bs-surface-border: inset 0 0 0 1px var(--bg-surface-border);
+  --bs-surface-outline: 0 0 0 2px var(--bg-surface-border);
+  --bs-popup: 0 0 16px rgba(255, 255, 255, 0.2);
+
+  --bg-surface: rgba(0, 0, 0, 0.2);
+  --bg-surface-low: rgba(0, 0, 0, 0.2);
+
+  border-color: var(--bg-surface-border);
   border-radius: var(--bo-radius);
   box-shadow: var(--bs-popup);
   overflow: hidden;
@@ -66,6 +89,7 @@
     flex: 1;
     & .input {
       background-color: var(--bg-surface);
+      color: white;
       @include dir.prop(border-right-width, 0, 1px);
       @include dir.prop(border-left-width, 1px, 0);
       @include dir.prop(
@@ -141,6 +165,7 @@
   margin-bottom: var(--sp-tight);
   display: flex;
   align-items: center;
+  --bg-surface-border: white;
 
   &::before,
   &::after {

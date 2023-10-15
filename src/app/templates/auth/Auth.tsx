@@ -59,7 +59,7 @@ function Homeserver({ onChange }) {
     isLoading: true,
     message: 'Loading homeserver list...',
   });
-  const hsRef = useRef();
+  const hsRef = useRef<{value?: string}>();
 
   const setupHsConfig = async (servername: string) => {
     setProcess({ isLoading: true, message: 'Looking for homeserver...' });
@@ -71,6 +71,7 @@ function Homeserver({ onChange }) {
     setProcess({ isLoading: true, message: `Connecting to ${baseUrl}...` });
     const tempClient = auth.createTemporaryClient(baseUrl);
 
+    // @ts-ignore - matrix-js-sdk type issue
     Promise.allSettled([tempClient.loginFlows(), tempClient.register()])
       .then((values) => {
         const loginFlow = values[0].status === 'fulfilled' ? values[0]?.value : undefined;
@@ -192,7 +193,7 @@ function Login({ loginFlow, baseUrl }) {
   };
 
   const validator = (values) => {
-    const errors: { email?: string } = {};
+    const errors: { email?: string, username?: string } = {};
     if (typeIndex === 1 && values.email.length > 0 && !isValidInput(values.email, EMAIL_REGEX)) {
       errors.email = BAD_EMAIL_ERROR;
     }
@@ -261,13 +262,13 @@ function Login({ loginFlow, baseUrl }) {
       </div>
       {isPassword && (
         <Formik initialValues={initialValues} onSubmit={submitter} validate={validator}>
-          {({ values, errors, handleChange, handleSubmit, isSubmitting }) => (
+          {({isSubmitting, handleSubmit, values, handleChange, errors}) => (
             <>
               {isSubmitting && <LoadingScreen message="Login in progress..." />}
               <form className="auth-form" onSubmit={handleSubmit}>
                 {typeIndex === 0 && (
                   <Input
-                    values={values.username}
+                    value={values.username}
                     name="username"
                     onChange={handleChange}
                     label="Username"
@@ -277,12 +278,12 @@ function Login({ loginFlow, baseUrl }) {
                 )}
                 {errors.username && (
                   <Text className="auth-form__error" variant="b3">
-                    {errors.username}
+                    {errors.username.toString()}
                   </Text>
                 )}
                 {typeIndex === 1 && (
                   <Input
-                    values={values.email}
+                    value={values.email}
                     name="email"
                     onChange={handleChange}
                     label="Email"
@@ -292,12 +293,12 @@ function Login({ loginFlow, baseUrl }) {
                 )}
                 {errors.email && (
                   <Text className="auth-form__error" variant="b3">
-                    {errors.email}
+                    {errors.email.toString()}
                   </Text>
                 )}
                 <div className="auth-form__pass-eye-wrapper">
                   <Input
-                    values={values.password}
+                    value={values.password}
                     name="password"
                     onChange={handleChange}
                     label="Password"
@@ -312,12 +313,12 @@ function Login({ loginFlow, baseUrl }) {
                 </div>
                 {errors.password && (
                   <Text className="auth-form__error" variant="b3">
-                    {errors.password}
+                    {errors.password.toString()}
                   </Text>
                 )}
                 {errors.other && (
                   <Text className="auth-form__error" variant="b3">
-                    {errors.other}
+                    {errors.other.toString()}
                   </Text>
                 )}
                 <div className="auth-form__btns">
@@ -352,7 +353,7 @@ function Register({ registerInfo, loginFlow, baseUrl }) {
   const [process, setProcess] = useState<any>({});
   const [passVisible, setPassVisible] = useState(false);
   const [cPassVisible, setCPassVisible] = useState(false);
-  const formRef = useRef();
+  const formRef = useRef<any>(); // TODO: type
 
   const ssoProviders = loginFlow?.filter((flow) => flow.type === 'm.login.sso')[0];
   const isDisabled = registerInfo.errcode !== undefined;
@@ -544,7 +545,7 @@ function Register({ registerInfo, loginFlow, baseUrl }) {
               )}
               <form className="auth-form" ref={formRef} onSubmit={handleSubmit}>
                 <Input
-                  values={values.username}
+                  value={values.username}
                   name="username"
                   onChange={handleChange}
                   label="Username"
@@ -553,12 +554,12 @@ function Register({ registerInfo, loginFlow, baseUrl }) {
                 />
                 {errors.username && (
                   <Text className="auth-form__error" variant="b3">
-                    {errors.username}
+                    {errors.username.toString()}
                   </Text>
                 )}
                 <div className="auth-form__pass-eye-wrapper">
                   <Input
-                    values={values.password}
+                    value={values.password}
                     name="password"
                     onChange={handleChange}
                     label="Password"
@@ -573,12 +574,12 @@ function Register({ registerInfo, loginFlow, baseUrl }) {
                 </div>
                 {errors.password && (
                   <Text className="auth-form__error" variant="b3">
-                    {errors.password}
+                    {errors.password.toString()}
                   </Text>
                 )}
                 <div className="auth-form__pass-eye-wrapper">
                   <Input
-                    values={values.confirmPassword}
+                    value={values.confirmPassword}
                     name="confirmPassword"
                     onChange={handleChange}
                     label="Confirm password"
@@ -593,12 +594,12 @@ function Register({ registerInfo, loginFlow, baseUrl }) {
                 </div>
                 {errors.confirmPassword && (
                   <Text className="auth-form__error" variant="b3">
-                    {errors.confirmPassword}
+                    {errors.confirmPassword.toString()}
                   </Text>
                 )}
                 {isEmail && (
                   <Input
-                    values={values.email}
+                    value={values.email}
                     name="email"
                     onChange={handleChange}
                     label={`Email${isEmailRequired ? '' : ' (optional)'}`}
@@ -608,12 +609,12 @@ function Register({ registerInfo, loginFlow, baseUrl }) {
                 )}
                 {errors.email && (
                   <Text className="auth-form__error" variant="b3">
-                    {errors.email}
+                    {errors.email.toString()}
                   </Text>
                 )}
                 {errors.other && (
                   <Text className="auth-form__error" variant="b3">
-                    {errors.other}
+                    {errors.other.toString()}
                   </Text>
                 )}
                 <div className="auth-form__btns">
@@ -714,7 +715,6 @@ function Auth() {
           {!loginToken && (
             <div className="auth-card">
               <Header>
-                <Avatar size="extra-small" imageSrc={CinnySvg} />
                 <TitleWrapper>
                   <Text variant="h2" weight="medium">
                     Variance
@@ -747,6 +747,7 @@ function Auth() {
             </a>
           </Text>
         </div>
+        <div className="auth__bg"></div>
       </div>
     </ScrollView>
   );
