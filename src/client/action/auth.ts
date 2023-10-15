@@ -2,6 +2,14 @@ import * as sdk from 'matrix-js-sdk';
 import cons from '../state/cons';
 import { WellKnown, getWellKnown } from '../../util/matrixUtil';
 
+type Identifier = {
+  type?: string,
+  user?: string,
+  medium?: string,
+  address?: string
+}
+
+
 function updateLocalStore(
   accessToken: string,
   deviceId: string,
@@ -16,7 +24,7 @@ function updateLocalStore(
   localStorage.setItem(cons.secretKey.SLIDING_SYNC_PROXY_URL, slidingSyncProxyUrl);
 }
 
-function createTemporaryClient(baseUrl) {
+function createTemporaryClient(baseUrl: string): sdk.MatrixClient {
   return sdk.createClient({ baseUrl });
 }
 
@@ -26,8 +34,9 @@ async function startSsoLogin(baseUrl, type, idpId) {
   window.location.href = client.getSsoLoginUrl(window.location.href, type, idpId);
 }
 
+
 async function login(baseUrl: string, username: string, email: string, password: string) {
-  const identifier = {};
+  const identifier: Identifier = {};
   if (username) {
     identifier.type = 'm.id.user';
     identifier.user = username;
@@ -53,7 +62,7 @@ async function login(baseUrl: string, username: string, email: string, password:
   updateLocalStore(res.access_token, res.device_id, res.user_id, myBaseUrl, mySlidingSyncProxyUrl);
 }
 
-async function loginWithToken(baseUrl, token) {
+async function loginWithToken(baseUrl: string, token: string) {
   const client = createTemporaryClient(baseUrl);
 
   const res = await client.login('m.login.token', {
@@ -65,15 +74,14 @@ async function loginWithToken(baseUrl, token) {
   updateLocalStore(res.access_token, res.device_id, res.user_id, myBaseUrl);
 }
 
-// eslint-disable-next-line camelcase
-async function verifyEmail(baseUrl, email, client_secret, send_attempt, next_link) {
+async function verifyEmail(baseUrl: string, email: string, clientSecret: string, sendAttempt: number, nextLink?: string) {
   const res = await fetch(`${baseUrl}/_matrix/client/r0/register/email/requestToken`, {
     method: 'POST',
     body: JSON.stringify({
       email,
-      client_secret,
-      send_attempt,
-      next_link,
+      clientSecret,
+      sendAttempt,
+      nextLink,
     }),
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
@@ -84,7 +92,7 @@ async function verifyEmail(baseUrl, email, client_secret, send_attempt, next_lin
   return data;
 }
 
-async function completeRegisterStage(baseUrl, username, password, auth) {
+async function completeRegisterStage(baseUrl: string, username: string, password: string, auth: sdk.AuthDict) {
   const tempClient = createTemporaryClient(baseUrl);
 
   try {
@@ -94,7 +102,8 @@ async function completeRegisterStage(baseUrl, username, password, auth) {
       auth,
       initial_device_display_name: cons.DEVICE_DISPLAY_NAME,
     });
-    const data = { completed: result.completed || [] };
+    // @ts-ignore - matrix-js-sdk type error
+    const data = { completed: result.completed || [], done: false };
     if (result.access_token) {
       data.done = true;
       updateLocalStore(result.access_token, result.device_id, result.user_id, baseUrl);
@@ -102,7 +111,7 @@ async function completeRegisterStage(baseUrl, username, password, auth) {
     return data;
   } catch (e) {
     const result = e.data;
-    const data = { completed: result.completed || [] };
+    const data = { completed: result.completed || [], done: false };
     if (result.access_token) {
       data.done = true;
       updateLocalStore(result.access_token, result.device_id, result.user_id, baseUrl);
