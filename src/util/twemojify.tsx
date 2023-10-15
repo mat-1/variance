@@ -44,7 +44,7 @@ linkify.registerCustomProtocol('gemini');
  */
 export function twemojify(
   text: string,
-  opts: { base?: string } | undefined,
+  opts?: { base?: string },
   shouldLinkify: boolean = false,
   sanitize: boolean = true,
   maths: boolean = false,

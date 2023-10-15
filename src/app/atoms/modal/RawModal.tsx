@@ -5,6 +5,7 @@ import './RawModal.scss';
 import Modal from 'react-modal';
 
 import navigation from '../../../client/state/navigation';
+import ScrollView from '../scroll/ScrollView';
 
 Modal.setAppElement('#root');
 
