@@ -9,15 +9,13 @@ import { roomIdByActivity, roomIdByAtoZ } from '../../../util/sort';
 
 import RoomsCategory from './RoomsCategory';
 
-import { useCategorizedSpaces } from '../../hooks/useCategorizedSpaces';
 
 const drawerPostie = new Postie();
 function Home({ spaceId }) {
   const mx = initMatrix.matrixClient;
   const { roomList, notifications, accountData } = initMatrix;
   const { spaces, rooms, directs } = roomList;
-  useCategorizedSpaces();
-  const isCategorized = accountData.categorizedSpaces.has(spaceId);
+  const isCategorized = true;
 
   let categories = null;
   let spaceIds = [];
@@ -34,10 +32,10 @@ function Home({ spaceId }) {
     roomIds = roomList.getOrphanRooms();
   }
 
-  if (isCategorized) {
-    categories = roomList.getCategorizedSpaces(spaceIds);
-    categories.delete(spaceId);
-  }
+  
+  categories = roomList.getCategorizedSpaces(spaceIds);
+  categories.delete(spaceId);
+  
 
   useEffect(() => {
     const selectorChanged = (selectedRoomId, prevSelectedRoomId) => {
@@ -54,7 +52,7 @@ function Home({ spaceId }) {
     const notiChanged = (roomId, total, prevTotal) => {
       if (total === prevTotal) return;
       if (drawerPostie.hasTopicAndSubscriber('unread-change', roomId)) {
-        drawerPostie.post('unread-change', roomId);
+        drawerPostie.post('unread-change', roomId, null);
       }
     };
 
