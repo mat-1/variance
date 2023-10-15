@@ -1,11 +1,11 @@
 const cons = {
   version: '2.2.6',
   secretKey: {
-    ACCESS_TOKEN: 'cinny_access_token',
-    DEVICE_ID: 'cinny_device_id',
-    USER_ID: 'cinny_user_id',
-    BASE_URL: 'cinny_hs_base_url',
-    SLIDING_SYNC_PROXY_URL: 'cinny_sliding_sync_proxy_url',
+    ACCESS_TOKEN: 'variance_access_token',
+    DEVICE_ID: 'variance_device_id',
+    USER_ID: 'variance_user_id',
+    BASE_URL: 'variance_hs_base_url',
+    SLIDING_SYNC_PROXY_URL: 'variance_sliding_sync_proxy_url',
   },
   DEVICE_DISPLAY_NAME: 'Variance Web',
   IN_CINNY_SPACES: 'in.cinny.spaces',
