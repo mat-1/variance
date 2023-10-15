@@ -19,6 +19,8 @@ function Time({ timestamp, fullTime }) {
     formattedDate = dateFormat(date, isToday || isYesterday ? 'hh:MM TT' : 'dd/mm/yyyy');
     if (isYesterday) {
       formattedDate = `Yesterday, ${formattedDate}`;
+    } else if (isToday) {
+      formattedDate = `Today, ${formattedDate}`
     }
   }
 

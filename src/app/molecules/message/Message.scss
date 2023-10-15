@@ -106,31 +106,22 @@
   align-items: baseline;
 
   & .message__profile {
+    display: flex;
     min-width: 0;
     color: var(--tc-surface-high);
     @include dir.side(margin, 0, var(--sp-tight));
 
-    & > span {
-      @extend .cp-txt__ellipsis;
-      color: inherit;
-    }
-    & > span:last-child {
-      display: none;
-    }
-    &:hover {
-      & > span:first-child {
-        display: none;
-      }
-      & > span:last-child {
-        display: block;
-      }
-    }
+    flex-direction: row;
+    align-items: center;
+    gap: 0.3rem;
+    
+    
   }
 
   & .message__time {
     flex: 1;
     display: flex;
-    justify-content: flex-end;
+    
     & > .text {
       white-space: nowrap;
       color: var(--tc-surface-low);
