@@ -136,8 +136,8 @@ class RoomList extends EventEmitter {
     if (parents.size === 0) this.roomIdToParents.delete(roomId);
   }
 
-  getAllParentSpaces(roomId) {
-    const allParents = new Set();
+  getAllParentSpaces(roomId: string): Set<string> {
+    const allParents = new Set<string>();
 
     const addAllParentIds = (rId) => {
       if (allParents.has(rId)) return;

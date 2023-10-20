@@ -1,6 +1,7 @@
 import EventEmitter from 'events';
 import encrypt from 'browser-encrypt-attachment';
 import { encode } from 'blurhash';
+import { EventTimeline, MatrixClient } from 'matrix-js-sdk';
 import { getShortcodeToEmoji } from '../../app/organisms/emoji-board/custom-emoji';
 import { getBlobSafeMimeType } from '../../util/mimetypes';
 import { sanitizeText } from '../../util/sanitize';
@@ -8,6 +9,7 @@ import cons from './cons';
 import settings from './settings';
 import { markdown, plain, html } from '../../util/markdown';
 import { clearUrlsFromHtml, clearUrlsFromText } from '../../util/clear-urls/clearUrls';
+import RoomList from './RoomList';
 
 const blurhashField = 'xyz.amorgan.blurhash';
 
@@ -100,7 +102,31 @@ function getVideoThumbnail(video, width, height, mimeType) {
 }
 
 class RoomsInput extends EventEmitter {
-  constructor(mx, roomList) {
+  private matrixClient: MatrixClient;
+
+  private roomList: RoomList;
+
+  private roomIdToInput: Map<
+    string,
+    {
+      message?: string;
+      replyTo?: {
+        userId: string;
+        eventId: string;
+        body: string;
+        formattedBody?: string;
+      };
+      attachment?: {
+        file: File;
+        uploadingPromise?: Promise<{
+          content_uri: string;
+        }>;
+      };
+      isSending?: boolean;
+    }
+  >;
+
+  constructor(mx: MatrixClient, roomList: RoomList) {
     super();
 
     this.matrixClient = mx;
@@ -108,7 +134,7 @@ class RoomsInput extends EventEmitter {
     this.roomIdToInput = new Map();
   }
 
-  cleanEmptyEntry(roomId) {
+  cleanEmptyEntry(roomId: string) {
     const input = this.getInput(roomId);
     const isEmpty =
       typeof input.attachment === 'undefined' &&
@@ -123,39 +149,39 @@ class RoomsInput extends EventEmitter {
     return this.roomIdToInput.get(roomId) || {};
   }
 
-  setMessage(roomId, message) {
+  setMessage(roomId: string, message) {
     const input = this.getInput(roomId);
     input.message = message;
     this.roomIdToInput.set(roomId, input);
     if (message === '') this.cleanEmptyEntry(roomId);
   }
 
-  getMessage(roomId) {
+  getMessage(roomId: string) {
     const input = this.getInput(roomId);
     if (typeof input.message === 'undefined') return '';
     return input.message;
   }
 
-  setReplyTo(roomId, replyTo) {
+  setReplyTo(roomId: string, replyTo) {
     const input = this.getInput(roomId);
     input.replyTo = replyTo;
     this.roomIdToInput.set(roomId, input);
   }
 
-  getReplyTo(roomId) {
+  getReplyTo(roomId: string) {
     const input = this.getInput(roomId);
     if (typeof input.replyTo === 'undefined') return null;
     return input.replyTo;
   }
 
-  cancelReplyTo(roomId) {
+  cancelReplyTo(roomId: string) {
     const input = this.getInput(roomId);
     if (typeof input.replyTo === 'undefined') return;
     delete input.replyTo;
     this.roomIdToInput.set(roomId, input);
   }
 
-  setAttachment(roomId, file) {
+  setAttachment(roomId: string, file) {
     const input = this.getInput(roomId);
     input.attachment = {
       file,
@@ -163,13 +189,13 @@ class RoomsInput extends EventEmitter {
     this.roomIdToInput.set(roomId, input);
   }
 
-  getAttachment(roomId) {
+  getAttachment(roomId: string) {
     const input = this.getInput(roomId);
     if (typeof input.attachment === 'undefined') return null;
     return input.attachment.file;
   }
 
-  cancelAttachment(roomId) {
+  cancelAttachment(roomId: string) {
     const input = this.getInput(roomId);
     if (typeof input.attachment === 'undefined') return;
 
@@ -185,18 +211,18 @@ class RoomsInput extends EventEmitter {
     this.emit(cons.events.roomsInput.ATTACHMENT_CANCELED, roomId);
   }
 
-  isSending(roomId) {
+  isSending(roomId: string) {
     return this.roomIdToInput.get(roomId)?.isSending || false;
   }
 
-  getContent(roomId, options, message: string, reply, edit) {
+  getContent(roomId: string, options, message: string, reply, edit) {
     const msgType = options?.msgType || 'm.text';
     const autoMarkdown = options?.autoMarkdown ?? true;
     const isHtml = options?.isHtml ?? false;
 
     const room = this.matrixClient.getRoom(roomId);
 
-    const userNames = room.currentState.userIdsToDisplayNames;
+    const userNames = room.getLiveTimeline().getState(EventTimeline.FORWARDS).userIdsToDisplayNames;
     const parentIds = this.roomList.getAllParentSpaces(room.roomId);
     const parentRooms = [...parentIds].map((id) => this.matrixClient.getRoom(id));
     const emojis = getShortcodeToEmoji(this.matrixClient, [room, ...parentRooms]);

@@ -6,6 +6,8 @@ import './RoomViewInput.scss';
 import { ReactEditor } from 'slate-react';
 import { Editor, Transforms } from 'slate';
 
+import EventEmitter from 'events';
+
 import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
 import settings from '../../../client/state/settings';
@@ -41,6 +43,7 @@ const CMD_REGEX = /(^\/|:|@)(\S*)$/;
 let isTyping = false;
 let isCmdActivated = false;
 let cmdCursorPos = null;
+
 function RoomViewInput({
   roomId,
   roomTimeline,
@@ -48,16 +51,17 @@ function RoomViewInput({
 }: {
   roomId: string;
   roomTimeline: RoomTimeline;
-  viewEvent: string;
+  viewEvent: EventEmitter;
 }) {
   const [attachment, setAttachment] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
 
-  const editor: React.MutableRefObject<ReactEditor> = useRef(null);
-  const inputBaseRef = useRef(null);
-  const uploadInputRef = useRef(null);
-  const uploadProgressRef = useRef(null);
-  const rightOptionsRef = useRef(null);
+  const editor = useRef<ReactEditor>(null);
+  const editorElRef = useRef<HTMLDivElement>(null);
+  const inputBaseRef = useRef<HTMLDivElement>(null);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
+  const uploadProgressRef = useRef<HTMLSpanElement>(null);
+  const rightOptionsRef = useRef<HTMLDivElement>(null);
 
   const TYPING_TIMEOUT = 5000;
   const mx = initMatrix.matrixClient;
@@ -85,7 +89,6 @@ function RoomViewInput({
   }
 
   function clearEditor() {
-    console.log('clear editor');
     Transforms.delete(editor.current, {
       at: {
         anchor: editor.current.start([]),
@@ -120,14 +123,16 @@ function RoomViewInput({
     uploadInputRef.current.value = null;
   }
 
-  function rightOptionsA11Y(A11Y) {
+  function rightOptionsA11Y(A11Y: boolean) {
+    if (rightOptionsRef.current === null) return;
     const rightOptions = rightOptionsRef.current.children;
     for (let index = 0; index < rightOptions.length; index += 1) {
-      rightOptions[index].tabIndex = A11Y ? 0 : -1;
+      const el = rightOptions[index] as HTMLElement;
+      el.tabIndex = A11Y ? 0 : -1;
     }
   }
 
-  function activateCmd(prefix) {
+  function activateCmd(prefix: string) {
     isCmdActivated = true;
     rightOptionsA11Y(false);
     viewEvent.emit('cmd_activate', prefix);
@@ -158,6 +163,10 @@ function RoomViewInput({
 
   function focusInput() {
     if (settings.isTouchScreenDevice) return;
+
+    // check if editor.current is in the DOM
+    if (!document.body.contains(editorElRef.current)) return;
+
     ReactEditor.focus(editor.current);
     Transforms.select(editor.current, Editor.end(editor.current, []));
   }
@@ -297,7 +306,7 @@ function RoomViewInput({
     return editor.current.selection.anchor.offset;
   }
 
-  function recognizeCmd(rawInput) {
+  function recognizeCmd(rawInput: string) {
     const cursor = getCursorPosition();
     const targetInput = rawInput.slice(0, cursor);
 
@@ -442,6 +451,7 @@ function RoomViewInput({
             onKeyDown={handleKeyDown}
             onCreateEditor={handleCreateEditor}
             readOnly={readOnly}
+            ref={editorElRef}
             placeholder="Send a message..."
           />
         </div>
