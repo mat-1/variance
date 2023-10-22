@@ -20,6 +20,15 @@ export function cssColorMXID(userId: string): string {
   return `--mx-uc-${colorNumber + 1}`;
 }
 
-export default function colorMXID(userId: string): string {
+export function colorMXID(userId: string): string {
   return `var(${cssColorMXID(userId)})`;
+}
+
+export function cssBackgroundColorMXID(userId: string): string {
+  const colorNumber = hashCode(userId) % 8;
+  return `--mx-bg-${colorNumber + 1}`;
+}
+
+export function backgroundColorMXID(userId: string): string {
+  return `var(${cssBackgroundColorMXID(userId)})`;
 }

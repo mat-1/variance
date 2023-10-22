@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import './RoomMembers.scss';
 
 import initMatrix from '../../../client/initMatrix';
-import colorMXID from '../../../util/colorMXID';
 import { openProfileViewer } from '../../../client/action/navigation';
 import { getUsernameOfRoomMember, getPowerLabel } from '../../../util/matrixUtil';
 import AsyncSearch from '../../../util/AsyncSearch';
@@ -15,6 +14,7 @@ import Input from '../../atoms/input/Input';
 import { MenuHeader } from '../../atoms/context-menu/ContextMenu';
 import SegmentedControls from '../../atoms/segmented-controls/SegmentedControls';
 import PeopleSelector from '../people-selector/PeopleSelector';
+import { colorMXID } from '../../../util/colorMXID';
 
 const PER_PAGE_MEMBER = 50;
 

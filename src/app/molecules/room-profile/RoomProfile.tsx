@@ -6,7 +6,7 @@ import { twemojify } from '../../../util/twemojify';
 
 import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
-import colorMXID from '../../../util/colorMXID';
+import { backgroundColorMXID } from '../../../util/colorMXID';
 
 import Text from '../../atoms/text/Text';
 import Avatar from '../../atoms/avatar/Avatar';
@@ -21,7 +21,7 @@ import { useStore } from '../../hooks/useStore';
 import { useForceUpdate } from '../../hooks/useForceUpdate';
 import { confirmDialog } from '../confirm-dialog/ConfirmDialog';
 
-function RoomProfile({ roomId }) {
+function RoomProfile({ roomId }: { roomId: string }) {
   const isMountStore = useStore();
   const [isEditing, setIsEditing] = useState(false);
   const [, forceUpdate] = useForceUpdate();
@@ -212,12 +212,17 @@ function RoomProfile({ roomId }) {
     <div className="room-profile">
       <div className="room-profile__content">
         {!canChangeAvatar && (
-          <Avatar imageSrc={avatarSrc} text={roomName} bgColor={colorMXID(roomId)} size="large" />
+          <Avatar
+            imageSrc={avatarSrc}
+            text={roomName}
+            bgColor={backgroundColorMXID(roomId)}
+            size="large"
+          />
         )}
         {canChangeAvatar && (
           <ImageUpload
             text={roomName}
-            bgColor={colorMXID(roomId)}
+            bgColor={backgroundColorMXID(roomId)}
             imageSrc={avatarSrc}
             onUpload={handleAvatarUpload}
             onRequestRemove={() => handleAvatarUpload(null)}

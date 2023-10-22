@@ -15,7 +15,6 @@ import {
   parseReply,
   trimHTMLReply,
 } from '../../../util/matrixUtil';
-import colorMXID from '../../../util/colorMXID';
 import { getEventCords } from '../../../util/common';
 import { redactEvent, sendReaction } from '../../../client/action/roomTimeline';
 import {
@@ -55,6 +54,7 @@ import { getBlobSafeMimeType } from '../../../util/mimetypes';
 import { html, plain } from '../../../util/markdown';
 import { Embed } from '../media/Media';
 import RoomTimeline from '../../../client/state/RoomTimeline';
+import { backgroundColorMXID, colorMXID } from '../../../util/colorMXID';
 
 function PlaceholderMessage() {
   return (
@@ -89,7 +89,12 @@ const MessageAvatar = React.memo(
   }) => (
     <div className="message__avatar-container">
       <button type="button" onClick={() => openProfileViewer(userId, roomId)}>
-        <Avatar imageSrc={avatarSrc} text={username} bgColor={colorMXID(userId)} size="small" />
+        <Avatar
+          imageSrc={avatarSrc}
+          text={username}
+          bgColor={backgroundColorMXID(userId)}
+          size="small"
+        />
       </button>
     </div>
   ),
@@ -177,7 +182,7 @@ const MessageReplyWrapper = React.memo(
 
           setReply({
             to: username,
-            color: colorMXID(mEvent.getSender()),
+            color: colorMXID(mEvent.getSender() ?? ''),
             body: parsedBody,
             event: mEvent,
           });

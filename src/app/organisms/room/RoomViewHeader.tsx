@@ -14,7 +14,7 @@ import {
   openNavigation,
 } from '../../../client/action/navigation';
 import { togglePeopleDrawer } from '../../../client/action/settings';
-import colorMXID from '../../../util/colorMXID';
+import { backgroundColorMXID } from '../../../util/colorMXID';
 import { getEventCords } from '../../../util/common';
 
 import { tabText } from './RoomSettings';
@@ -90,7 +90,12 @@ function RoomViewHeader({ roomId }) {
         type="button"
         onMouseUp={(e) => blurOnBubbling(e, '.room-header__btn')}
       >
-        <Avatar imageSrc={avatarSrc} text={roomName} bgColor={colorMXID(roomId)} size="small" />
+        <Avatar
+          imageSrc={avatarSrc}
+          text={roomName}
+          bgColor={backgroundColorMXID(roomId)}
+          size="small"
+        />
         <TitleWrapper>
           <Text variant="h2" weight="medium" primary>
             {twemojify(roomName)}

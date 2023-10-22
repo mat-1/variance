@@ -58,6 +58,7 @@ import ShieldUserIC from '../../../../public/res/ic/outlined/shield-user.svg';
 
 import CinnySVG from '../../../../public/res/svg/cinny.svg';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
+import Input from '../../atoms/input/Input';
 
 let capabilities = {
   privateReadReceipts: false,
@@ -97,20 +98,35 @@ function AppearanceSection() {
         <SettingTile
           title="Theme"
           content={
-            <SegmentedControls
-              selectedId={settings.themeSettings.getThemeId()}
-              segments={Array.from(settings.themeSettings.themeIdToName).map(
-                ([themeId, themeName]) => ({
-                  text: themeName,
-                  id: themeId,
-                }),
+            <>
+              <SegmentedControls
+                selectedId={settings.themeSettings.getThemeId()}
+                segments={Array.from(settings.themeSettings.themeIdToName).map(
+                  ([themeId, themeName]) => ({
+                    text: themeName,
+                    id: themeId,
+                  }),
+                )}
+                onSelect={(themeId: string) => {
+                  if (settings.themeSettings.useSystemTheme) toggleSystemTheme();
+                  settings.setThemeId(themeId);
+                  updateState({});
+                }}
+              />
+              {settings.themeSettings.getThemeId() === 'custom' && (
+                <form>
+                  <Input
+                    label="Load theme from URL"
+                    // onChange={onDisplayNameInputChange}
+                    // value={mx.getUser(mx.getUserId()).displayName}
+                    // forwardRef={displayNameRef}
+                  />
+                  <Button variant="primary" type="submit">
+                    Load
+                  </Button>
+                </form>
               )}
-              onSelect={(themeId: string) => {
-                if (settings.themeSettings.useSystemTheme) toggleSystemTheme();
-                settings.setThemeId(themeId);
-                updateState({});
-              }}
-            />
+            </>
           }
         />
         <SettingTile

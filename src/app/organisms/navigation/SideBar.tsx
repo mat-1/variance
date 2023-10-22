@@ -7,7 +7,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
-import colorMXID from '../../../util/colorMXID';
+import { backgroundColorMXID } from '../../../util/colorMXID';
 import {
   selectTab,
   openShortcutSpaces,
@@ -42,7 +42,7 @@ function useNotificationUpdate() {
   const { notifications } = initMatrix;
   const [, forceUpdate] = useState({});
   useEffect(() => {
-    function onNotificationChanged(roomId, total, prevTotal) {
+    function onNotificationChanged(roomId: string, total: number, prevTotal: number) {
       if (total === prevTotal) return;
       forceUpdate({});
     }
@@ -57,12 +57,12 @@ function ProfileAvatarMenu() {
   const mx = initMatrix.matrixClient;
   const [profile, setProfile] = useState({
     avatarUrl: null,
-    displayName: mx.getUser(mx.getUserId()).displayName,
+    displayName: mx.getUser(mx.getUserId())?.displayName,
   });
 
   useEffect(() => {
     const user = mx.getUser(mx.getUserId());
-    const setNewProfile = (avatarUrl, displayName) =>
+    const setNewProfile = (avatarUrl: string, displayName: string) =>
       setProfile({
         avatarUrl: avatarUrl || null,
         displayName: displayName || profile.displayName,
@@ -86,7 +86,7 @@ function ProfileAvatarMenu() {
       avatar={
         <Avatar
           text={profile.displayName}
-          bgColor={colorMXID(mx.getUserId())}
+          bgColor={backgroundColorMXID(mx.getUserId())}
           size="normal"
           imageSrc={
             profile.avatarUrl !== null ? mx.mxcUrlToHttp(profile.avatarUrl, 42, 42, 'crop') : null
@@ -259,7 +259,7 @@ function DraggableSpaceShortcut({ isActive, spaceId, index, moveShortcut, onDrop
         <Avatar
           ref={avatarRef}
           text={room.name}
-          bgColor={colorMXID(room.roomId)}
+          bgColor={backgroundColorMXID(room.roomId)}
           size="normal"
           imageSrc={room.getAvatarUrl(initMatrix.matrixClient.baseUrl, 42, 42, 'crop') || null}
         />

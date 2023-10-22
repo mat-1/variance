@@ -18,7 +18,7 @@ import {
   hasDevices,
 } from '../../../util/matrixUtil';
 import { getEventCords } from '../../../util/common';
-import colorMXID from '../../../util/colorMXID';
+import { backgroundColorMXID } from '../../../util/colorMXID';
 
 import Text from '../../atoms/text/Text';
 import Chip from '../../atoms/chip/Chip';
@@ -88,7 +88,7 @@ ModerationTools.propTypes = {
   userId: PropTypes.string.isRequired,
 };
 
-function SessionInfo({ userId }) {
+function SessionInfo({ userId }: { userId: string }) {
   const [devices, setDevices] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const mx = initMatrix.matrixClient;
@@ -391,7 +391,12 @@ function ProfileViewer() {
     return (
       <div className="profile-viewer">
         <div className="profile-viewer__user">
-          <Avatar imageSrc={avatarUrl} text={username} bgColor={colorMXID(userId)} size="large" />
+          <Avatar
+            imageSrc={avatarUrl}
+            text={username}
+            bgColor={backgroundColorMXID(userId)}
+            size="large"
+          />
           <div className="profile-viewer__user__info">
             <Text variant="s1" weight="medium">
               {twemojify(username)}

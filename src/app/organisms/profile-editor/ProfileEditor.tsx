@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { twemojify } from '../../../util/twemojify';
 
 import initMatrix from '../../../client/initMatrix';
-import colorMXID from '../../../util/colorMXID';
+import { backgroundColorMXID } from '../../../util/colorMXID';
 
 import Text from '../../atoms/text/Text';
 import IconButton from '../../atoms/button/IconButton';
@@ -120,7 +120,7 @@ function ProfileEditor({ userId }) {
     <div className="profile-editor">
       <ImageUpload
         text={username ?? userId}
-        bgColor={colorMXID(userId)}
+        bgColor={backgroundColorMXID(userId)}
         imageSrc={avatarSrc}
         onUpload={handleAvatarUpload}
         onRequestRemove={() => handleAvatarUpload(null)}

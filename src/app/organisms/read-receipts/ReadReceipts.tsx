@@ -4,7 +4,7 @@ import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
 import navigation from '../../../client/state/navigation';
 import { getUsername, getUsernameOfRoomMember } from '../../../util/matrixUtil';
-import colorMXID from '../../../util/colorMXID';
+import { colorMXID } from '../../../util/colorMXID';
 
 import IconButton from '../../atoms/button/IconButton';
 import PeopleSelector from '../../molecules/people-selector/PeopleSelector';

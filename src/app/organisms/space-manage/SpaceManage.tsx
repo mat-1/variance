@@ -8,7 +8,7 @@ import { twemojify } from '../../../util/twemojify';
 import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
 import navigation from '../../../client/state/navigation';
-import colorMXID from '../../../util/colorMXID';
+import { backgroundColorMXID } from '../../../util/colorMXID';
 import { selectRoom, selectTab } from '../../../client/action/navigation';
 import RoomsHierarchy from '../../../client/state/RoomsHierarchy';
 import { joinRuleToIconSrc } from '../../../util/matrixUtil';
@@ -108,7 +108,7 @@ function SpaceManageItem({
   const roomAvatarJSX = (
     <Avatar
       text={name}
-      bgColor={colorMXID(roomId)}
+      bgColor={backgroundColorMXID(roomId)}
       imageSrc={isDM ? imageSrc : null}
       iconColor="var(--ic-surface-low)"
       iconSrc={isDM ? null : joinRuleToIconSrc(roomInfo.join_rules || roomInfo.join_rule, isSpace)}

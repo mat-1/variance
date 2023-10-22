@@ -4,7 +4,7 @@ import './PeopleDrawer.scss';
 
 import initMatrix from '../../../client/initMatrix';
 import { getPowerLabel, getUsernameOfRoomMember } from '../../../util/matrixUtil';
-import colorMXID from '../../../util/colorMXID';
+import { colorMXID } from '../../../util/colorMXID';
 import { openInviteUser, openProfileViewer } from '../../../client/action/navigation';
 import AsyncSearch from '../../../util/AsyncSearch';
 import { memberByAtoZ, memberByPowerLevel } from '../../../util/sort';

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './RoomSelector.scss';
 
 import { twemojify } from '../../../util/twemojify';
-import colorMXID from '../../../util/colorMXID';
+import { backgroundColorMXID } from '../../../util/colorMXID';
 
 import Text from '../../atoms/text/Text';
 import Avatar from '../../atoms/avatar/Avatar';
@@ -78,7 +78,7 @@ function RoomSelector({
         <>
           <Avatar
             text={name}
-            bgColor={colorMXID(roomId)}
+            bgColor={backgroundColorMXID(roomId)}
             imageSrc={imageSrc}
             iconColor="var(--ic-surface-low)"
             iconSrc={iconSrc}

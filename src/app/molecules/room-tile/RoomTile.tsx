@@ -4,7 +4,7 @@ import './RoomTile.scss';
 
 import { twemojify } from '../../../util/twemojify';
 
-import colorMXID from '../../../util/colorMXID';
+import { backgroundColorMXID } from '../../../util/colorMXID';
 
 import Text from '../../atoms/text/Text';
 import Avatar from '../../atoms/avatar/Avatar';
@@ -13,7 +13,7 @@ function RoomTile({ avatarSrc, name, id, inviterName, memberCount, desc, options
   return (
     <div className="room-tile">
       <div className="room-tile__avatar">
-        <Avatar imageSrc={avatarSrc} bgColor={colorMXID(id)} text={name} />
+        <Avatar imageSrc={avatarSrc} bgColor={backgroundColorMXID(id)} text={name} />
       </div>
       <div className="room-tile__content">
         <Text variant="s1">{twemojify(name)}</Text>
