@@ -14,7 +14,7 @@ import Input from '../../atoms/input/Input';
 import { MenuHeader } from '../../atoms/context-menu/ContextMenu';
 import SegmentedControls from '../../atoms/segmented-controls/SegmentedControls';
 import PeopleSelector from '../people-selector/PeopleSelector';
-import { colorMXID } from '../../../util/colorMXID';
+import { backgroundColorMXID } from '../../../util/colorMXID';
 
 const PER_PAGE_MEMBER = 50;
 
@@ -146,7 +146,7 @@ function RoomMembers({ roomId }) {
             onClick={() => openProfileViewer(member.userId, roomId)}
             avatarSrc={member.avatarSrc}
             name={member.name}
-            color={colorMXID(member.userId)}
+            color={backgroundColorMXID(member.userId)}
             peopleRole={member.peopleRole}
           />
         ))}

@@ -59,7 +59,6 @@ import ShieldUserIC from '../../../../public/res/ic/outlined/shield-user.svg';
 import CinnySVG from '../../../../public/res/svg/cinny.svg';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
 import Input from '../../atoms/input/Input';
-import { loadThemeFromUrl } from '../../../client/state/themes/loadTheme';
 
 let capabilities = {
   privateReadReceipts: false,

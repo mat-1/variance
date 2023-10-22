@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import './PeopleSelector.scss';
 
 import { twemojify } from '../../../util/twemojify';
@@ -9,7 +8,19 @@ import { blurOnBubbling } from '../../atoms/button/script';
 import Text from '../../atoms/text/Text';
 import Avatar from '../../atoms/avatar/Avatar';
 
-function PeopleSelector({ avatarSrc, name, color, peopleRole, onClick }) {
+function PeopleSelector({
+  avatarSrc,
+  name,
+  color,
+  peopleRole,
+  onClick,
+}: {
+  avatarSrc: string | undefined;
+  name: string;
+  color: string;
+  peopleRole: string | undefined;
+  onClick: () => void;
+}) {
   return (
     <div className="people-selector__container">
       <button
@@ -31,18 +42,5 @@ function PeopleSelector({ avatarSrc, name, color, peopleRole, onClick }) {
     </div>
   );
 }
-
-PeopleSelector.defaultProps = {
-  avatarSrc: null,
-  peopleRole: null,
-};
-
-PeopleSelector.propTypes = {
-  avatarSrc: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
-  peopleRole: PropTypes.string,
-  onClick: PropTypes.func.isRequired,
-};
 
 export default PeopleSelector;
