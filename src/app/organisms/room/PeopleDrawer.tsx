@@ -4,7 +4,7 @@ import './PeopleDrawer.scss';
 
 import initMatrix from '../../../client/initMatrix';
 import { getPowerLabel, getUsernameOfRoomMember } from '../../../util/matrixUtil';
-import { colorMXID } from '../../../util/colorMXID';
+import { backgroundColorMXID } from '../../../util/colorMXID';
 import { openInviteUser, openProfileViewer } from '../../../client/action/navigation';
 import AsyncSearch from '../../../util/AsyncSearch';
 import { memberByAtoZ, memberByPowerLevel } from '../../../util/sort';
@@ -169,7 +169,7 @@ function PeopleDrawer({ roomId }) {
                   onClick={() => openProfileViewer(member.userId, roomId)}
                   avatarSrc={member.avatarSrc}
                   name={member.name}
-                  color={colorMXID(member.userId)}
+                  color={backgroundColorMXID(member.userId)}
                   peopleRole={member.peopleRole}
                 />
               ))}
