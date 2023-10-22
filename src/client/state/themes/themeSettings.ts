@@ -22,6 +22,7 @@ const DEFAULT_THEME_ID_TO_NAME = {
 interface ThemeSettingsOpts {
   customThemeName: string | null;
   customTheme: Partial<ThemeStyle>;
+  customThemeUrl: string;
   themeId: string;
   useSystemTheme: boolean;
 }
@@ -30,6 +31,8 @@ export class ThemeSettings {
   themeIdToName: Map<string, string>;
 
   customThemeStyle: ThemeStyle;
+
+  customThemeUrl: string;
 
   themeId: string;
 
@@ -43,6 +46,8 @@ export class ThemeSettings {
       ...CLASSIC_THEME,
       ...opts.customTheme,
     };
+
+    this.customThemeUrl = '';
 
     this.themeId = opts.themeId;
 
@@ -61,6 +66,9 @@ export class ThemeSettings {
 
     const customTheme = settings.customTheme || {};
 
+    const customThemeUrl =
+      typeof settings.customThemeUrl === 'string' ? settings.customThemeUrl : '';
+
     const themeId = typeof settings.themeId === 'string' ? settings.themeId : DEFAULT_DARK_THEME_ID;
 
     const useSystemTheme =
@@ -69,6 +77,7 @@ export class ThemeSettings {
     return new ThemeSettings({
       customThemeName,
       customTheme,
+      customThemeUrl,
       themeId,
       useSystemTheme,
     });
@@ -78,6 +87,7 @@ export class ThemeSettings {
     return {
       customThemeName: this.getCustomThemeName(),
       customTheme: this.getCustomThemeStyle(),
+      customThemeUrl: this.customThemeUrl,
       themeId: this.getThemeId(),
       useSystemTheme: this.getUseSystemTheme(),
     };
@@ -146,6 +156,14 @@ export class ThemeSettings {
       ...this.customThemeStyle,
       ...themeStyle,
     };
+  }
+
+  getCustomThemeUrl(): string {
+    return this.customThemeUrl;
+  }
+
+  setCustomThemeUrl(url: string): void {
+    this.customThemeUrl = url;
   }
 
   getUseSystemTheme(): boolean {

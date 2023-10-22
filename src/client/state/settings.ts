@@ -3,6 +3,7 @@ import appDispatcher from '../dispatcher';
 
 import cons from './cons';
 import { ThemeSettings } from './themes/themeSettings';
+import { loadThemeFromUrl } from './themes/loadTheme';
 
 function getSettings(): Record<string, unknown> | null {
   const settings = localStorage.getItem('settings');
@@ -93,6 +94,16 @@ class Settings extends EventEmitter {
     this.themeSettings.applyTheme();
   }
 
+  async setCustomThemeUrl(url: string) {
+    this.themeSettings.setCustomThemeUrl(url);
+    // save here so if loading the theme fails then the url is still saved
+    this.updateThemeSettings();
+    const themeStyle = await loadThemeFromUrl(url);
+    this.themeSettings.setCustomThemeStyle(themeStyle);
+    this.themeSettings.applyTheme();
+    this.updateThemeSettings();
+  }
+
   toggleUseSystemTheme() {
     this.themeSettings.useSystemTheme = !this.themeSettings.useSystemTheme;
     this.updateThemeSettings();
@@ -100,6 +111,8 @@ class Settings extends EventEmitter {
 
     this.emit(cons.events.settings.SYSTEM_THEME_TOGGLED, this.themeSettings.useSystemTheme);
   }
+
+  setCustom;
 
   getIsMarkdown(): boolean {
     if (typeof this.isMarkdown === 'boolean') return this.isMarkdown;

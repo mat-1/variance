@@ -59,6 +59,7 @@ import ShieldUserIC from '../../../../public/res/ic/outlined/shield-user.svg';
 import CinnySVG from '../../../../public/res/svg/cinny.svg';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
 import Input from '../../atoms/input/Input';
+import { loadThemeFromUrl } from '../../../client/state/themes/loadTheme';
 
 let capabilities = {
   privateReadReceipts: false,
@@ -77,6 +78,16 @@ function AccountSection() {
 
 function AppearanceSection() {
   const [, updateState] = useState({});
+
+  function handleLoadThemeFromUrl(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const url = formData.get('url') as string;
+
+    settings.setCustomThemeUrl(url);
+
+    updateState({});
+  }
 
   return (
     <div className="settings-appearance">
@@ -114,12 +125,14 @@ function AppearanceSection() {
                 }}
               />
               {settings.themeSettings.getThemeId() === 'custom' && (
-                <form class="settings-appearance__load-theme-from-url-form">
+                <form
+                  className="settings-appearance__load-theme-from-url-form"
+                  onSubmit={handleLoadThemeFromUrl}
+                >
                   <Input
-                    label="Load theme from URL"
-                    // onChange={onDisplayNameInputChange}
-                    // value={mx.getUser(mx.getUserId()).displayName}
-                    // forwardRef={displayNameRef}
+                    label="Load theme from URL (uses Element's theme format)"
+                    name="url"
+                    value={settings.themeSettings.getCustomThemeUrl()}
                   />
                   <Button
                     variant="primary"

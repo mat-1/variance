@@ -147,7 +147,7 @@ function RoomAliases({ roomId }) {
     setIsPublic(!isPublic);
   };
 
-  const handleAliasSubmit = async (e) => {
+  const handleAliasSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validate.status === cons.status.ERROR) return;
     if (!validate.alias) return;
