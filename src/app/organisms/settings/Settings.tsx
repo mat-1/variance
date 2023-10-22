@@ -26,7 +26,7 @@ import Text from '../../atoms/text/Text';
 import IconButton from '../../atoms/button/IconButton';
 import Button from '../../atoms/button/Button';
 import Toggle from '../../atoms/button/Toggle';
-import Tabs from '../../atoms/tabs/Tabs';
+import Tabs, { ITabItem } from '../../atoms/tabs/Tabs';
 import { MenuHeader } from '../../atoms/context-menu/ContextMenu';
 import SegmentedControls from '../../atoms/segmented-controls/SegmentedControls';
 
@@ -85,7 +85,7 @@ function AppearanceSection() {
           title="Follow system theme"
           options={
             <Toggle
-              isActive={settings.useSystemTheme}
+              isActive={settings.themeSettings.useSystemTheme}
               onToggle={() => {
                 toggleSystemTheme();
                 updateState({});
@@ -98,15 +98,15 @@ function AppearanceSection() {
           title="Theme"
           content={
             <SegmentedControls
-              selectedId={settings.getThemeSettings().getThemeId()}
-              segments={Array.from(settings.getThemeSettings().themeIdToName).map(
+              selectedId={settings.themeSettings.getThemeId()}
+              segments={Array.from(settings.themeSettings.themeIdToName).map(
                 ([themeId, themeName]) => ({
                   text: themeName,
                   id: themeId,
                 }),
               )}
               onSelect={(themeId: string) => {
-                if (settings.useSystemTheme) toggleSystemTheme();
+                if (settings.themeSettings.useSystemTheme) toggleSystemTheme();
                 settings.setThemeId(themeId);
                 updateState({});
               }}
@@ -584,7 +584,7 @@ export const tabText = {
   PRIVACY: 'Privacy',
   ABOUT: 'About',
 };
-const tabItems = [
+const tabItems: ITabItem<undefined>[] = [
   {
     text: tabText.ACCOUNT,
     iconSrc: UserIC,
@@ -635,11 +635,13 @@ const tabItems = [
   },
 ];
 
-function useWindowToggle(setSelectedTab): [boolean, () => void] {
+function useWindowToggle(
+  setSelectedTab: (tab: ITabItem<undefined>) => void,
+): [boolean, () => void] {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const openSettings = (tab) => {
+    const openSettings = (tab: string) => {
       const tabItem = tabItems.find((item) => item.text === tab);
       if (tabItem) setSelectedTab(tabItem);
       setIsOpen(true);
@@ -668,14 +670,14 @@ async function getCapabilities() {
 }
 
 function Settings() {
-  const [selectedTab, setSelectedTab] = useState(tabItems[0]);
+  const [selectedTab, setSelectedTab] = useState<ITabItem<undefined> | undefined>(tabItems[0]);
   const [isOpen, requestClose] = useWindowToggle(setSelectedTab);
 
   useEffect(() => {
     getCapabilities();
   }, []);
 
-  const handleTabChange = (tabItem) => setSelectedTab(tabItem);
+  const handleTabChange = (tabItem: ITabItem<undefined>) => setSelectedTab(tabItem);
   const handleLogout = async () => {
     if (
       await confirmDialog(

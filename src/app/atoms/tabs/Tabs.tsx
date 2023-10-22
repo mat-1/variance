@@ -5,7 +5,19 @@ import './Tabs.scss';
 import Button from '../button/Button';
 import ScrollView from '../scroll/ScrollView';
 
-function TabItem({ selected, iconSrc, onClick, children, disabled }) {
+function TabItem({
+  selected,
+  iconSrc,
+  onClick,
+  children,
+  disabled,
+}: {
+  selected: boolean;
+  iconSrc: string;
+  onClick: () => void;
+  children: React.ReactNode;
+  disabled: boolean;
+}) {
   const isSelected = selected ? 'tab-item--selected' : '';
 
   return (
@@ -35,7 +47,7 @@ TabItem.propTypes = {
   disabled: PropTypes.bool,
 };
 
-interface ITabItem<D> {
+export interface ITabItem<D> {
   iconSrc: string;
   text: string;
   disabled: boolean;
@@ -50,7 +62,7 @@ function Tabs<D = undefined>({
 }: {
   items: ITabItem<D>[];
   defaultSelected: number;
-  onSelect: (item: { iconSrc: string; text: string; disabled: boolean }, index: number) => void;
+  onSelect: (item: ITabItem<D>, index: number) => void;
   data?: D;
 }) {
   const [selectedItem, setSelectedItem] = useState(items[defaultSelected]);
@@ -58,7 +70,7 @@ function Tabs<D = undefined>({
     setSelectedItem(items[defaultSelected]);
   }, [defaultSelected, items]);
 
-  const handleTabSelection = (item, index) => {
+  const handleTabSelection = (item: ITabItem<D>, index: number) => {
     if (selectedItem === item) return;
     setSelectedItem(item);
     onSelect(item, index);
@@ -84,7 +96,7 @@ function Tabs<D = undefined>({
         </ScrollView>
       </div>
       <div className="tabs__rendered">
-        <ScrollView autoHide>{(selectedItem ?? items[0])?.render(data)}</ScrollView>
+        <ScrollView autoHide>{(selectedItem ?? items[0])?.render?.(data)}</ScrollView>
       </div>
     </div>
   );

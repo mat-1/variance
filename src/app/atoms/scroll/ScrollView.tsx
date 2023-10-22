@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 import PropTypes from 'prop-types';
 import './ScrollView.scss';
 
@@ -17,7 +17,7 @@ const ScrollView = React.forwardRef(
       autoHide?: boolean;
       invisible?: boolean;
       onScroll?: (e: React.UIEvent<HTMLDivElement, UIEvent>) => void;
-      children: ReactElement;
+      children: ReactNode;
     },
     ref: React.Ref<HTMLDivElement>,
   ) => {
@@ -39,7 +39,6 @@ ScrollView.defaultProps = {
   vertical: true,
   autoHide: false,
   invisible: false,
-  onScroll: null,
 };
 
 ScrollView.propTypes = {

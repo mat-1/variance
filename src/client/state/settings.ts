@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 import appDispatcher from '../dispatcher';
 
 import cons from './cons';
-import { ThemeSettings } from './themes';
+import { ThemeSettings } from './themes/themeSettings';
 
 function getSettings(): Record<string, unknown> | null {
   const settings = localStorage.getItem('settings');
@@ -94,11 +94,11 @@ class Settings extends EventEmitter {
   }
 
   toggleUseSystemTheme() {
-    this.useSystemTheme = !this.useSystemTheme;
+    this.themeSettings.useSystemTheme = !this.themeSettings.useSystemTheme;
     this.updateThemeSettings();
     this.themeSettings.applyTheme();
 
-    this.emit(cons.events.settings.SYSTEM_THEME_TOGGLED, this.useSystemTheme);
+    this.emit(cons.events.settings.SYSTEM_THEME_TOGGLED, this.themeSettings.useSystemTheme);
   }
 
   getIsMarkdown(): boolean {
@@ -247,7 +247,7 @@ class Settings extends EventEmitter {
     return settings.clearUrls;
   }
 
-  setter(action) {
+  setter(action: { type: string }) {
     const actions = {
       [cons.actions.settings.TOGGLE_SYSTEM_THEME]: () => {
         this.toggleUseSystemTheme();

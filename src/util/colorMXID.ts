@@ -1,14 +1,12 @@
 // https://github.com/cloudrac3r/cadencegq/blob/master/pug/mxid.pug
 
-export function hashCode(str) {
+export function hashCode(str: string): number {
   let hash = 0;
-  let i;
-  let chr;
   if (str.length === 0) {
     return hash;
   }
-  for (i = 0; i < str.length; i += 1) {
-    chr = str.charCodeAt(i);
+  for (let i = 0; i < str.length; i += 1) {
+    const chr = str.charCodeAt(i);
     // eslint-disable-next-line no-bitwise
     hash = (hash << 5) - hash + chr;
     // eslint-disable-next-line no-bitwise
@@ -17,11 +15,11 @@ export function hashCode(str) {
   return Math.abs(hash);
 }
 
-export function cssColorMXID(userId) {
+export function cssColorMXID(userId: string): string {
   const colorNumber = hashCode(userId) % 8;
   return `--mx-uc-${colorNumber + 1}`;
 }
 
-export default function colorMXID(userId) {
+export default function colorMXID(userId: string): string {
   return `var(${cssColorMXID(userId)})`;
 }
