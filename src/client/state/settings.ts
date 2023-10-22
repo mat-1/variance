@@ -112,8 +112,6 @@ class Settings extends EventEmitter {
     this.emit(cons.events.settings.SYSTEM_THEME_TOGGLED, this.themeSettings.useSystemTheme);
   }
 
-  setCustom;
-
   getIsMarkdown(): boolean {
     if (typeof this.isMarkdown === 'boolean') return this.isMarkdown;
 

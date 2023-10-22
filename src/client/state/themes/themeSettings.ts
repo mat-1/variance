@@ -47,7 +47,7 @@ export class ThemeSettings {
       ...opts.customTheme,
     };
 
-    this.customThemeUrl = '';
+    this.customThemeUrl = opts.customThemeUrl;
 
     this.themeId = opts.themeId;
 
