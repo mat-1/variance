@@ -17,6 +17,7 @@ const Button = React.forwardRef(
       onClick,
       children,
       disabled,
+      leftAligned,
     }: {
       id?: string;
       className?: string;
@@ -26,22 +27,25 @@ const Button = React.forwardRef(
       onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
       children: React.ReactNode;
       disabled?: boolean;
+      leftAligned?: boolean;
     },
     ref: React.Ref<HTMLButtonElement>,
   ) => {
-    const iconClass = iconSrc === null ? '' : `btn-${variant}--icon`;
+    const iconClass = iconSrc === undefined ? '' : `btn-${variant}--icon`;
     return (
       <button
         ref={ref}
         id={id === '' ? undefined : id}
-        className={`${className ? `${className} ` : ''}btn-${variant} ${iconClass} noselect`}
+        className={`${className ? `${className} ` : ''}btn-${variant} ${iconClass} ${
+          leftAligned ? 'btn-left-aligned ' : ''
+        }noselect`}
         onMouseUp={(e) => blurOnBubbling(e, `.btn-${variant}`)}
         onClick={onClick}
         // eslint-disable-next-line react/button-has-type
         type={type}
         disabled={disabled}
       >
-        {iconSrc !== null && <RawIcon size="small" src={iconSrc} />}
+        {iconSrc !== undefined && <RawIcon size="small" src={iconSrc} />}
         {typeof children === 'string' && <Text variant="b1">{children}</Text>}
         {typeof children !== 'string' && children}
       </button>
@@ -51,11 +55,8 @@ const Button = React.forwardRef(
 
 Button.defaultProps = {
   id: '',
-  className: null,
   variant: 'surface',
-  iconSrc: null,
   type: 'button',
-  onClick: null,
   disabled: false,
 };
 

@@ -114,14 +114,18 @@ function AppearanceSection() {
                 }}
               />
               {settings.themeSettings.getThemeId() === 'custom' && (
-                <form>
+                <form class="settings-appearance__load-theme-from-url-form">
                   <Input
                     label="Load theme from URL"
                     // onChange={onDisplayNameInputChange}
                     // value={mx.getUser(mx.getUserId()).displayName}
                     // forwardRef={displayNameRef}
                   />
-                  <Button variant="primary" type="submit">
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    className="settings-appearance__load-theme-from-url-btn"
+                  >
                     Load
                   </Button>
                 </form>

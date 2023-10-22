@@ -111,3 +111,16 @@
     }
   }
 }
+
+.settings-appearance__load-theme-from-url-form {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+
+  & > button {
+    height: 46px;
+    margin-top: var(--sp-normal);
+    @include dir.side(margin, var(--sp-normal), 0);
+  }
+}

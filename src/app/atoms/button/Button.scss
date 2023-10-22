@@ -18,6 +18,10 @@
   cursor: pointer;
   @include state.disabled;
 
+  &:not(.btn-left-aligned) {
+    justify-content: center;
+  }
+
   & .text {
     @extend .cp-txt__ellipsis;
   }

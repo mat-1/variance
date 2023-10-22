@@ -26,6 +26,7 @@ function TabItem({
       iconSrc={iconSrc}
       onClick={onClick}
       disabled={disabled}
+      leftAligned
     >
       {children}
     </Button>
