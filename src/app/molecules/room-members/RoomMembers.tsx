@@ -128,14 +128,14 @@ function RoomMembers({ roomId }) {
           searchMembers ? `Found — ${mList.length}` : members.length
         } members`}</MenuHeader>
         <SegmentedControls
-          selected={(() => {
-            const getSegmentIndex = { join: 0, invite: 1, ban: 2 };
-            return getSegmentIndex[membership];
-          })()}
-          segments={[{ text: 'Joined' }, { text: 'Invited' }, { text: 'Banned' }]}
-          onSelect={(index) => {
-            const memberships = ['join', 'invite', 'ban'];
-            setMembership(memberships[index]);
+          selectedId={membership}
+          segments={[
+            { text: 'Joined', id: 'join' },
+            { text: 'Invited', id: 'invite' },
+            { text: 'Banned', id: 'ban' },
+          ]}
+          onSelect={(id) => {
+            setMembership(id);
           }}
         />
       </div>

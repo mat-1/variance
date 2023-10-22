@@ -98,17 +98,16 @@ function AppearanceSection() {
           title="Theme"
           content={
             <SegmentedControls
-              selected={settings.useSystemTheme ? -1 : settings.getThemeIndex()}
-              segments={[
-                { text: 'Light' },
-                { text: 'Silver' },
-                { text: 'Dark' },
-                { text: 'Butter' },
-                { text: 'Ayu' },
-              ]}
-              onSelect={(index) => {
+              selectedId={settings.getThemeSettings().getThemeId()}
+              segments={Array.from(settings.getThemeSettings().themeIdToName).map(
+                ([themeId, themeName]) => ({
+                  text: themeName,
+                  id: themeId,
+                }),
+              )}
+              onSelect={(themeId: string) => {
                 if (settings.useSystemTheme) toggleSystemTheme();
-                settings.setTheme(index);
+                settings.setThemeId(themeId);
                 updateState({});
               }}
             />

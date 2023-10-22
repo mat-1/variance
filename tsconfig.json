@@ -2,13 +2,14 @@
   "compilerOptions": {
     "sourceMap": true,
     "jsx": "react",
-    "target": "ES6",
+    "target": "ESNext",
     "allowJs": true,
     "esModuleInterop": true,
     "moduleResolution": "Node",
     "outDir": "dist",
     "skipLibCheck": true,
-    "module": "ESNext"
+    "module": "ESNext",
+    "strict": true
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src"]

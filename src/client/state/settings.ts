@@ -2,14 +2,15 @@ import EventEmitter from 'events';
 import appDispatcher from '../dispatcher';
 
 import cons from './cons';
+import { ThemeSettings } from './themes';
 
-function getSettings() {
+function getSettings(): Record<string, unknown> | null {
   const settings = localStorage.getItem('settings');
   if (settings === null) return null;
   return JSON.parse(settings);
 }
 
-function setSettings(key, value) {
+function setSettings(key: string, value: unknown) {
   let settings = getSettings();
   if (settings === null) settings = {};
   settings[key] = value;
@@ -19,11 +20,7 @@ function setSettings(key, value) {
 class Settings extends EventEmitter {
   isTouchScreenDevice: boolean;
 
-  themes: string[];
-
-  themeIndex: number;
-
-  useSystemTheme: boolean;
+  themeSettings: ThemeSettings;
 
   isMarkdown: boolean;
 
@@ -56,10 +53,8 @@ class Settings extends EventEmitter {
 
     this.isTouchScreenDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-    this.themes = ['', 'silver-theme', 'dark-theme', 'butter-theme', 'ayu-theme'];
-    this.themeIndex = this.getThemeIndex();
+    this.themeSettings = this.getThemeSettings();
 
-    this.useSystemTheme = this.getUseSystemTheme();
     this.isMarkdown = this.getIsMarkdown();
     this.isPeopleDrawer = this.getIsPeopleDrawer();
     this.hideMembershipEvents = this.getHideMembershipEvents();
@@ -75,88 +70,65 @@ class Settings extends EventEmitter {
     this.clearUrls = this.getClearUrls();
   }
 
-  getThemeIndex() {
-    if (typeof this.themeIndex === 'number') return this.themeIndex;
+  getThemeSettings(): ThemeSettings {
+    if (this.themeSettings !== undefined) return this.themeSettings;
 
     const settings = getSettings();
-    if (settings === null) return 0;
-    if (typeof settings.themeIndex === 'undefined') return 0;
-    // eslint-disable-next-line radix
-    return parseInt(settings.themeIndex);
+    const themeSettings = ThemeSettings.fromSettings(settings ?? {});
+
+    return themeSettings;
   }
 
-  getThemeName() {
-    return this.themes[this.themeIndex];
-  }
+  updateThemeSettings(): void {
+    const settings = this.getThemeSettings().toSettings();
 
-  _clearTheme() {
-    document.body.classList.remove('system-theme');
-    this.themes.forEach((themeName) => {
-      if (themeName === '') return;
-      document.body.classList.remove(themeName);
+    Object.entries(settings).forEach(([key, value]) => {
+      setSettings(key, value);
     });
   }
 
-  applyTheme() {
-    this._clearTheme();
-    if (this.useSystemTheme) {
-      document.body.classList.add('system-theme');
-    } else if (this.themes[this.themeIndex]) {
-      document.body.classList.add(this.themes[this.themeIndex]);
-    }
-  }
-
-  setTheme(themeIndex) {
-    this.themeIndex = themeIndex;
-    setSettings('themeIndex', this.themeIndex);
-    this.applyTheme();
+  setThemeId(themeId: string): void {
+    this.themeSettings.setThemeId(themeId);
+    this.updateThemeSettings();
+    this.themeSettings.applyTheme();
   }
 
   toggleUseSystemTheme() {
     this.useSystemTheme = !this.useSystemTheme;
-    setSettings('useSystemTheme', this.useSystemTheme);
-    this.applyTheme();
+    this.updateThemeSettings();
+    this.themeSettings.applyTheme();
 
     this.emit(cons.events.settings.SYSTEM_THEME_TOGGLED, this.useSystemTheme);
   }
 
-  getUseSystemTheme() {
-    if (typeof this.useSystemTheme === 'boolean') return this.useSystemTheme;
-
-    const settings = getSettings();
-    if (settings === null) return true;
-    if (typeof settings.useSystemTheme === 'undefined') return true;
-    return settings.useSystemTheme;
-  }
-
-  getIsMarkdown() {
+  getIsMarkdown(): boolean {
     if (typeof this.isMarkdown === 'boolean') return this.isMarkdown;
 
     const settings = getSettings();
     if (settings === null) return true;
-    if (typeof settings.isMarkdown === 'undefined') return true;
+    if (typeof settings.isMarkdown !== 'boolean') return true;
     return settings.isMarkdown;
   }
 
-  getHideMembershipEvents() {
+  getHideMembershipEvents(): boolean {
     if (typeof this.hideMembershipEvents === 'boolean') return this.hideMembershipEvents;
 
     const settings = getSettings();
     if (settings === null) return false;
-    if (typeof settings.hideMembershipEvents === 'undefined') return false;
+    if (typeof settings.hideMembershipEvents !== 'boolean') return false;
     return settings.hideMembershipEvents;
   }
 
-  getHideNickAvatarEvents() {
+  getHideNickAvatarEvents(): boolean {
     if (typeof this.hideNickAvatarEvents === 'boolean') return this.hideNickAvatarEvents;
 
     const settings = getSettings();
     if (settings === null) return true;
-    if (typeof settings.hideNickAvatarEvents === 'undefined') return true;
+    if (typeof settings.hideNickAvatarEvents !== 'boolean') return true;
     return settings.hideNickAvatarEvents;
   }
 
-  getSendOnEnter() {
+  getSendOnEnter(): boolean {
     if (typeof this.sendMessageOnEnter === 'boolean') return this.sendMessageOnEnter;
 
     const settings = getSettings();
@@ -164,48 +136,48 @@ class Settings extends EventEmitter {
     const defaultSendOnEnter = !this.isTouchScreenDevice;
 
     if (settings === null) return defaultSendOnEnter;
-    if (typeof settings.sendMessageOnEnter === 'undefined') return defaultSendOnEnter;
+    if (typeof settings.sendMessageOnEnter !== 'boolean') return defaultSendOnEnter;
     return settings.sendMessageOnEnter;
   }
 
-  getOnlyAnimateOnHover() {
+  getOnlyAnimateOnHover(): boolean {
     if (typeof this.onlyAnimateOnHover === 'boolean') return this.onlyAnimateOnHover;
 
     const settings = getSettings();
     if (settings === null) return true;
-    if (typeof settings.onlyAnimateOnHover === 'undefined') return true;
+    if (typeof settings.onlyAnimateOnHover !== 'boolean') return true;
     return settings.onlyAnimateOnHover;
   }
 
-  getIsPeopleDrawer() {
+  getIsPeopleDrawer(): boolean {
     if (typeof this.isPeopleDrawer === 'boolean') return this.isPeopleDrawer;
 
     const settings = getSettings();
     if (settings === null) return true;
-    if (typeof settings.isPeopleDrawer === 'undefined') return true;
+    if (typeof settings.isPeopleDrawer !== 'boolean') return true;
     return settings.isPeopleDrawer;
   }
 
-  get showNotifications() {
+  get showNotifications(): boolean {
     if (window.Notification?.permission !== 'granted') return false;
     return this._showNotifications;
   }
 
-  getShowNotifications() {
+  getShowNotifications(): boolean {
     if (typeof this._showNotifications === 'boolean') return this._showNotifications;
 
     const settings = getSettings();
     if (settings === null) return true;
-    if (typeof settings.showNotifications === 'undefined') return true;
+    if (typeof settings.showNotifications !== 'boolean') return true;
     return settings.showNotifications;
   }
 
-  getIsNotificationSounds() {
+  getIsNotificationSounds(): boolean {
     if (typeof this.isNotificationSounds === 'boolean') return this.isNotificationSounds;
 
     const settings = getSettings();
     if (settings === null) return true;
-    if (typeof settings.isNotificationSounds === 'undefined') return true;
+    if (typeof settings.isNotificationSounds !== 'boolean') return true;
     return settings.isNotificationSounds;
   }
 
@@ -216,12 +188,12 @@ class Settings extends EventEmitter {
     this.emit(cons.events.settings.SHOW_ROOM_LIST_AVATAR_TOGGLED, this.showRoomListAvatar);
   }
 
-  getShowRoomListAvatar() {
+  getShowRoomListAvatar(): boolean {
     if (typeof this.showRoomListAvatar === 'boolean') return this.showRoomListAvatar;
 
     const settings = getSettings();
     if (settings === null) return false;
-    if (typeof settings.showRoomListAvatar === 'undefined') return false;
+    if (typeof settings.showRoomListAvatar !== 'boolean') return false;
     return settings.showRoomListAvatar;
   }
 
@@ -232,12 +204,12 @@ class Settings extends EventEmitter {
     this.emit(cons.events.settings.SHOW_YOUTUBE_EMBED_PLAYER_TOGGLED, this.showYoutubeEmbedPlayer);
   }
 
-  getShowYoutubeEmbedPlayer() {
+  getShowYoutubeEmbedPlayer(): boolean {
     if (typeof this.showYoutubeEmbedPlayer === 'boolean') return this.showYoutubeEmbedPlayer;
 
     const settings = getSettings();
     if (settings === null) return false;
-    if (typeof settings.showYoutubeEmbedPlayer === 'undefined') return false;
+    if (typeof settings.showYoutubeEmbedPlayer !== 'boolean') return false;
     return settings.showYoutubeEmbedPlayer;
   }
 
@@ -248,30 +220,30 @@ class Settings extends EventEmitter {
     this.emit(cons.events.settings.SHOW_URL_PREVIEW_TOGGLED, this.showUrlPreview);
   }
 
-  getShowUrlPreview() {
+  getShowUrlPreview(): boolean {
     if (typeof this.showUrlPreview === 'boolean') return this.showUrlPreview;
 
     const settings = getSettings();
     if (settings === null) return false;
-    if (typeof settings.showUrlPreview === 'undefined') return false;
+    if (typeof settings.showUrlPreview !== 'boolean') return false;
     return settings.showUrlPreview;
   }
 
-  getSendReadReceipts() {
+  getSendReadReceipts(): boolean {
     if (typeof this.sendReadReceipts === 'boolean') return this.sendReadReceipts;
 
     const settings = getSettings();
     if (settings === null) return true;
-    if (typeof settings.sendReadReceipts === 'undefined') return true;
+    if (typeof settings.sendReadReceipts !== 'boolean') return true;
     return settings.sendReadReceipts;
   }
 
-  getClearUrls() {
+  getClearUrls(): boolean {
     if (typeof this.clearUrls === 'boolean') return this.clearUrls;
 
     const settings = getSettings();
     if (settings === null) return true;
-    if (typeof settings.clearUrls === 'undefined') return true;
+    if (typeof settings.clearUrls !== 'boolean') return true;
     return settings.clearUrls;
   }
 

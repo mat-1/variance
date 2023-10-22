@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import './SegmentedControls.scss';
 
 import { blurOnBubbling } from '../button/script';
@@ -7,26 +6,38 @@ import { blurOnBubbling } from '../button/script';
 import Text from '../text/Text';
 import RawIcon from '../system-icons/RawIcon';
 
-function SegmentedControls({ selected, segments, onSelect }) {
-  const [select, setSelect] = useState(selected);
+function SegmentedControls({
+  selectedId,
+  segments,
+  onSelect,
+}: {
+  selectedId: string;
+  segments: {
+    iconSrc?: string;
+    text?: string;
+    id: string;
+  }[];
+  onSelect: (id: string) => void;
+}) {
+  const [select, setSelect] = useState(selectedId);
 
-  function selectSegment(segmentIndex) {
-    setSelect(segmentIndex);
-    onSelect(segmentIndex);
+  function selectSegment(segmentId: string) {
+    setSelect(segmentId);
+    onSelect(segmentId);
   }
 
   useEffect(() => {
-    setSelect(selected);
-  }, [selected]);
+    setSelect(selectedId);
+  }, [selectedId]);
 
   return (
     <div className="segmented-controls">
-      {segments.map((segment, index) => (
+      {segments.map((segment) => (
         <button
-          key={Math.random().toString(20).substr(2, 6)}
-          className={`segment-btn${select === index ? ' segment-btn--active' : ''}`}
+          key={Math.random().toString(20).slice(2, 6)}
+          className={`segment-btn${select === segment.id ? ' segment-btn--active' : ''}`}
           type="button"
-          onClick={() => selectSegment(index)}
+          onClick={() => selectSegment(segment.id)}
           onMouseUp={(e) => blurOnBubbling(e, '.segment-btn')}
         >
           <div className="segment-btn__base">
@@ -38,16 +49,5 @@ function SegmentedControls({ selected, segments, onSelect }) {
     </div>
   );
 }
-
-SegmentedControls.propTypes = {
-  selected: PropTypes.number.isRequired,
-  segments: PropTypes.arrayOf(
-    PropTypes.shape({
-      iconSrc: PropTypes.string,
-      text: PropTypes.string,
-    }),
-  ).isRequired,
-  onSelect: PropTypes.func.isRequired,
-};
 
 export default SegmentedControls;
