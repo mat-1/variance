@@ -1,6 +1,6 @@
 import cons from './cons';
 
-function getSecret(key) {
+function getSecret(key: string) {
   return localStorage.getItem(key);
 }
 

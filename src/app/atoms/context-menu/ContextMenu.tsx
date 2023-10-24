@@ -16,7 +16,7 @@ function ContextMenu({ content, placement, maxWidth, render, afterToggle }) {
 
   useEffect(() => {
     if (afterToggle !== null) afterToggle(isVisible);
-  }, [isVisible]);
+  }, [afterToggle, isVisible]);
 
   return (
     <Tippy

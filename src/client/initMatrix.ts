@@ -74,9 +74,9 @@ export class InitMatrix extends EventEmitter {
       SYNCING: () => {
         console.log('SYNCING state');
       },
-      PREPARED: (prevState) => {
+      PREPARED: (prevState: string | null) => {
         console.log('PREPARED state');
-        console.log('Previous state: ', prevState);
+        console.log('Previous state:', prevState);
         // TODO: remove global.initMatrix at end
         global.initMatrix = this;
         if (prevState === null) {
@@ -96,14 +96,27 @@ export class InitMatrix extends EventEmitter {
       CATCHUP: () => {
         console.log('CATCHUP state');
       },
-      ERROR: () => {
+      ERROR: (_prevState: string | null, data?: sdk.SyncStateData) => {
         console.log('ERROR state');
+        console.log('Error data:', data?.error);
+        if (data?.error instanceof sdk.InvalidStoreError) {
+          (async () => {
+            console.log("it's an InvalidStoreError, deleting cache");
+            await this.matrixClient.store.deleteAllData();
+            console.log('cache deleted, reloading');
+            window.location.reload();
+          })();
+        }
       },
       STOPPED: () => {
         console.log('STOPPED state');
       },
     };
-    this.matrixClient.on(sdk.ClientEvent.Sync, (state, prevState) => sync[state](prevState));
+    this.matrixClient.on(
+      sdk.ClientEvent.Sync,
+      (state: sdk.SyncState, prevState: sdk.SyncState | null, data?: sdk.SyncStateData) =>
+        sync[state](prevState, data),
+    );
   }
 
   listenEvents() {

@@ -34,66 +34,82 @@ import FlagIC from '../../../../public/res/ic/outlined/flag.svg';
 
 const ROW_EMOJIS_COUNT = 7;
 
-const EmojiGroup = React.memo(({ name, groupEmojis }) => {
-  function getEmojiBoard() {
-    const emojiBoard = [];
-    const totalEmojis = groupEmojis.length;
+const EmojiGroup = React.memo(
+  ({
+    name,
+    groupEmojis,
+  }: {
+    name: string;
+    groupEmojis: {
+      length: number;
+      unicode: string;
+      hexcode: string;
+      mxc: string;
+      shortcode: string;
+      shortcodes: string[] | undefined;
+    }[];
+  }) => {
+    function getEmojiBoard() {
+      const emojiBoard = [];
+      const totalEmojis = groupEmojis.length;
 
-    for (let r = 0; r < totalEmojis; r += ROW_EMOJIS_COUNT) {
-      const emojiRow = [];
-      for (let c = r; c < r + ROW_EMOJIS_COUNT; c += 1) {
-        const emojiIndex = c;
-        if (emojiIndex >= totalEmojis) break;
-        const emoji = groupEmojis[emojiIndex];
-        emojiRow.push(
-          <span key={emojiIndex}>
-            {emoji.hexcode ? (
-              // This is a unicode emoji, and should be rendered with twemoji
-              parse(
-                twemoji.parse(emoji.unicode, {
-                  attributes: () => ({
-                    unicode: emoji.unicode,
-                    shortcodes: emoji.shortcodes?.toString(),
-                    hexcode: emoji.hexcode,
-                    loading: 'lazy',
+      for (let r = 0; r < totalEmojis; r += ROW_EMOJIS_COUNT) {
+        const emojiRow = [];
+        for (let c = r; c < r + ROW_EMOJIS_COUNT; c += 1) {
+          const emojiIndex = c;
+          if (emojiIndex >= totalEmojis) break;
+          const emoji = groupEmojis[emojiIndex];
+          console.trace('rendering emoji board');
+          emojiRow.push(
+            <span key={emojiIndex}>
+              {emoji.hexcode ? (
+                // This is a unicode emoji, and should be rendered with twemoji
+                parse(
+                  twemoji.parse(emoji.unicode, {
+                    attributes: () => ({
+                      unicode: emoji.unicode,
+                      shortcodes: emoji.shortcodes?.toString(),
+                      hexcode: emoji.hexcode,
+                      loading: 'lazy',
+                    }),
+                    base: TWEMOJI_BASE_URL,
                   }),
-                  base: TWEMOJI_BASE_URL,
-                }),
-              )
-            ) : (
-              // This is a custom emoji, and should be render as an mxc
-              <img
-                className="emoji"
-                draggable="false"
-                loading="lazy"
-                alt={emoji.shortcode}
-                unicode={`:${emoji.shortcode}:`}
-                shortcodes={emoji.shortcode}
-                src={initMatrix.matrixClient.mxcUrlToHttp(emoji.mxc)}
-                data-mx-emoticon={emoji.mxc}
-              />
-            )}
-          </span>,
+                )
+              ) : (
+                // This is a custom emoji, and should be render as an mxc
+                <img
+                  className="emoji"
+                  draggable="false"
+                  loading="lazy"
+                  alt={emoji.shortcode}
+                  unicode={`:${emoji.shortcode}:`}
+                  shortcodes={emoji.shortcode}
+                  src={initMatrix.matrixClient.mxcUrlToHttp(emoji.mxc)}
+                  data-mx-emoticon={emoji.mxc}
+                />
+              )}
+            </span>,
+          );
+        }
+        emojiBoard.push(
+          <div key={r} className="emoji-row">
+            {emojiRow}
+          </div>,
         );
       }
-      emojiBoard.push(
-        <div key={r} className="emoji-row">
-          {emojiRow}
-        </div>,
-      );
+      return emojiBoard;
     }
-    return emojiBoard;
-  }
 
-  return (
-    <div className="emoji-group">
-      <Text className="emoji-group__header" variant="b2" weight="bold">
-        {name}
-      </Text>
-      {groupEmojis.length !== 0 && <div className="emoji-set noselect">{getEmojiBoard()}</div>}
-    </div>
-  );
-});
+    return (
+      <div className="emoji-group">
+        <Text className="emoji-group__header" variant="b2" weight="bold">
+          {name}
+        </Text>
+        {groupEmojis.length !== 0 && <div className="emoji-set noselect">{getEmojiBoard()}</div>}
+      </div>
+    );
+  },
+);
 
 EmojiGroup.propTypes = {
   name: PropTypes.string.isRequired,

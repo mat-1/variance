@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Drawer.scss';
 
+import { ClientEvent } from 'matrix-js-sdk';
 import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
 import navigation from '../../../client/state/navigation';
@@ -18,7 +19,9 @@ import { useSelectedTab } from '../../hooks/useSelectedTab';
 import { useSelectedSpace } from '../../hooks/useSelectedSpace';
 
 function useSystemState() {
-  const [systemState, setSystemState] = useState(null);
+  const [systemState, setSystemState] = useState<{
+    status: string;
+  } | null>(null);
 
   useEffect(() => {
     const handleSystemState = (state) => {
@@ -27,9 +30,9 @@ function useSystemState() {
       }
       if (systemState !== null) setSystemState(null);
     };
-    initMatrix.matrixClient.on('sync', handleSystemState);
+    initMatrix.matrixClient.on(ClientEvent.Sync, handleSystemState);
     return () => {
-      initMatrix.matrixClient.removeListener('sync', handleSystemState);
+      initMatrix.matrixClient.removeListener(ClientEvent.Sync, handleSystemState);
     };
   }, [systemState]);
 

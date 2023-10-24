@@ -142,7 +142,7 @@ function Homeserver({ onChange }) {
           content={(hideMenu) => (
             <>
               <MenuHeader>Homeserver list</MenuHeader>
-              {hs?.list.map((hsName) => (
+              {hs?.list.map((hsName: string) => (
                 <MenuItem
                   key={hsName}
                   onClick={() => {
