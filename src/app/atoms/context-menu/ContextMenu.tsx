@@ -9,14 +9,26 @@ import Text from '../text/Text';
 import Button from '../button/Button';
 import ScrollView from '../scroll/ScrollView';
 
-function ContextMenu({ content, placement, maxWidth, render, afterToggle }) {
+function ContextMenu({
+  content,
+  placement,
+  maxWidth,
+  render,
+  afterToggle,
+}: {
+  content: React.ReactNode | ((hideMenu: () => void) => React.ReactNode);
+  placement?: 'top' | 'right' | 'bottom' | 'left';
+  maxWidth?: string | number;
+  render: (toggleMenu: () => void) => React.ReactNode;
+  afterToggle?: (isVisible: boolean) => void;
+}) {
   const [isVisible, setVisibility] = useState(false);
   const showMenu = () => setVisibility(true);
   const hideMenu = () => setVisibility(false);
 
   useEffect(() => {
-    if (afterToggle !== null) afterToggle(isVisible);
-  }, [afterToggle, isVisible]);
+    if (afterToggle) afterToggle(isVisible);
+  }, [isVisible]);
 
   return (
     <Tippy

@@ -375,7 +375,7 @@ function ProfileViewer() {
       }
     };
 
-    const handlePowerSelector = (e) => {
+    const handlePowerSelector = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       openReusableContextMenu('bottom', getEventCords(e, '.btn-surface'), (closeMenu) => (
         <PowerLevelSelector
           value={powerLevel}
@@ -406,8 +406,8 @@ function ProfileViewer() {
           <div className="profile-viewer__user__role">
             <Text variant="b3">Role</Text>
             <Button
-              onClick={canChangeRole ? handlePowerSelector : null}
-              iconSrc={canChangeRole ? ChevronBottomIC : null}
+              onClick={canChangeRole ? handlePowerSelector : undefined}
+              iconSrc={canChangeRole ? ChevronBottomIC : undefined}
             >
               {`${getPowerLabel(powerLevel) || 'Member'} - ${powerLevel}`}
             </Button>

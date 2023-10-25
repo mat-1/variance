@@ -156,7 +156,12 @@ export function openSearch(term) {
   });
 }
 
-export function openReusableContextMenu(placement, cords, render, afterClose) {
+export function openReusableContextMenu(
+  placement: 'top' | 'right' | 'bottom' | 'left',
+  cords,
+  render,
+  afterClose?,
+) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_REUSABLE_CONTEXT_MENU,
     placement,

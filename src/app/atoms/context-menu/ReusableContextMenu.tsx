@@ -5,18 +5,18 @@ import navigation from '../../../client/state/navigation';
 
 import ContextMenu from './ContextMenu';
 
-let key = null;
+let key: null | number = null;
 function ReusableContextMenu() {
   const [data, setData] = useState(null);
-  const openerRef = useRef(null);
+  const openerRef = useRef<HTMLInputElement>(null);
 
   const closeMenu = () => {
     key = null;
-    if (data) openerRef.current.click();
+    if (data && openerRef.current) openerRef.current.click();
   };
 
   useEffect(() => {
-    if (data) {
+    if (data && openerRef.current) {
       const { cords } = data;
       openerRef.current.style.transform = `translate(${cords.x}px, ${cords.y}px)`;
       openerRef.current.style.width = `${cords.width}px`;
@@ -58,6 +58,8 @@ function ReusableContextMenu() {
       if (key === copyKey) key = null;
     }, 200);
   };
+
+  console.log('ReusableContextMenu', ReusableContextMenu);
 
   return (
     <ContextMenu
