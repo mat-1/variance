@@ -145,22 +145,14 @@ function PeopleDrawer({ roomId }) {
           <ScrollView autoHide>
             <div className="people-drawer__content">
               <SegmentedControl
-                selected={(() => {
-                  const getSegmentIndex = {
-                    join: 0,
-                    invite: 1,
-                    ban: 2,
-                  };
-                  return getSegmentIndex[membership];
-                })()}
-                segments={[{ text: 'Joined' }, { text: 'Invited' }, { text: 'Banned' }]}
-                onSelect={(index) => {
-                  const selectSegment = [
-                    () => setMembership('join'),
-                    () => setMembership('invite'),
-                    () => setMembership('ban'),
-                  ];
-                  selectSegment[index]?.();
+                selectedId={membership}
+                segments={[
+                  { text: 'Joined', id: 'join' },
+                  { text: 'Invited', id: 'invite' },
+                  { text: 'Banned', id: 'ban' },
+                ]}
+                onSelect={(id) => {
+                  setMembership(id);
                 }}
               />
               {mList.map((member) => (
