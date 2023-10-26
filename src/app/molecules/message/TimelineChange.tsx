@@ -12,7 +12,17 @@ import InviteArraowIC from '../../../../public/res/ic/outlined/invite-arrow.svg'
 import InviteCancelArraowIC from '../../../../public/res/ic/outlined/invite-cancel-arrow.svg';
 import UserIC from '../../../../public/res/ic/outlined/user.svg';
 
-function TimelineChange({ variant, content, timestamp, onClick }) {
+function TimelineChange({
+  variant,
+  content,
+  timestamp,
+  onClick,
+}: {
+  variant: 'join' | 'leave' | 'invite' | 'invite-cancel' | 'avatar' | 'other';
+  content: string | React.ReactNode;
+  timestamp: number;
+  onClick: () => void;
+}) {
   let iconSrc;
 
   switch (variant) {

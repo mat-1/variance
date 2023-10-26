@@ -27,6 +27,7 @@ import { parseTimelineChange } from './common';
 import TimelineScroll from './TimelineScroll';
 import EventLimit from './EventLimit';
 import RoomTimeline from '../../../client/state/RoomTimeline';
+import { MatrixEvent, Store } from 'matrix-js-sdk';
 
 const PAG_LIMIT = 30;
 const MAX_MSG_DIFF_MINUTES = 5;
@@ -113,7 +114,15 @@ function handleOnClickCapture(e) {
   }
 }
 
-function renderEvent(roomTimeline, mEvent, prevMEvent, isFocus, isEdit, setEdit, cancelEdit) {
+function renderEvent(
+  roomTimeline: RoomTimeline,
+  mEvent: MatrixEvent,
+  prevMEvent: MatrixEvent | null,
+  isFocus: boolean,
+  isEdit: boolean,
+  setEdit: (eventId: string) => void,
+  cancelEdit: () => void,
+) {
   const isBodyOnly =
     prevMEvent !== null &&
     prevMEvent.getSender() === mEvent.getSender() &&
@@ -149,10 +158,15 @@ function renderEvent(roomTimeline, mEvent, prevMEvent, isFocus, isEdit, setEdit,
   );
 }
 
-function useTimeline(roomTimeline, eventId, readUptoEvtStore, eventLimitRef) {
+function useTimeline(
+  roomTimeline: RoomTimeline,
+  eventId: string,
+  readUptoEvtStore: Store,
+  eventLimitRef: React.MutableRefObject<EventLimit>,
+) {
   const [timelineInfo, setTimelineInfo] = useState(null);
 
-  const setEventTimeline = async (eId) => {
+  const setEventTimeline = async (eId: string) => {
     if (typeof eId === 'string') {
       const isLoaded = await roomTimeline.loadEventTimeline(eId);
       if (isLoaded) return;
@@ -164,7 +178,7 @@ function useTimeline(roomTimeline, eventId, readUptoEvtStore, eventLimitRef) {
 
   useEffect(() => {
     const limit = eventLimitRef.current;
-    const initTimeline = (eId) => {
+    const initTimeline = (eId: string) => {
       // NOTICE: eId can be id of readUpto, reply or specific event.
       // readUpTo: when user click jump to unread message button.
       // reply: when user click reply from timeline.

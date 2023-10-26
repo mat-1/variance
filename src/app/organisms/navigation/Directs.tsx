@@ -8,6 +8,7 @@ import Postie from '../../../util/Postie';
 import { roomIdByActivity } from '../../../util/sort';
 
 import RoomsCategory from './RoomsCategory';
+import { RoomEvent } from 'matrix-js-sdk';
 
 const drawerPostie = new Postie();
 function Directs({ size }) {
@@ -31,9 +32,9 @@ function Directs({ size }) {
       });
       setDirectIds(newDirectIds);
     };
-    mx.on('Room.timeline', handleTimeline);
+    mx.on(RoomEvent.Timeline, handleTimeline);
     return () => {
-      mx.removeListener('Room.timeline', handleTimeline);
+      mx.removeListener(RoomEvent.Timeline, handleTimeline);
     };
   }, [directIds]);
 

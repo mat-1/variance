@@ -797,7 +797,7 @@ function Message({
   // make the message transparent while sending and red if it failed sending
   const [messageStatus, setMessageStatus] = useState(mEvent.status);
 
-  mEvent.on(MatrixEventEvent.Status, (e) => {
+  mEvent.once(MatrixEventEvent.Status, (e) => {
     setMessageStatus(e.status);
   });
 
