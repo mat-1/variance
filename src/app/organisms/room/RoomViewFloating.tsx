@@ -17,11 +17,13 @@ import TickMarkIC from '../../../../public/res/ic/outlined/tick-mark.svg';
 import { getUsersActionJsx } from './common';
 import RoomTimeline from '../../../client/state/RoomTimeline';
 
-function useJumpToEvent(roomTimeline) {
-  const [eventId, setEventId] = useState(null);
+function useJumpToEvent(roomTimeline: RoomTimeline): [boolean, () => void, () => void] {
+  const [eventId, setEventId] = useState<null | string>(null);
 
   const jumpToEvent = () => {
-    roomTimeline.loadEventTimeline(eventId);
+    if (eventId !== null) {
+      roomTimeline.loadEventTimeline(eventId);
+    }
   };
 
   const cancelJumpToEvent = () => {
@@ -31,11 +33,12 @@ function useJumpToEvent(roomTimeline) {
 
   useEffect(() => {
     const readEventId = roomTimeline.getReadUpToEventId();
-    // we only show "Jump to unread" btn only if the event is not in timeline.
-    // if event is in timeline
-    // we will automatically open the timeline from that event position
-    if (!readEventId?.startsWith('~') && !roomTimeline.hasEventInTimeline(readEventId)) {
-      setEventId(readEventId);
+    // we only show the "Jump to unread messages" button if the event is not in the timeline.
+    // if event is in timeline, we will automatically open the timeline from that event position
+    if (readEventId !== null) {
+      if (!readEventId.startsWith('~') && !roomTimeline.hasEventInTimeline(readEventId)) {
+        setEventId(readEventId);
+      }
     }
 
     const { notifications } = initMatrix;
@@ -51,12 +54,12 @@ function useJumpToEvent(roomTimeline) {
   return [!!eventId, jumpToEvent, cancelJumpToEvent];
 }
 
-function useTypingMembers(roomTimeline) {
+function useTypingMembers(roomTimeline: RoomTimeline) {
   const [typingMembers, setTypingMembers] = useState(new Set());
 
-  const updateTyping = (members) => {
+  const updateTyping = (members: Set<string>) => {
     const mx = initMatrix.matrixClient;
-    members.delete(mx.getUserId());
+    members.delete(mx.getUserId()!);
     setTypingMembers(members);
   };
 
@@ -86,7 +89,13 @@ function useScrollToBottom(roomTimeline: RoomTimeline): [boolean, (atBottom: boo
   return [isAtBottom, setIsAtBottom];
 }
 
-function RoomViewFloating({ roomId, roomTimeline }) {
+function RoomViewFloating({
+  roomId,
+  roomTimeline,
+}: {
+  roomId: string;
+  roomTimeline: RoomTimeline;
+}) {
   const [isJumpToEvent, jumpToEvent, cancelJumpToEvent] = useJumpToEvent(roomTimeline);
   const [typingMembers] = useTypingMembers(roomTimeline);
   const [isAtBottom, setIsAtBottom] = useScrollToBottom(roomTimeline);
@@ -99,7 +108,12 @@ function RoomViewFloating({ roomId, roomTimeline }) {
   return (
     <>
       <div className={`room-view__unread ${isJumpToEvent ? 'room-view__unread--open' : ''}`}>
-        <Button iconSrc={MessageUnreadIC} onClick={jumpToEvent} variant="primary">
+        <Button
+          iconSrc={MessageUnreadIC}
+          onClick={() => jumpToEvent()}
+          variant="primary"
+          leftAligned
+        >
           <Text variant="b3" weight="medium">
             Jump to unread messages
           </Text>
