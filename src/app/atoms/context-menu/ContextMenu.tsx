@@ -28,7 +28,7 @@ function ContextMenu({
 
   useEffect(() => {
     if (afterToggle) afterToggle(isVisible);
-  }, [isVisible, afterToggle]);
+  }, [isVisible]);
 
   return (
     <Tippy
