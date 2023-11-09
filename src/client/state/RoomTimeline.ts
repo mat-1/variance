@@ -55,7 +55,7 @@ function addToMap(myMap: Map<string, MatrixEvent[]>, mEvent: MatrixEvent) {
   return mEvent;
 }
 
-function getFirstLinkedTimeline(timeline: EventTimeline) {
+function getFirstLinkedTimeline(timeline: EventTimeline): EventTimeline {
   let prevTimeline: EventTimeline | null = timeline;
   let tm = prevTimeline;
   while (prevTimeline) {
@@ -64,7 +64,7 @@ function getFirstLinkedTimeline(timeline: EventTimeline) {
   }
   return tm;
 }
-function getLastLinkedTimeline(timeline: EventTimeline) {
+function getLastLinkedTimeline(timeline: EventTimeline): EventTimeline {
   let nextTimeline: EventTimeline | null = timeline;
   let tm = nextTimeline;
   while (nextTimeline) {
@@ -87,7 +87,7 @@ function iterateLinkedTimelines(
   }
 }
 
-function isTimelineLinked(tm1: EventTimeline, tm2: EventTimeline) {
+function isTimelineLinked(tm1: EventTimeline, tm2: EventTimeline): boolean {
   let tm: EventTimeline | null = getFirstLinkedTimeline(tm1);
   while (tm) {
     if (tm === tm2) return true;

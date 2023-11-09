@@ -32,12 +32,15 @@ export function getEventCords(
   ev: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   targetSelector?: string,
 ) {
-  const path = ev.nativeEvent.composedPath();
-  const target = (
-    targetSelector
-      ? path.find((element: HTMLElement) => element.matches?.(targetSelector))
-      : ev.target
-  ) as HTMLElement;
+  console.log(ev, targetSelector);
+  const path = ev.nativeEvent.composedPath() as HTMLElement[];
+
+  const targetFromSelector = targetSelector
+    ? path.find((element) => element.matches?.(targetSelector))
+    : undefined;
+
+  const target = targetFromSelector ?? (ev.target as HTMLElement);
+
   const boxInfo = target.getBoundingClientRect();
 
   return {
