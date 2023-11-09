@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import './EmojiBoard.scss';
 
 import parse from 'html-react-parser';
-import twemoji from 'twemoji';
 import { emojiGroups, emojis } from './emoji';
 import { getRelevantPacks } from './custom-emoji';
 import initMatrix from '../../../client/initMatrix';
@@ -64,17 +63,15 @@ const EmojiGroup = React.memo(
             <span key={emojiIndex}>
               {emoji.hexcode ? (
                 // This is a unicode emoji, and should be rendered with twemoji
-                parse(
-                  twemoji.parse(emoji.unicode, {
-                    attributes: () => ({
-                      unicode: emoji.unicode,
-                      shortcodes: emoji.shortcodes?.toString(),
-                      hexcode: emoji.hexcode,
-                      loading: 'lazy',
-                    }),
-                    base: TWEMOJI_BASE_URL,
-                  }),
-                )
+                <img
+                  loading="lazy"
+                  src={`${TWEMOJI_BASE_URL}${emoji.hexcode.toLowerCase()}.svg`}
+                  alt={emoji.unicode}
+                  unicode={emoji.unicode}
+                  shortcodes={emoji.shortcodes?.toString()}
+                  hexcode={emoji.hexcode}
+                  className="emoji"
+                />
               ) : (
                 // This is a custom emoji, and should be render as an mxc
                 <img
@@ -161,10 +158,10 @@ function EmojiBoard({ onSelect, searchRef }) {
   const scrollEmojisRef = useRef(null);
   const emojiInfo = useRef(null);
 
-  function isTargetNotEmoji(target) {
+  function isTargetNotEmoji(target: HTMLElement) {
     return target.classList.contains('emoji') === false;
   }
-  function getEmojiDataFromTarget(target) {
+  function getEmojiDataFromTarget(target: HTMLElement) {
     const unicode = target.getAttribute('unicode');
     const hexcode = target.getAttribute('hexcode');
     const mxc = target.getAttribute('data-mx-emoticon');
@@ -196,19 +193,19 @@ function EmojiBoard({ onSelect, searchRef }) {
     infoShortcode.textContent = `:${emoji.shortcode}:`;
   }
 
-  function hoverEmoji(e) {
+  function hoverEmoji(e: MouseEvent) {
     if (isTargetNotEmoji(e.target)) return;
 
     const emoji = e.target;
     const { shortcodes, unicode } = getEmojiDataFromTarget(emoji);
     const { src } = e.target;
 
-    if (typeof shortcodes === 'undefined') {
+    if (shortcodes === undefined) {
       searchRef.current.placeholder = 'Search';
       setEmojiInfo({
         unicode: '🙂',
         shortcode: 'slight_smile',
-        src: 'https://twemoji.maxcdn.com/v/13.1.0/72x72/1f642.png',
+        src: `${TWEMOJI_BASE_URL}1f642.svg`,
       });
       return;
     }
@@ -356,7 +353,9 @@ function EmojiBoard({ onSelect, searchRef }) {
           </ScrollView>
         </div>
         <div ref={emojiInfo} className="emoji-board__content__info">
-          <div>{parse(twemoji.parse('🙂', { base: TWEMOJI_BASE_URL }))}</div>
+          <div>
+            <img alt=":slight_smile:" src={`${TWEMOJI_BASE_URL}1f642.svg`} className="emoji" />
+          </div>
           <Text>:slight_smile:</Text>
         </div>
       </div>

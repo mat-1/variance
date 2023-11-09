@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './RoomViewCmdBar.scss';
-import parse from 'html-react-parser';
-import twemoji from 'twemoji';
 
 import { twemojify, TWEMOJI_BASE_URL } from '../../../util/twemojify';
 
@@ -53,14 +51,14 @@ function renderSuggestions({ prefix, option, suggestions }, fireCmd) {
 
     // Renders a small Twemoji
     function renderTwemoji(emoji) {
-      return parse(
-        twemoji.parse(emoji.unicode, {
-          attributes: () => ({
-            unicode: emoji.unicode,
-            shortcodes: emoji.shortcodes?.toString(),
-          }),
-          base: TWEMOJI_BASE_URL,
-        }),
+      return (
+        <img
+          className="emoji"
+          src={`${TWEMOJI_BASE_URL}${emoji.hexcode.toLowerCase()}.svg`}
+          alt={emoji.unicode}
+          unicode={emoji.unicode}
+          shortcodes={emoji.shortcodes?.toString()}
+        />
       );
     }
 

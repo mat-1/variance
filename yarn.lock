@@ -1944,6 +1944,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"emojibase-regex@npm:^15.2.0":
+  version: 15.2.0
+  resolution: "emojibase-regex@npm:15.2.0"
+  checksum: c77052fe858ff420313eba7a785812f78b63d3aa93d0b10ff23e70c325b6076fac88b28126c1f1469632f5f27e5ca88176d0282c4908b78fa250569c5767ff48
+  languageName: node
+  linkType: hard
+
 "encoding@npm:^0.1.13":
   version: 0.1.13
   resolution: "encoding@npm:0.1.13"
@@ -2646,17 +2653,6 @@ __metadata:
     jsonfile: "npm:^6.0.1"
     universalify: "npm:^2.0.0"
   checksum: c4e9fabf9762a70d1403316b7faa899f3d3303c8afa765b891c2210fdeba368461e04ae1203920b64ef6a7d066a39ab8cef2160b5ce8d1011bb4368688cd9bb7
-  languageName: node
-  linkType: hard
-
-"fs-extra@npm:^8.0.1":
-  version: 8.1.0
-  resolution: "fs-extra@npm:8.1.0"
-  dependencies:
-    graceful-fs: "npm:^4.2.0"
-    jsonfile: "npm:^4.0.0"
-    universalify: "npm:^0.1.0"
-  checksum: 6fb12449f5349be724a138b4a7b45fe6a317d2972054517f5971959c26fbd17c0e145731a11c7324460262baa33e0a799b183ceace98f7a372c95fbb6f20f5de
   languageName: node
   linkType: hard
 
@@ -3531,31 +3527,6 @@ __metadata:
   bin:
     json5: lib/cli.js
   checksum: 1db67b853ff0de3534085d630691d3247de53a2ed1390ba0ddff681ea43e9b3e30ecbdb65c5e9aab49435e44059c23dbd6fee8ee619419ba37465bb0dd7135da
-  languageName: node
-  linkType: hard
-
-"jsonfile@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "jsonfile@npm:4.0.0"
-  dependencies:
-    graceful-fs: "npm:^4.1.6"
-  dependenciesMeta:
-    graceful-fs:
-      optional: true
-  checksum: 17796f0ab1be8479827d3683433f97ebe0a1c6932c3360fa40348eac36904d69269aab26f8b16da311882d94b42e9208e8b28e490bf926364f3ac9bff134c226
-  languageName: node
-  linkType: hard
-
-"jsonfile@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "jsonfile@npm:5.0.0"
-  dependencies:
-    graceful-fs: "npm:^4.1.6"
-    universalify: "npm:^0.1.2"
-  dependenciesMeta:
-    graceful-fs:
-      optional: true
-  checksum: fcf7a1c6c97c1980f67f587f0892259c3c7e9886fdd96ff2e991594d18e45565177f3e657a83efefc07af863ed4b012e2b7335a40120cf0082c25b79b077df02
   languageName: node
   linkType: hard
 
@@ -5220,25 +5191,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"twemoji-parser@npm:14.0.0":
-  version: 14.0.0
-  resolution: "twemoji-parser@npm:14.0.0"
-  checksum: bc4628fa108f534996778c46ca28ef79582e4929c41781154d1784b9e434efc817d01343b1fde41c552a0b79768951a244902648c33bfeac212bf4c4bcf50d80
-  languageName: node
-  linkType: hard
-
-"twemoji@npm:14.0.2":
-  version: 14.0.2
-  resolution: "twemoji@npm:14.0.2"
-  dependencies:
-    fs-extra: "npm:^8.0.1"
-    jsonfile: "npm:^5.0.0"
-    twemoji-parser: "npm:14.0.0"
-    universalify: "npm:^0.1.2"
-  checksum: 5090d84aa540d23a5f0d8ad69716d24cfe87c69e815968e8a9d4e379d3a9eb1f9852582010dd3839f9494a24d4b93d217ef053832796e689f9798d27cb292140
-  languageName: node
-  linkType: hard
-
 "type-check@npm:^0.4.0, type-check@npm:~0.4.0":
   version: 0.4.0
   resolution: "type-check@npm:0.4.0"
@@ -5373,13 +5325,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"universalify@npm:^0.1.0, universalify@npm:^0.1.2":
-  version: 0.1.2
-  resolution: "universalify@npm:0.1.2"
-  checksum: 40cdc60f6e61070fe658ca36016a8f4ec216b29bf04a55dce14e3710cc84c7448538ef4dad3728d0bfe29975ccd7bfb5f414c45e7b78883567fb31b246f02dff
-  languageName: node
-  linkType: hard
-
 "universalify@npm:^2.0.0":
   version: 2.0.0
   resolution: "universalify@npm:2.0.0"
@@ -5448,6 +5393,7 @@ __metadata:
     buffer: "npm:6.0.3"
     dateformat: "npm:5.0.3"
     emojibase-data: "npm:15.2.0"
+    emojibase-regex: "npm:^15.2.0"
     eslint: "npm:8.52.0"
     eslint-config-airbnb: "npm:19.0.4"
     eslint-config-prettier: "npm:9.0.0"
@@ -5480,7 +5426,6 @@ __metadata:
     slate-history: "npm:0.100.0"
     slate-react: "npm:0.100.0"
     tippy.js: "npm:6.3.7"
-    twemoji: "npm:14.0.2"
     typescript: "npm:5.2.2"
     vite: "npm:4.5.0"
     vite-plugin-static-copy: "npm:0.17.0"

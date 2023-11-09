@@ -121,10 +121,10 @@
     @include dir.side(margin, var(--left-margin), var(--right-margin));
   }
   & .emoji {
-    max-width: 38px;
-    max-height: 38px;
-    width: 100%;
-    height: 100%;
+    width: 38px;
+    height: 38px;
+    // width: 100%;
+    // height: 100%;
     overflow: hidden;
     object-fit: contain;
     padding: var(--emoji-padding);
