@@ -8,7 +8,7 @@ import parse from 'html-react-parser';
 import { sanitizeText } from './sanitize';
 import { clearUrlsFromHtml } from './clear-urls/clearUrls';
 
-export const TWEMOJI_BASE_URL = '/public/res/emoji/';
+export const TWEMOJI_BASE_URL = '/public/emoji/';
 
 const Math = lazy(() => import('../app/atoms/math/Math'));
 

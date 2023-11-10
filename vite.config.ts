@@ -24,6 +24,10 @@ const copyFiles = {
       src: 'public/res/android',
       dest: 'public/',
     },
+    {
+      src: 'public/res/emoji',
+      dest: 'public/',
+    },
   ],
 };
 
