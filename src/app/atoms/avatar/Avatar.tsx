@@ -52,6 +52,7 @@ const Avatar = React.forwardRef(
       <div ref={ref} className={`avatar-container avatar-container__${size} noselect`}>
         {activeImageSrc !== null ? (
           <img
+            loading="lazy"
             draggable="false"
             src={activeImageSrc}
             onLoad={(e) => {

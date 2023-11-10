@@ -58,7 +58,6 @@ const EmojiGroup = React.memo(
           const emojiIndex = c;
           if (emojiIndex >= totalEmojis) break;
           const emoji = groupEmojis[emojiIndex];
-          console.trace('rendering emoji board');
           emojiRow.push(
             <span key={emojiIndex}>
               {emoji.hexcode ? (

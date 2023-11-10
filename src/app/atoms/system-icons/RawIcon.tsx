@@ -2,7 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './RawIcon.scss';
 
-function RawIcon({ color, size, src, isImage }) {
+function RawIcon({
+  color,
+  size,
+  src,
+  isImage,
+}: {
+  color?: string | null;
+  size?: 'large' | 'normal' | 'small' | 'extra-small';
+  src: string;
+  isImage?: boolean;
+}) {
   const style = {};
   if (color !== null) style.backgroundColor = color;
   if (isImage) {

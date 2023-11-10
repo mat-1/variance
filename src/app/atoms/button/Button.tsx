@@ -45,7 +45,7 @@ const Button = React.forwardRef(
         type={type}
         disabled={disabled}
       >
-        {iconSrc !== undefined && <RawIcon size="small" src={iconSrc} />}
+        {iconSrc && <RawIcon size="small" src={iconSrc} />}
         {typeof children === 'string' && <Text variant="b1">{children}</Text>}
         {typeof children !== 'string' && children}
       </button>

@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import './RoomViewContent.scss';
 
 import dateFormat from 'dateformat';
+import { MatrixEvent } from 'matrix-js-sdk';
 import { twemojify } from '../../../util/twemojify';
 
 import initMatrix from '../../../client/initMatrix';
@@ -21,13 +22,12 @@ import { Message, PlaceholderMessage } from '../../molecules/message/Message';
 import RoomIntro from '../../molecules/room-intro/RoomIntro';
 import TimelineChange from '../../molecules/message/TimelineChange';
 
-import { useStore } from '../../hooks/useStore';
+import { Store, useStore } from '../../hooks/useStore';
 import { useForceUpdate } from '../../hooks/useForceUpdate';
 import { parseTimelineChange } from './common';
 import TimelineScroll from './TimelineScroll';
 import EventLimit from './EventLimit';
 import RoomTimeline from '../../../client/state/RoomTimeline';
-import { MatrixEvent, Store } from 'matrix-js-sdk';
 
 const PAG_LIMIT = 30;
 const MAX_MSG_DIFF_MINUTES = 5;
@@ -161,7 +161,7 @@ function renderEvent(
 function useTimeline(
   roomTimeline: RoomTimeline,
   eventId: string,
-  readUptoEvtStore: Store,
+  readUptoEvtStore: Store<MatrixEvent>,
   eventLimitRef: React.MutableRefObject<EventLimit>,
 ) {
   const [timelineInfo, setTimelineInfo] = useState(null);
@@ -192,7 +192,7 @@ function useTimeline(
       }
       if (!readUptoEvtStore.getItem() && roomTimeline.hasEventInTimeline(readUpToId)) {
         // either opening live timeline or jump to unread.
-        readUptoEvtStore.setItem(roomTimeline.findEventByIdInTimelineSet(readUpToId));
+        readUptoEvtStore.setItem(roomTimeline.findEventByIdInTimelineSet(readUpToId)!);
       }
       if (readUptoEvtStore.getItem() && !isSpecificEvent) {
         focusEventIndex = roomTimeline.getUnreadEventIndex(readUptoEvtStore.getItem().getId());

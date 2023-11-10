@@ -348,7 +348,10 @@ class RoomTimeline extends EventEmitter {
     return this.timeline.findIndex((mEvent) => mEvent.getId() === eventId);
   }
 
-  findEventByIdInTimelineSet(eventId, eventTimelineSet = this.getUnfilteredTimelineSet()) {
+  findEventByIdInTimelineSet(
+    eventId: string,
+    eventTimelineSet = this.getUnfilteredTimelineSet(),
+  ): MatrixEvent | undefined {
     return eventTimelineSet.findEventById(eventId);
   }
 
