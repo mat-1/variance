@@ -28,6 +28,14 @@ const copyFiles = {
       src: 'public/res/emoji',
       dest: 'public/',
     },
+    {
+      src: 'public/manifest.json',
+      dest: '',
+    },
+    {
+      src: 'public/favicon.ico',
+      dest: '',
+    },
   ],
 };
 

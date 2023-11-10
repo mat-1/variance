@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
-  "author": "Cinny and Variance contributors",
+  "author": "Variance and Cinny contributors",
   "license": "AGPL-3.0-only",
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "5.0.17",
