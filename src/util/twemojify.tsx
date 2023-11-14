@@ -57,7 +57,7 @@ export function twemojify(
 
   // RegExp based on emoji's official Unicode standards
   // http://www.unicode.org/Public/UNIDATA/EmojiSources.txt
-  content = content.replace(EMOJI_REGEX, (match) => {
+  content = content.replaceAll(EMOJI_REGEX, (match) => {
     // remove unnecessary variation selector codepoint
     const cleanedMatch = match.indexOf('\u200d') < 0 ? match.replaceAll('\uFE0F', '') : match;
     // concatenate codepoints with -
