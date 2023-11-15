@@ -1,4 +1,10 @@
 class EventLimit {
+  private _from: number;
+
+  private readonly SMALLEST_EVT_HEIGHT: number;
+
+  private readonly PAGES_COUNT: number;
+
   constructor() {
     this._from = 0;
 
@@ -18,11 +24,11 @@ class EventLimit {
     return this._from + this.maxEvents;
   }
 
-  setFrom(from) {
+  setFrom(from: number) {
     this._from = from < 0 ? 0 : from;
   }
 
-  paginate(backwards, limit, timelineLength) {
+  paginate(backwards: boolean, limit: number, timelineLength: number) {
     this._from = backwards ? this._from - limit : this._from + limit;
 
     if (!backwards && this.length > timelineLength) {

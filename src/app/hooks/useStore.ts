@@ -21,6 +21,7 @@ export function useStore<S>(...args: unknown[]): Store<S> {
     return () => {
       itemRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, args);
 
   return { getItem, setItem };

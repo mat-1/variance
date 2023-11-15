@@ -1,7 +1,14 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useRef,
+  ReactElement,
+} from 'react';
 import PropTypes from 'prop-types';
 import './RoomViewContent.scss';
 
@@ -35,8 +42,8 @@ const PLACEHOLDER_COUNT = 2;
 const PLACEHOLDERS_HEIGHT = 96 * PLACEHOLDER_COUNT;
 const SCROLL_TRIGGER_POS = PLACEHOLDERS_HEIGHT * 4;
 
-function loadingMsgPlaceholders(key, count = 2) {
-  const pl = [];
+function loadingMsgPlaceholders(key: string, count: number = 2) {
+  const pl: ReactElement[] = [];
   const genPlaceholders = () => {
     for (let i = 0; i < count; i += 1) {
       pl.push(<PlaceholderMessage key={`placeholder-${i}${key}`} />);
@@ -218,16 +225,16 @@ function useTimeline(
 }
 
 function usePaginate(
-  roomTimeline,
-  readUptoEvtStore,
-  forceUpdateLimit,
-  timelineScrollRef,
-  eventLimitRef,
+  roomTimeline: RoomTimeline,
+  readUptoEvtStore: Store<MatrixEvent>,
+  forceUpdateLimit: () => void,
+  timelineScrollRef: React.MutableRefObject<TimelineScroll>,
+  eventLimitRef: React.MutableRefObject<EventLimit>,
 ) {
-  const [info, setInfo] = useState(null);
+  const [info, setInfo] = useState<{ backwards: boolean; loaded: number } | null>(null);
 
   useEffect(() => {
-    const handlePaginatedFromServer = (backwards, loaded) => {
+    const handlePaginatedFromServer = (backwards: boolean, loaded: number) => {
       const limit = eventLimitRef.current;
       if (loaded === 0) return;
       if (!readUptoEvtStore.getItem()) {
@@ -406,11 +413,11 @@ function RoomViewContent({
 
   const timelineSVRef = useRef(null);
   const timelineScrollRef = useRef(null);
-  const eventLimitRef = useRef(null);
+  const eventLimitRef = useRef<EventLimit | null>(null);
   const [editEventId, setEditEventId] = useState(null);
   const cancelEdit = () => setEditEventId(null);
 
-  const readUptoEvtStore = useStore(roomTimeline);
+  const readUptoEvtStore = useStore<MatrixEvent>(roomTimeline);
   const [onLimitUpdate, forceUpdateLimit] = useForceUpdate();
 
   const timelineInfo = useTimeline(roomTimeline, eventId, readUptoEvtStore, eventLimitRef);
@@ -566,6 +573,7 @@ function RoomViewContent({
   const renderTimeline = () => {
     const tl = [];
     const limit = eventLimitRef.current;
+    if (limit === null) return;
 
     let itemCountIndex = 0;
     jumpToItemIndex = -1;

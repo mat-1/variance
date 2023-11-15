@@ -288,9 +288,9 @@ class RoomTimeline extends EventEmitter {
     return this.room.getUnfilteredTimelineSet();
   }
 
-  getEventReaders(mEvent) {
-    const liveEvents = this.liveTimeline.getEvents();
-    const readers = [];
+  getEventReaders(mEvent: MatrixEvent) {
+    const liveEvents: MatrixEvent[] = this.liveTimeline.getEvents();
+    const readers: string[] = [];
     if (!mEvent) return [];
 
     for (let i = liveEvents.length - 1; i >= 0; i -= 1) {
@@ -341,7 +341,8 @@ class RoomTimeline extends EventEmitter {
   }
 
   getReadUpToEventId() {
-    return this.room.getEventReadUpTo(this.matrixClient.getUserId());
+    const userId = this.matrixClient.getUserId();
+    return userId ? this.room.getEventReadUpTo(userId) : null;
   }
 
   getEventIndex(eventId) {
