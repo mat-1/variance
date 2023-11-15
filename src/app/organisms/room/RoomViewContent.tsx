@@ -584,10 +584,14 @@ function RoomViewContent({
       tl.push(loadingMsgPlaceholders(1, PLACEHOLDER_COUNT));
       itemCountIndex += PLACEHOLDER_COUNT;
     }
+    console.log('-');
     for (let i = limit.from; i < limit.length; i += 1) {
       if (i >= timeline.length) break;
       const mEvent = timeline[i];
       const prevMEvent = timeline[i - 1] ?? null;
+
+      console.log(mEvent);
+      console.log(mEvent.getType());
 
       if (i === 0 && !roomTimeline.canPaginateBackward()) {
         if (mEvent.getType() === 'm.room.create') {

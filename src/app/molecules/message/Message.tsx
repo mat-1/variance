@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import './Message.scss';
 
 import { find } from 'linkifyjs';
-import { MatrixEvent, MatrixEventEvent } from 'matrix-js-sdk';
+import { MatrixEvent, MatrixEventEvent, Thread } from 'matrix-js-sdk';
 import { twemojify } from '../../../util/twemojify';
 
 import initMatrix from '../../../client/initMatrix';
@@ -661,6 +661,45 @@ const MessageOptions = React.memo(
   },
 );
 
+const MessageThreadSummary = React.memo(({ thread }: { thread: Thread }) => {
+  const threadId = thread.length;
+  const lastReply = thread.lastReply();
+
+  const lastSender = lastReply?.sender;
+  const lastSenderAvatarSrc =
+    lastSender?.getAvatarUrl(initMatrix.matrixClient.baseUrl, 36, 36, 'crop', true, false) ?? null;
+
+  return (
+    <div className="message__threadSummary">
+      <div className="message__threadSummary-count">
+        <Text>
+          {thread.length} message{threadId > 1 ? 's' : ''} ›
+        </Text>
+      </div>
+      <div className="message__threadSummary-lastReply">
+        {lastReply ? (
+          <>
+            <Avatar
+              imageSrc={lastSenderAvatarSrc}
+              text={lastReply.sender?.name}
+              bgColor={backgroundColorMXID(lastReply.sender?.userId)}
+              size="ultra-small"
+            />
+            <span className="message__threadSummary-lastReply-sender">
+              <Text span>{lastReply.sender?.name}</Text>{' '}
+            </span>
+            <span className="message__threadSummary-lastReply-body">
+              <Text span>{lastReply.getContent().body}</Text>
+            </span>
+          </>
+        ) : (
+          <Text>No replies</Text>
+        )}
+      </div>
+    </div>
+  );
+});
+
 function genMediaContent(mE) {
   const mx = initMatrix.matrixClient;
   const mContent = mE.getContent();
@@ -895,6 +934,7 @@ function Message({
         {roomTimeline && !isEdit && (
           <MessageOptions roomTimeline={roomTimeline} mEvent={mEvent} edit={edit} reply={reply} />
         )}
+        {mEvent.isThreadRoot && <MessageThreadSummary thread={mEvent.thread} />}
       </div>
     </div>
   );

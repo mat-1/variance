@@ -103,12 +103,14 @@
   --ic-normal: 24px;
   --ic-small: 20px;
   --ic-extra-small: 18px;
+  --ic-ultra-small: 18px;
 
   /* avatar size */
   --av-large: 80px;
   --av-normal: 42px;
   --av-small: 36px;
   --av-extra-small: 24px;
+  --av-ultra-small: 12px;
 
   /* shadow and overlay */
   --bg-overlay: rgba(0, 0, 0, 20%);
@@ -134,7 +136,7 @@
   /* border */
   --bo-radius: 8px;
 
-  /* font styles: font-size, letter-spacing, line-hight */
+  /* font styles: font-size, letter-spacing, line-height */
   --fs-h1: 35.6px;
   --ls-h1: -1.5px;
   --lh-h1: 38px;
@@ -158,6 +160,10 @@
   --fs-b3: 11.2px;
   --ls-b3: 0px;
   --lh-b3: 16px;
+
+  --fs-b4: 5.6px;
+  --ls-b4: 0px;
+  --lh-b4: 8px;
 
   /* font-weight */
   --fw-light: 300;
