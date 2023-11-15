@@ -1,3 +1,4 @@
+import { IRoomTimelineData, MatrixEvent, Room, RoomEvent } from 'matrix-js-sdk';
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
@@ -8,20 +9,26 @@ import Postie from '../../../util/Postie';
 import { roomIdByActivity } from '../../../util/sort';
 
 import RoomsCategory from './RoomsCategory';
-import { RoomEvent } from 'matrix-js-sdk';
 
 const drawerPostie = new Postie();
 function Directs({ size }) {
   const mx = initMatrix.matrixClient;
   const { roomList, notifications } = initMatrix;
-  const [directIds, setDirectIds] = useState([]);
+  const [directIds, setDirectIds] = useState<string[]>([]);
 
   useEffect(() => {
     setDirectIds([...roomList.directs].sort(roomIdByActivity));
   }, [size]);
 
   useEffect(() => {
-    const handleTimeline = (event, room, toStartOfTimeline, removed, data) => {
+    const handleTimeline = (
+      event: MatrixEvent,
+      room: Room | undefined,
+      atStart: boolean,
+      removed: boolean,
+      data: IRoomTimelineData,
+    ) => {
+      if (!room) return;
       if (!roomList.directs.has(room.roomId)) return;
       if (!data.liveEvent) return;
       if (directIds[0] === room.roomId) return;
@@ -39,7 +46,7 @@ function Directs({ size }) {
   }, [directIds]);
 
   useEffect(() => {
-    const selectorChanged = (selectedRoomId, prevSelectedRoomId) => {
+    const selectorChanged = (selectedRoomId: string, prevSelectedRoomId: string) => {
       if (!drawerPostie.hasTopic('selector-change')) return;
       const addresses = [];
       if (drawerPostie.hasSubscriber('selector-change', selectedRoomId))
@@ -50,7 +57,7 @@ function Directs({ size }) {
       drawerPostie.post('selector-change', addresses, selectedRoomId);
     };
 
-    const notiChanged = (roomId, total, prevTotal) => {
+    const notiChanged = (roomId: string, total: number, prevTotal: number) => {
       if (total === prevTotal) return;
       if (drawerPostie.hasTopicAndSubscriber('unread-change', roomId)) {
         drawerPostie.post('unread-change', roomId);

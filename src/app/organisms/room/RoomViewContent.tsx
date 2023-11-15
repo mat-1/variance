@@ -406,7 +406,7 @@ function RoomViewContent({
   eventId,
   roomTimeline,
 }: {
-  eventId: string;
+  eventId: string | null;
   roomTimeline: RoomTimeline;
 }) {
   const [throttle] = useState(new Throttle());

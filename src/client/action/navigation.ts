@@ -1,25 +1,26 @@
 import appDispatcher from '../dispatcher';
 import cons from '../state/cons';
 
-export function selectTab(tabId) {
+export function selectTab(tabId: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.SELECT_TAB,
     tabId,
   });
 }
 
-export function selectSpace(roomId) {
+export function selectSpace(roomId: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.SELECT_SPACE,
     roomId,
   });
 }
 
-export function selectRoom(roomId, eventId) {
+export function selectRoom(roomId: string, eventId?: string, threadId?: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.SELECT_ROOM,
     roomId,
     eventId,
+    threadId,
   });
 }
 
@@ -30,7 +31,7 @@ export function openNavigation() {
   });
 }
 
-export function openSpaceSettings(roomId, tabText) {
+export function openSpaceSettings(roomId: string, tabText: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_SPACE_SETTINGS,
     roomId,
@@ -38,21 +39,21 @@ export function openSpaceSettings(roomId, tabText) {
   });
 }
 
-export function openSpaceManage(roomId) {
+export function openSpaceManage(roomId: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_SPACE_MANAGE,
     roomId,
   });
 }
 
-export function openSpaceAddExisting(roomId) {
+export function openSpaceAddExisting(roomId: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_SPACE_ADDEXISTING,
     roomId,
   });
 }
 
-export function toggleRoomSettings(tabText) {
+export function toggleRoomSettings(tabText: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.TOGGLE_ROOM_SETTINGS,
     tabText,
@@ -71,14 +72,14 @@ export function openInviteList() {
   });
 }
 
-export function openPublicRooms(searchTerm) {
+export function openPublicRooms(searchTerm: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_PUBLIC_ROOMS,
     searchTerm,
   });
 }
 
-export function openCreateRoom(isSpace = false, parentId = null) {
+export function openCreateRoom(isSpace: boolean = false, parentId: string | null = null) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_CREATE_ROOM,
     isSpace,
@@ -86,14 +87,14 @@ export function openCreateRoom(isSpace = false, parentId = null) {
   });
 }
 
-export function openJoinAlias(term) {
+export function openJoinAlias(term: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_JOIN_ALIAS,
     term,
   });
 }
 
-export function openInviteUser(roomId, searchTerm) {
+export function openInviteUser(roomId: string, searchTerm: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_INVITE_USER,
     roomId,
@@ -101,7 +102,7 @@ export function openInviteUser(roomId, searchTerm) {
   });
 }
 
-export function openProfileViewer(userId, roomId) {
+export function openProfileViewer(userId: string, roomId: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_PROFILE_VIEWER,
     userId,
@@ -109,14 +110,14 @@ export function openProfileViewer(userId, roomId) {
   });
 }
 
-export function openSettings(tabText) {
+export function openSettings(tabText: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_SETTINGS,
     tabText,
   });
 }
 
-export function openEmojiBoard(cords, requestEmojiCallback) {
+export function openEmojiBoard(cords, requestEmojiCallback: (emoji: string) => void) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_EMOJIBOARD,
     cords,
@@ -124,7 +125,7 @@ export function openEmojiBoard(cords, requestEmojiCallback) {
   });
 }
 
-export function openReadReceipts(roomId, userIds) {
+export function openReadReceipts(roomId: string, userIds: string[]) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_READRECEIPTS,
     roomId,
@@ -132,14 +133,14 @@ export function openReadReceipts(roomId, userIds) {
   });
 }
 
-export function openViewSource(event) {
+export function openViewSource(event: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_VIEWSOURCE,
     event,
   });
 }
 
-export function replyTo(userId, eventId, body, formattedBody) {
+export function replyTo(userId: string, eventId: string, body: string, formattedBody: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.CLICK_REPLY_TO,
     userId,
@@ -149,7 +150,7 @@ export function replyTo(userId, eventId, body, formattedBody) {
   });
 }
 
-export function openSearch(term) {
+export function openSearch(term: string) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_SEARCH,
     term,

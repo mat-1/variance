@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import encrypt from 'browser-encrypt-attachment';
 import { encode } from 'blurhash';
-import { EventTimeline, MatrixClient } from 'matrix-js-sdk';
+import { EventTimeline, MatrixClient, MatrixEvent } from 'matrix-js-sdk';
 import { getShortcodeToEmoji } from '../../app/organisms/emoji-board/custom-emoji';
 import { getBlobSafeMimeType } from '../../util/mimetypes';
 import { sanitizeText } from '../../util/sanitize';
@@ -215,7 +215,7 @@ class RoomsInput extends EventEmitter {
     return this.roomIdToInput.get(roomId)?.isSending || false;
   }
 
-  getContent(roomId: string, options, message: string, reply, edit) {
+  getContent(roomId: string, options, message: string, reply: boolean, edit?: MatrixEvent) {
     const msgType = options?.msgType || 'm.text';
     const autoMarkdown = options?.autoMarkdown ?? true;
     const isHtml = options?.isHtml ?? false;
@@ -320,7 +320,7 @@ class RoomsInput extends EventEmitter {
     return content;
   }
 
-  async sendInput(roomId, options) {
+  async sendInput(roomId: string, threadId: string | undefined, options) {
     const input = this.getInput(roomId);
     input.isSending = true;
     this.roomIdToInput.set(roomId, input);
@@ -331,7 +331,8 @@ class RoomsInput extends EventEmitter {
 
     if (this.getMessage(roomId).trim() !== '') {
       const content = this.getContent(roomId, options, input.message, input.replyTo);
-      this.matrixClient.sendMessage(roomId, content);
+      if (threadId) this.matrixClient.sendMessage(roomId, threadId ?? null, content, undefined);
+      else this.matrixClient.sendMessage(roomId, content);
     }
 
     if (this.isSending(roomId)) this.roomIdToInput.delete(roomId);

@@ -112,7 +112,7 @@ Avatar.propTypes = {
   iconSrc: PropTypes.string,
   iconColor: PropTypes.string,
   imageSrc: PropTypes.string,
-  size: PropTypes.oneOf(['large', 'normal', 'small', 'extra-small']),
+  size: PropTypes.oneOf(['large', 'normal', 'small', 'extra-small', 'ultra-small']),
 };
 
 export default Avatar;

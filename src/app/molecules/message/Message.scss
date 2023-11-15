@@ -498,9 +498,14 @@
   border-radius: calc(var(--bo-radius) / 2);
   margin-top: var(--sp-extra-tight);
   width: fit-content;
+  cursor: pointer;
 
   &-count p {
     color: var(--tc-link);
+  }
+
+  :hover > &-count p {
+    text-decoration: underline;
   }
 
   &-lastReply-sender span {

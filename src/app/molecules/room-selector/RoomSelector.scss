@@ -85,3 +85,8 @@
     border-radius: calc(var(--bo-radius) / 2);
   }
 }
+
+.thread-selector__lines {
+  width: var(--av-extra-small);
+  height: var(--av-extra-small);
+}

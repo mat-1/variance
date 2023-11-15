@@ -46,10 +46,12 @@ let cmdCursorPos = null;
 
 function RoomViewInput({
   roomId,
+  threadId,
   roomTimeline,
   viewEvent,
 }: {
   roomId: string;
+  threadId?: string;
   roomTimeline: RoomTimeline;
   viewEvent: EventEmitter;
 }) {
@@ -249,7 +251,7 @@ function RoomViewInput({
     }
     readOnly = true;
 
-    await roomsInput.sendInput(roomId, opt);
+    await roomsInput.sendInput(roomId, threadId, opt);
     readOnly = false;
     focusInput();
 
@@ -561,10 +563,5 @@ function RoomViewInput({
     </>
   );
 }
-RoomViewInput.propTypes = {
-  roomId: PropTypes.string.isRequired,
-  roomTimeline: PropTypes.shape({}).isRequired,
-  viewEvent: PropTypes.shape({}).isRequired,
-};
 
 export default RoomViewInput;
