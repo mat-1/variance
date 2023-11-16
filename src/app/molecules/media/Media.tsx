@@ -151,7 +151,7 @@ function Image({ name, width, height, link, file, type, blurhash }) {
           onClick={toggleLightbox}
           onKeyDown={toggleLightbox}
         >
-          {blurhash && blur && <BlurhashCanvas hash={blurhash} punch={1} />}
+          {blurhash && blur && <BlurhashCanvas hash={blurhash} punch={1} width={32} height={32} />}
           {url !== null && (
             <img
               style={{ display: blur ? 'none' : 'unset' }}
@@ -320,7 +320,9 @@ function Video({
       >
         {url === null ? (
           <>
-            {blurhash && blur && <BlurhashCanvas hash={blurhash} punch={1} />}
+            {blurhash && blur && (
+              <BlurhashCanvas hash={blurhash} punch={1} width={32} height={32} />
+            )}
             {thumbUrl !== null && (
               <img
                 style={{ display: blur ? 'none' : 'unset' }}
