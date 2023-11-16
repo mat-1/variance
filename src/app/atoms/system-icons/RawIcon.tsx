@@ -9,7 +9,7 @@ function RawIcon({
   isImage,
 }: {
   color?: string | null;
-  size?: 'large' | 'normal' | 'small' | 'extra-small';
+  size?: 'large' | 'normal' | 'small' | 'extra-small' | 'ultra-small';
   src: string;
   isImage?: boolean;
 }) {
@@ -34,7 +34,7 @@ RawIcon.defaultProps = {
 
 RawIcon.propTypes = {
   color: PropTypes.string,
-  size: PropTypes.oneOf(['large', 'normal', 'small', 'extra-small']),
+  size: PropTypes.oneOf(['large', 'normal', 'small', 'extra-small', 'ultra-small']),
   src: PropTypes.string.isRequired,
   isImage: PropTypes.bool,
 };

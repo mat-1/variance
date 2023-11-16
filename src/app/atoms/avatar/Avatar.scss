@@ -26,6 +26,12 @@
     height: var(--av-extra-small);
   }
 
+  &__ultra-small {
+    width: var(--av-ultra-small);
+    height: var(--av-ultra-small);
+    border-radius: calc(var(--bo-radius) / 2);
+  }
+
   > img {
     width: 100%;
     height: 100%;

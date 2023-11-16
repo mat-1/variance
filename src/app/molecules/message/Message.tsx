@@ -4,7 +4,13 @@ import PropTypes from 'prop-types';
 import './Message.scss';
 
 import { find } from 'linkifyjs';
-import { MatrixEvent, MatrixEventEvent } from 'matrix-js-sdk';
+import {
+  MatrixEvent,
+  MatrixEventEvent,
+  RoomEvent,
+  THREAD_RELATION_TYPE,
+  Thread,
+} from 'matrix-js-sdk';
 import { twemojify } from '../../../util/twemojify';
 
 import initMatrix from '../../../client/initMatrix';
@@ -23,6 +29,7 @@ import {
   openReadReceipts,
   openViewSource,
   replyTo,
+  selectRoom,
 } from '../../../client/action/navigation';
 import { sanitizeCustomHtml } from '../../../util/sanitize';
 
@@ -56,7 +63,7 @@ import { Embed } from '../media/Media';
 import RoomTimeline from '../../../client/state/RoomTimeline';
 import { backgroundColorMXID, colorMXID } from '../../../util/colorMXID';
 
-function PlaceholderMessage() {
+export function PlaceholderMessage() {
   return (
     <div className="ph-msg">
       <div className="ph-msg__avatar-container">
@@ -132,7 +139,7 @@ const MessageHeader = React.memo(
   ),
 );
 
-function MessageReply({ name, color, body }) {
+export function MessageReply({ name, color, body }) {
   return (
     <div className="message__reply">
       <Text variant="b2">
@@ -160,9 +167,11 @@ const MessageReplyWrapper = React.memo(
       const loadReply = async () => {
         try {
           const eTimeline = await mx.getEventTimeline(timelineSet, eventId);
+          if (!eTimeline) return;
           await roomTimeline.decryptAllEventsOfTimeline(eTimeline);
 
           let mEvent = eTimeline.getTimelineSet().findEventById(eventId);
+
           const editedList = roomTimeline.editedTimeline.get(mEvent.getId());
           if (editedList) {
             mEvent = editedList[editedList.length - 1];
@@ -202,7 +211,9 @@ const MessageReplyWrapper = React.memo(
       };
     }, [eventId, roomTimeline]);
 
-    const focusReply = (ev) => {
+    const focusReply = (
+      ev: React.KeyboardEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>,
+    ) => {
       if (!ev.key || ev.key === ' ' || ev.key === 'Enter') {
         if (ev.key) ev.preventDefault();
         if (reply?.event === null) return;
@@ -661,9 +672,64 @@ const MessageOptions = React.memo(
   },
 );
 
-function genMediaContent(mE) {
+const MessageThreadSummary = React.memo(({ thread }: { thread: Thread }) => {
+  const [lastReply, setLastReply] = useState(thread.lastReply());
+
+  const lastSender = lastReply?.sender;
+  const lastSenderAvatarSrc =
+    lastSender?.getAvatarUrl(initMatrix.matrixClient.baseUrl, 36, 36, 'crop', true, false) ??
+    undefined;
+
+  function selectThread() {
+    selectRoom(thread.roomId, undefined, thread.rootEvent?.getId());
+  }
+
+  thread.on(RoomEvent.Timeline, () => {
+    setLastReply(thread.lastReply());
+  });
+
+  return (
+    <button className="message__threadSummary" onClick={selectThread} type="button">
+      <div className="message__threadSummary-count">
+        <Text>
+          {thread.length} message{thread.length > 1 ? 's' : ''} ›
+        </Text>
+      </div>
+      <div className="message__threadSummary-lastReply">
+        {lastReply ? (
+          <>
+            {lastSender ? (
+              <>
+                <Avatar
+                  imageSrc={lastSenderAvatarSrc}
+                  text={lastSender?.name}
+                  bgColor={backgroundColorMXID(lastSender?.userId)}
+                  size="ultra-small"
+                />
+                <span className="message__threadSummary-lastReply-sender">
+                  <Text span>{lastSender?.name}</Text>{' '}
+                </span>
+              </>
+            ) : (
+              <span className="message__threadSummary-lastReply-sender">
+                <Text span>Unknown user</Text>{' '}
+              </span>
+            )}
+            <span className="message__threadSummary-lastReply-body">
+              <Text span>{lastReply.getContent().body}</Text>
+            </span>
+          </>
+        ) : (
+          <Text>Couldn&apos;t load latest message</Text>
+        )}
+      </div>
+    </button>
+  );
+});
+
+function genMediaContent(matrixEvent: MatrixEvent) {
   const mx = initMatrix.matrixClient;
-  const mContent = mE.getContent();
+  const mContent = matrixEvent.getContent();
   if (!mContent || !mContent.body)
     return <span style={{ color: 'var(--bg-danger)' }}>Malformed event</span>;
 
@@ -676,9 +742,9 @@ function genMediaContent(mE) {
   if (typeof mediaMXC === 'undefined' || mediaMXC === '')
     return <span style={{ color: 'var(--bg-danger)' }}>Malformed event</span>;
 
-  let msgType = mE.getContent()?.msgtype;
+  let msgType = matrixEvent.getContent()?.msgtype;
   const safeMimetype = getBlobSafeMimeType(mContent.info?.mimetype);
-  if (mE.getType() === 'm.sticker') {
+  if (matrixEvent.getType() === 'm.sticker') {
     msgType = 'm.sticker';
   } else if (safeMimetype === 'application/octet-stream') {
     msgType = 'm.file';
@@ -751,7 +817,7 @@ function genMediaContent(mE) {
   }
 }
 
-function getEditedBody(editedMEvent) {
+function getEditedBody(editedMEvent: MatrixEvent) {
   const newContent = editedMEvent.getContent()['m.new_content'];
   if (typeof newContent === 'undefined') return [null, false, null];
 
@@ -763,11 +829,11 @@ function getEditedBody(editedMEvent) {
   return [parsedContent.body, isCustomHTML, newContent.formatted_body ?? null];
 }
 
-function findLinks(body) {
+function findLinks(body: string) {
   return find(body, 'url').filter((v, i, a) => a.findIndex((v2) => v2.href === v.href) === i);
 }
 
-function Message({
+export function Message({
   mEvent,
   isBodyOnly,
   roomTimeline,
@@ -793,12 +859,20 @@ function Message({
   if (focus) className.push('message--focus');
   const content = mEvent.getContent();
   const eventId = mEvent.getId();
-  const msgType = content?.msgtype;
+
   // make the message transparent while sending and red if it failed sending
   const [messageStatus, setMessageStatus] = useState(mEvent.status);
 
-  mEvent.once(MatrixEventEvent.Status, (e) => {
+  if (!eventId) {
+    // if the message doesn't have an id then there's nothing to do
+    console.warn('Message without id', mEvent);
+    return null;
+  }
+  const msgType = content?.msgtype;
+
+  mEvent.once(MatrixEventEvent.Status, (e: MatrixEvent) => {
     setMessageStatus(e.status);
+    console.log('Message status changed', e.status);
   });
 
   const senderId = mEvent.getSender();
@@ -823,7 +897,11 @@ function Message({
   const haveReactions = roomTimeline
     ? reactionTimeline.has(eventId) || !!mEvent.getServerAggregatedRelation('m.annotation')
     : false;
-  const isReply = !!mEvent.replyEventId;
+  const eventRelation = mEvent.getRelation();
+  const isReply =
+    !!mEvent.replyEventId &&
+    // don't render thread fallback replies
+    !(eventRelation?.rel_type === THREAD_RELATION_TYPE.name && eventRelation?.is_falling_back);
 
   if (isEdited) {
     const editedList = editedTimeline.get(eventId);
@@ -837,6 +915,9 @@ function Message({
   }
 
   if (typeof body !== 'string') body = '';
+
+  // don't show the thread summary if we're in a thread
+  const isThreadRoot = mEvent.isThreadRoot && roomTimeline?.thread === undefined;
 
   return (
     <div className={className.join(' ')}>
@@ -895,6 +976,7 @@ function Message({
         {roomTimeline && !isEdit && (
           <MessageOptions roomTimeline={roomTimeline} mEvent={mEvent} edit={edit} reply={reply} />
         )}
+        {isThreadRoot && <MessageThreadSummary thread={mEvent.thread} />}
       </div>
     </div>
   );
@@ -918,5 +1000,3 @@ Message.propTypes = {
   setEdit: PropTypes.func,
   cancelEdit: PropTypes.func,
 };
-
-export { Message, MessageReply, PlaceholderMessage };

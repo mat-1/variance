@@ -13,7 +13,7 @@ function Text({
 }: {
   className: string | null;
   style: React.CSSProperties | undefined;
-  variant: 'h1' | 'h2' | 's1' | 'b1' | 'b2' | 'b3';
+  variant: 'h1' | 'h2' | 's1' | 'b1' | 'b2' | 'b3' | 'b4';
   weight: 'light' | 'normal' | 'medium' | 'bold';
   primary: boolean;
   span: boolean;

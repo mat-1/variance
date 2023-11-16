@@ -45,13 +45,17 @@ export class InitMatrix extends EventEmitter {
     });
     await indexedDBStore.startup();
 
+    if (!secret.baseUrl) {
+      throw new Error('baseUrl must be set when calling startClient');
+    }
+
     this.matrixClient = sdk.createClient({
       baseUrl: secret.baseUrl,
-      accessToken: secret.accessToken,
-      userId: secret.userId,
+      accessToken: secret.accessToken ?? undefined,
+      userId: secret.userId ?? undefined,
       store: indexedDBStore,
       cryptoStore: new sdk.IndexedDBCryptoStore(global.indexedDB, 'crypto-store'),
-      deviceId: secret.deviceId,
+      deviceId: secret.deviceId ?? undefined,
       timelineSupport: true,
       cryptoCallbacks,
       verificationMethods: ['m.sas.v1'],
@@ -61,6 +65,7 @@ export class InitMatrix extends EventEmitter {
 
     await this.matrixClient.startClient({
       lazyLoadMembers: true,
+      threadSupport: true,
       // slidingSync: new SlidingSync(),
     });
     this.matrixClient.setGlobalErrorOnUnknownDevices(false);

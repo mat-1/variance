@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './RoomSelector.scss';
+import { NotificationCountType, type Thread } from 'matrix-js-sdk';
 
 import { twemojify } from '../../../util/twemojify';
 import { backgroundColorMXID } from '../../../util/colorMXID';
@@ -9,6 +10,17 @@ import Text from '../../atoms/text/Text';
 import Avatar from '../../atoms/avatar/Avatar';
 import NotificationBadge from '../../atoms/badge/NotificationBadge';
 import { blurOnBubbling } from '../../atoms/button/script';
+import { selectRoom } from '../../../client/action/navigation';
+
+interface RoomSelectorWrapperProps {
+  isSelected: boolean;
+  isMuted: boolean;
+  isUnread: boolean;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  content: React.ReactNode;
+  options: React.ReactNode;
+  onContextMenu: React.MouseEventHandler<HTMLButtonElement>;
+}
 
 function RoomSelectorWrapper({
   isSelected,
@@ -18,7 +30,7 @@ function RoomSelectorWrapper({
   content,
   options,
   onContextMenu,
-}) {
+}: RoomSelectorWrapperProps) {
   const classes = ['room-selector'];
   if (isMuted) classes.push('room-selector--muted');
   if (isUnread) classes.push('room-selector--unread');
@@ -54,6 +66,22 @@ RoomSelectorWrapper.propTypes = {
   onContextMenu: PropTypes.func,
 };
 
+interface RoomSelectorProps {
+  name: string;
+  parentName: string | null;
+  roomId: string;
+  imageSrc?: string;
+  iconSrc?: string;
+  isSelected: boolean;
+  isMuted: boolean;
+  isUnread: boolean;
+  notificationCount: string | number;
+  isAlert: boolean;
+  options: React.ReactNode;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  onContextMenu: React.MouseEventHandler<HTMLButtonElement>;
+}
+
 function RoomSelector({
   name,
   parentName,
@@ -68,7 +96,7 @@ function RoomSelector({
   options,
   onClick,
   onContextMenu,
-}) {
+}: RoomSelectorProps) {
   return (
     <RoomSelectorWrapper
       isSelected={isSelected}
@@ -133,3 +161,55 @@ RoomSelector.propTypes = {
 };
 
 export default RoomSelector;
+
+interface ThreadSelectorProps {
+  thread: Thread;
+  isSelected: boolean;
+  isMuted: boolean;
+}
+
+export function ThreadSelector({ thread, isSelected, isMuted }: ThreadSelectorProps) {
+  const { rootEvent } = thread;
+
+  const notificationCount = thread.room.getThreadUnreadNotificationCount(
+    thread.id,
+    NotificationCountType.Total,
+  );
+  const highlightNotificationCount = thread.room.getThreadUnreadNotificationCount(
+    thread.id,
+    NotificationCountType.Highlight,
+  );
+  const isUnread = !isMuted && notificationCount > 0;
+  const isAlert = highlightNotificationCount > 0;
+
+  const name = rootEvent?.getContent()?.body ?? 'Unknown thread';
+
+  const onClick = () => {
+    selectRoom(thread.roomId, undefined, thread.id);
+  };
+
+  return (
+    <RoomSelectorWrapper
+      isSelected={isSelected}
+      isMuted={isMuted}
+      isUnread={!isMuted && notificationCount > 0}
+      content={
+        <>
+          <div className="thread-selector__lines">{/* TODO */}</div>
+          <Text variant="b1" weight={isUnread ? 'medium' : 'normal'}>
+            {twemojify(name)}
+          </Text>
+          {isUnread && (
+            <NotificationBadge
+              alert={isAlert}
+              content={notificationCount > 0 ? notificationCount : null}
+            />
+          )}
+        </>
+      }
+      options={<div />}
+      onClick={onClick}
+      onContextMenu={() => {}}
+    />
+  );
+}

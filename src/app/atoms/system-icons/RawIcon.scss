@@ -26,3 +26,6 @@
 .ic-raw-extra-small {
   @include icSize(var(--ic-extra-small));
 }
+.ic-raw-ultra-small {
+  @include icSize(var(--ic-ultra-small));
+}

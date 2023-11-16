@@ -36,7 +36,7 @@ import TimelineScroll from './TimelineScroll';
 import EventLimit from './EventLimit';
 import RoomTimeline from '../../../client/state/RoomTimeline';
 
-const PAG_LIMIT = 30;
+const PAG_LIMIT = 50;
 const MAX_MSG_DIFF_MINUTES = 5;
 const PLACEHOLDER_COUNT = 2;
 const PLACEHOLDERS_HEIGHT = 96 * PLACEHOLDER_COUNT;
@@ -167,13 +167,13 @@ function renderEvent(
 
 function useTimeline(
   roomTimeline: RoomTimeline,
-  eventId: string,
+  eventId: string | null,
   readUptoEvtStore: Store<MatrixEvent>,
   eventLimitRef: React.MutableRefObject<EventLimit>,
 ) {
   const [timelineInfo, setTimelineInfo] = useState(null);
 
-  const setEventTimeline = async (eId: string) => {
+  const setEventTimeline = async (eId: string | null) => {
     if (typeof eId === 'string') {
       const isLoaded = await roomTimeline.loadEventTimeline(eId);
       if (isLoaded) return;
@@ -330,7 +330,12 @@ function useHandleScroll(
   return [handleScroll, handleScrollToLive];
 }
 
-function useEventArrive(roomTimeline, readUptoEvtStore, timelineScrollRef, eventLimitRef) {
+function useEventArrive(
+  roomTimeline: RoomTimeline,
+  readUptoEvtStore,
+  timelineScrollRef,
+  eventLimitRef,
+) {
   const myUserId = initMatrix.matrixClient.getUserId();
   const [newEvent, setEvent] = useState(null);
 
@@ -362,7 +367,7 @@ function useEventArrive(roomTimeline, readUptoEvtStore, timelineScrollRef, event
       }
     };
 
-    const handleEvent = (event) => {
+    const handleEvent = (event: MatrixEvent) => {
       const tLength = roomTimeline.timeline.length;
       const isViewingLive = roomTimeline.isServingLiveTimeline() && limit.length >= tLength - 1;
       const isAttached = timelineScroll.bottom < SCROLL_TRIGGER_POS;
@@ -406,13 +411,13 @@ function RoomViewContent({
   eventId,
   roomTimeline,
 }: {
-  eventId: string;
+  eventId: string | null;
   roomTimeline: RoomTimeline;
 }) {
   const [throttle] = useState(new Throttle());
 
   const timelineSVRef = useRef(null);
-  const timelineScrollRef = useRef(null);
+  const timelineScrollRef = useRef<TimelineScroll | null>(null);
   const eventLimitRef = useRef<EventLimit | null>(null);
   const [editEventId, setEditEventId] = useState(null);
   const cancelEdit = () => setEditEventId(null);

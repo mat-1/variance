@@ -12,6 +12,7 @@ import LogoUnreadSVG from '../../../public/res/svg/cinny-unread.svg';
 import LogoHighlightSVG from '../../../public/res/svg/cinny-highlight.svg';
 import { html, plain } from '../../util/markdown';
 import { RoomEvent } from 'matrix-js-sdk';
+import RoomList from './RoomList';
 
 function isNotifEvent(mEvent) {
   const eType = mEvent.getType();
@@ -33,7 +34,7 @@ function findMutedRule(overrideRules, roomId) {
 }
 
 class Notifications extends EventEmitter {
-  constructor(roomList) {
+  constructor(roomList: RoomList) {
     super();
 
     this.initialized = false;
@@ -89,7 +90,7 @@ class Notifications extends EventEmitter {
     return true;
   }
 
-  getNotiType(roomId) {
+  getNotiType(roomId: string) {
     const mx = this.matrixClient;
     let pushRule;
     try {
@@ -110,11 +111,11 @@ class Notifications extends EventEmitter {
     return cons.notifs.MENTIONS_AND_KEYWORDS;
   }
 
-  getNoti(roomId) {
+  getNoti(roomId: string) {
     return this.roomIdToNoti.get(roomId) || { total: 0, highlight: 0, from: null };
   }
 
-  getTotalNoti(roomId) {
+  getTotalNoti(roomId: string) {
     const { total } = this.getNoti(roomId);
     return total;
   }

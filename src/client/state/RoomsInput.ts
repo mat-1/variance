@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import encrypt from 'browser-encrypt-attachment';
 import { encode } from 'blurhash';
-import { EventTimeline, MatrixClient } from 'matrix-js-sdk';
+import { EventTimeline, MatrixClient, MatrixEvent } from 'matrix-js-sdk';
 import { getShortcodeToEmoji } from '../../app/organisms/emoji-board/custom-emoji';
 import { getBlobSafeMimeType } from '../../util/mimetypes';
 import { sanitizeText } from '../../util/sanitize';
@@ -101,6 +101,13 @@ function getVideoThumbnail(video, width, height, mimeType) {
   });
 }
 
+export interface ReplyTo {
+  userId: string;
+  eventId: string;
+  body: string;
+  formattedBody?: string;
+}
+
 class RoomsInput extends EventEmitter {
   private matrixClient: MatrixClient;
 
@@ -110,12 +117,7 @@ class RoomsInput extends EventEmitter {
     string,
     {
       message?: string;
-      replyTo?: {
-        userId: string;
-        eventId: string;
-        body: string;
-        formattedBody?: string;
-      };
+      replyTo?: ReplyTo;
       attachment?: {
         file: File;
         uploadingPromise?: Promise<{
@@ -145,11 +147,11 @@ class RoomsInput extends EventEmitter {
     }
   }
 
-  getInput(roomId) {
+  getInput(roomId: string) {
     return this.roomIdToInput.get(roomId) || {};
   }
 
-  setMessage(roomId: string, message) {
+  setMessage(roomId: string, message: string) {
     const input = this.getInput(roomId);
     input.message = message;
     this.roomIdToInput.set(roomId, input);
@@ -215,7 +217,7 @@ class RoomsInput extends EventEmitter {
     return this.roomIdToInput.get(roomId)?.isSending || false;
   }
 
-  getContent(roomId: string, options, message: string, reply, edit) {
+  getContent(roomId: string, options, message: string, reply?: ReplyTo, edit?: MatrixEvent) {
     const msgType = options?.msgType || 'm.text';
     const autoMarkdown = options?.autoMarkdown ?? true;
     const isHtml = options?.isHtml ?? false;
@@ -320,7 +322,7 @@ class RoomsInput extends EventEmitter {
     return content;
   }
 
-  async sendInput(roomId, options) {
+  async sendInput(roomId: string, threadId: string | undefined, options) {
     const input = this.getInput(roomId);
     input.isSending = true;
     this.roomIdToInput.set(roomId, input);
@@ -329,9 +331,10 @@ class RoomsInput extends EventEmitter {
       if (!this.isSending(roomId)) return;
     }
 
-    if (this.getMessage(roomId).trim() !== '') {
+    if (input.message) {
       const content = this.getContent(roomId, options, input.message, input.replyTo);
-      this.matrixClient.sendMessage(roomId, content);
+      if (threadId) this.matrixClient.sendMessage(roomId, threadId, content, undefined);
+      else this.matrixClient.sendMessage(roomId, content);
     }
 
     if (this.isSending(roomId)) this.roomIdToInput.delete(roomId);

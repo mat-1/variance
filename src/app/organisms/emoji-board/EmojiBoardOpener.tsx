@@ -36,7 +36,7 @@ function EmojiBoardOpener() {
     }
   }
 
-  function addEmoji(emoji) {
+  function addEmoji(emoji: string) {
     requestCallback(emoji);
   }
 

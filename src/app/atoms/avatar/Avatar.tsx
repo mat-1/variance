@@ -26,7 +26,7 @@ const Avatar = React.forwardRef(
       iconSrc?: string;
       iconColor?: string;
       imageSrc?: string;
-      size?: 'large' | 'normal' | 'small' | 'extra-small';
+      size?: 'large' | 'normal' | 'small' | 'extra-small' | 'ultra-small';
     },
     ref: React.Ref<HTMLDivElement>,
   ) => {
@@ -34,6 +34,7 @@ const Avatar = React.forwardRef(
     if (size === 'large') textSize = 'h1';
     if (size === 'small') textSize = 'b1';
     if (size === 'extra-small') textSize = 'b3';
+    if (size === 'ultra-small') textSize = 'b4';
 
     // matrix (or at least synapse) lets us replace .gif with .png in the url to make it static
     const pausedImageSrc = imageSrc?.replace(/\.gif\b/, '.png') ?? null;
@@ -111,7 +112,7 @@ Avatar.propTypes = {
   iconSrc: PropTypes.string,
   iconColor: PropTypes.string,
   imageSrc: PropTypes.string,
-  size: PropTypes.oneOf(['large', 'normal', 'small', 'extra-small']),
+  size: PropTypes.oneOf(['large', 'normal', 'small', 'extra-small', 'ultra-small']),
 };
 
 export default Avatar;

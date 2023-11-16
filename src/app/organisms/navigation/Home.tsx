@@ -95,21 +95,21 @@ function Home({ spaceId }) {
       )}
 
       {isCategorized &&
-        [...categories.keys()].sort(roomIdByAtoZ).map((catId) => {
-          const rms = [];
-          const dms = [];
-          categories.get(catId).forEach((id) => {
-            if (directs.has(id)) dms.push(id);
-            else rms.push(id);
+        [...categories.keys()].sort(roomIdByAtoZ).map((categoryId: string) => {
+          const roomsInCategory: string[] = [];
+          const DmsInCategory: string[] = [];
+          categories.get(categoryId).forEach((id: string) => {
+            if (directs.has(id)) DmsInCategory.push(id);
+            else roomsInCategory.push(id);
           });
-          rms.sort(roomIdByAtoZ);
-          dms.sort(roomIdByActivity);
+          roomsInCategory.sort(roomIdByAtoZ);
+          DmsInCategory.sort(roomIdByActivity);
           return (
             <RoomsCategory
-              key={catId}
-              spaceId={catId}
-              name={mx.getRoom(catId).name}
-              roomIds={rms.concat(dms)}
+              key={categoryId}
+              spaceId={categoryId}
+              name={mx.getRoom(categoryId).name}
+              roomIds={roomsInCategory.concat(DmsInCategory)}
               drawerPostie={drawerPostie}
             />
           );

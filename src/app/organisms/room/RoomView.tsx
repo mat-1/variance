@@ -12,13 +12,20 @@ import RoomViewContent from './RoomViewContent';
 import RoomViewFloating from './RoomViewFloating';
 import RoomViewInput from './RoomViewInput';
 import RoomViewCmdBar from './RoomViewCmdBar';
+import RoomTimeline from '../../../client/state/RoomTimeline';
 
 const viewEvent = new EventEmitter();
 
-function RoomView({ roomTimeline, eventId }) {
+function RoomView({
+  roomTimeline,
+  eventId,
+}: {
+  roomTimeline: RoomTimeline;
+  eventId: string | null;
+}) {
   const roomViewRef = useRef(null);
   // eslint-disable-next-line react/prop-types
-  const { roomId } = roomTimeline;
+  const { roomId, threadId } = roomTimeline;
 
   useEffect(() => {
     const settingsToggle = (isVisible) => {
@@ -48,7 +55,12 @@ function RoomView({ roomTimeline, eventId }) {
           <RoomViewFloating roomId={roomId} roomTimeline={roomTimeline} />
         </div>
         <div className="room-view__sticky">
-          <RoomViewInput roomId={roomId} roomTimeline={roomTimeline} viewEvent={viewEvent} />
+          <RoomViewInput
+            roomId={roomId}
+            threadId={threadId}
+            roomTimeline={roomTimeline}
+            viewEvent={viewEvent}
+          />
           <RoomViewCmdBar roomId={roomId} roomTimeline={roomTimeline} viewEvent={viewEvent} />
         </div>
       </div>

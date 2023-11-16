@@ -22,7 +22,17 @@ import HorizontalMenuIC from '../../../../public/res/ic/outlined/horizontal-menu
 import ChevronBottomIC from '../../../../public/res/ic/outlined/chevron-bottom.svg';
 import ChevronRightIC from '../../../../public/res/ic/outlined/chevron-right.svg';
 
-function RoomsCategory({ spaceId, name, hideHeader, roomIds, drawerPostie }) {
+interface RoomsCategoryProps {
+  spaceId?: string;
+  name: string;
+  hideHeader?: boolean;
+  roomIds: string[];
+  drawerPostie: {
+    subscribe: (channel: string, key: string, callback: () => void) => () => void;
+  };
+}
+
+function RoomsCategory({ spaceId, name, hideHeader, roomIds, drawerPostie }: RoomsCategoryProps) {
   const { spaces, directs } = initMatrix.roomList;
   const [isOpen, setIsOpen] = useState(true);
 
@@ -40,7 +50,7 @@ function RoomsCategory({ spaceId, name, hideHeader, roomIds, drawerPostie }) {
     ));
   };
 
-  const renderSelector = (roomId) => {
+  const renderSelector = (roomId: string) => {
     const isSpace = spaces.has(roomId);
     const isDM = directs.has(roomId);
 

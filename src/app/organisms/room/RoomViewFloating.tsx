@@ -18,7 +18,7 @@ import { getUsersActionJsx } from './common';
 import RoomTimeline from '../../../client/state/RoomTimeline';
 
 function useJumpToEvent(roomTimeline: RoomTimeline): [boolean, () => void, () => void] {
-  const [eventId, setEventId] = useState<null | string>(null);
+  const [eventId, setEventId] = useState<string | null>(null);
 
   const jumpToEvent = () => {
     if (eventId !== null) {
