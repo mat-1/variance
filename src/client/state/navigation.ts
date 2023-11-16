@@ -14,6 +14,8 @@ class Navigation extends EventEmitter {
 
   selectedRoomId: string | null;
 
+  selectedThreadId: string | null;
+
   isRoomSettings: boolean;
 
   recentRooms: string[];
@@ -32,6 +34,7 @@ class Navigation extends EventEmitter {
     this.selectedSpacePath = [cons.tabs.HOME];
 
     this.selectedRoomId = null;
+    this.selectedThreadId = null;
     this.isRoomSettings = false;
     this.recentRooms = [];
 
@@ -92,6 +95,7 @@ class Navigation extends EventEmitter {
   _selectRoom(roomId: string, eventId?: string, threadId?: string) {
     const prevSelectedRoomId = this.selectedRoomId;
     this.selectedRoomId = roomId;
+    this.selectedThreadId = threadId ?? null;
     if (prevSelectedRoomId !== roomId) this._mapRoomToSpace(roomId);
     this.removeRecentRoom(prevSelectedRoomId);
     this.addRecentRoom(prevSelectedRoomId);

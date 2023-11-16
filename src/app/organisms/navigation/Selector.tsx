@@ -79,7 +79,7 @@ function Selector({ roomId, isDM, drawerPostie, onClick }: SelectorProps) {
             ? null
             : joinRuleToIconSrc(room.getJoinRule(), room.isSpaceRoom())
         }
-        isSelected={navigation.selectedRoomId === roomId}
+        isSelected={navigation.selectedRoomId === roomId && navigation.selectedThreadId === null}
         isMuted={isMuted}
         isUnread={!isMuted && noti.hasNoti(roomId)}
         notificationCount={abbreviateNumber(noti.getTotalNoti(roomId))}
@@ -100,7 +100,7 @@ function Selector({ roomId, isDM, drawerPostie, onClick }: SelectorProps) {
         <ThreadSelector
           thread={thread}
           isMuted={isMuted}
-          isSelected={navigation.selectedRoomId === thread.id}
+          isSelected={navigation.selectedThreadId === thread.id}
         />
       ))}
     </>

@@ -10,6 +10,7 @@ import {
   RoomEvent,
   RoomMember,
   RoomMemberEvent,
+  Thread,
 } from 'matrix-js-sdk';
 import initMatrix from '../initMatrix';
 import cons from './cons';
@@ -113,6 +114,8 @@ class RoomTimeline extends EventEmitter {
 
   room: Room;
 
+  thread?: Thread;
+
   liveTimeline: EventTimeline;
 
   activeTimeline: EventTimeline;
@@ -156,6 +159,7 @@ class RoomTimeline extends EventEmitter {
     roomTimeline.liveTimeline = thread.liveTimeline;
     roomTimeline.activeTimeline = thread.liveTimeline;
     roomTimeline.threadId = threadId;
+    roomTimeline.thread = thread;
 
     return roomTimeline;
   }
@@ -291,15 +295,17 @@ class RoomTimeline extends EventEmitter {
     return Promise.allSettled(decryptionPromises);
   }
 
-  hasEventInTimeline(eventId: string, timeline = this.activeTimeline) {
+  hasEventInTimeline(eventId: string, timeline?: EventTimeline) {
+    const activeTimeline = timeline ?? this.activeTimeline;
+
     const timelineSet = this.getUnfilteredTimelineSet();
     const eventTimeline = timelineSet.getTimelineForEvent(eventId);
     if (!eventTimeline) return false;
-    return isTimelineLinked(eventTimeline, timeline);
+    return isTimelineLinked(eventTimeline, activeTimeline);
   }
 
   getUnfilteredTimelineSet() {
-    return this.room.getUnfilteredTimelineSet();
+    return this.thread?.getUnfilteredTimelineSet() ?? this.room.getUnfilteredTimelineSet();
   }
 
   getEventReaders(mEvent: MatrixEvent) {
@@ -356,10 +362,12 @@ class RoomTimeline extends EventEmitter {
 
   getReadUpToEventId() {
     const userId = this.matrixClient.getUserId();
-    return userId ? this.room.getEventReadUpTo(userId) : null;
+    if (!userId) return null;
+
+    return this.thread?.getEventReadUpTo(userId) ?? this.room.getEventReadUpTo(userId);
   }
 
-  getEventIndex(eventId) {
+  getEventIndex(eventId: string) {
     return this.timeline.findIndex((mEvent) => mEvent.getId() === eventId);
   }
 

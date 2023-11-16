@@ -667,7 +667,6 @@ const MessageOptions = React.memo(
 );
 
 const MessageThreadSummary = React.memo(({ thread }: { thread: Thread }) => {
-  const threadId = thread.length;
   const lastReply = thread.lastReply();
 
   // aaaaaaaaaaaaaa
@@ -678,7 +677,6 @@ const MessageThreadSummary = React.memo(({ thread }: { thread: Thread }) => {
     undefined;
 
   function selectThread() {
-    console.log('selectThread', thread.roomId, thread.rootEvent?.getId());
     selectRoom(thread.roomId, undefined, thread.rootEvent?.getId());
   }
 
@@ -686,7 +684,7 @@ const MessageThreadSummary = React.memo(({ thread }: { thread: Thread }) => {
     <button className="message__threadSummary" onClick={selectThread} type="button">
       <div className="message__threadSummary-count">
         <Text>
-          {thread.length} message{threadId > 1 ? 's' : ''} ›
+          {thread.length} message{thread.length > 1 ? 's' : ''} ›
         </Text>
       </div>
       <div className="message__threadSummary-lastReply">
@@ -856,7 +854,7 @@ export function Message({
   if (!eventId) {
     // if the message doesn't have an id then there's nothing to do
     console.warn('Message without id', mEvent);
-    return;
+    return null;
   }
   const msgType = content?.msgtype;
   // make the message transparent while sending and red if it failed sending
@@ -906,6 +904,9 @@ export function Message({
   }
 
   if (typeof body !== 'string') body = '';
+
+  // don't show the thread summary if we're in a thread
+  const isThreadRoot = mEvent.isThreadRoot && roomTimeline?.thread === undefined;
 
   return (
     <div className={className.join(' ')}>
@@ -964,7 +965,7 @@ export function Message({
         {roomTimeline && !isEdit && (
           <MessageOptions roomTimeline={roomTimeline} mEvent={mEvent} edit={edit} reply={reply} />
         )}
-        {mEvent.isThreadRoot && <MessageThreadSummary thread={mEvent.thread} />}
+        {isThreadRoot && <MessageThreadSummary thread={mEvent.thread} />}
       </div>
     </div>
   );
