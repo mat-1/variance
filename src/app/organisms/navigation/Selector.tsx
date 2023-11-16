@@ -65,7 +65,9 @@ function Selector({ roomId, isDM, drawerPostie, onClick }: SelectorProps) {
     );
   };
 
-  const openThreads = room.getThreads();
+  const openThreads = room
+    .getThreads()
+    .filter((thread) => thread.id === navigation.selectedThreadId);
 
   return (
     <>

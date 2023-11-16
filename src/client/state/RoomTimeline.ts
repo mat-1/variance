@@ -412,7 +412,7 @@ class RoomTimeline extends EventEmitter {
       removed: boolean,
       data: IRoomTimelineData,
     ) => {
-      if (room.roomId !== this.roomId) return;
+      if (room.roomId !== this.roomId || event.threadRootId !== this.threadId) return;
       if (this.isOngoingPagination) return;
 
       // User is currently viewing the old events probably

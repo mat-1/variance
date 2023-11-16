@@ -4,7 +4,13 @@ import PropTypes from 'prop-types';
 import './Message.scss';
 
 import { find } from 'linkifyjs';
-import { MatrixEvent, MatrixEventEvent, THREAD_RELATION_TYPE, Thread } from 'matrix-js-sdk';
+import {
+  MatrixEvent,
+  MatrixEventEvent,
+  RoomEvent,
+  THREAD_RELATION_TYPE,
+  Thread,
+} from 'matrix-js-sdk';
 import { twemojify } from '../../../util/twemojify';
 
 import initMatrix from '../../../client/initMatrix';
@@ -667,9 +673,7 @@ const MessageOptions = React.memo(
 );
 
 const MessageThreadSummary = React.memo(({ thread }: { thread: Thread }) => {
-  const lastReply = thread.lastReply();
-
-  // aaaaaaaaaaaaaa
+  const [lastReply, setLastReply] = useState(thread.lastReply());
 
   const lastSender = lastReply?.sender;
   const lastSenderAvatarSrc =
@@ -679,6 +683,10 @@ const MessageThreadSummary = React.memo(({ thread }: { thread: Thread }) => {
   function selectThread() {
     selectRoom(thread.roomId, undefined, thread.rootEvent?.getId());
   }
+
+  thread.on(RoomEvent.Timeline, () => {
+    setLastReply(thread.lastReply());
+  });
 
   return (
     <button className="message__threadSummary" onClick={selectThread} type="button">
@@ -851,17 +859,20 @@ export function Message({
   if (focus) className.push('message--focus');
   const content = mEvent.getContent();
   const eventId = mEvent.getId();
+
+  // make the message transparent while sending and red if it failed sending
+  const [messageStatus, setMessageStatus] = useState(mEvent.status);
+
   if (!eventId) {
     // if the message doesn't have an id then there's nothing to do
     console.warn('Message without id', mEvent);
     return null;
   }
   const msgType = content?.msgtype;
-  // make the message transparent while sending and red if it failed sending
-  const [messageStatus, setMessageStatus] = useState(mEvent.status);
 
-  mEvent.once(MatrixEventEvent.Status, (e) => {
+  mEvent.once(MatrixEventEvent.Status, (e: MatrixEvent) => {
     setMessageStatus(e.status);
+    console.log('Message status changed', e.status);
   });
 
   const senderId = mEvent.getSender();

@@ -512,9 +512,15 @@
     color: var(--tc-surface-high);
   }
 
+  &-lastReply-body {
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: fit-content;
+  }
   &-lastReply-body span {
     color: var(--tc-surface-low);
   }
+
   &-lastReply {
     display: flex;
     align-items: center;
@@ -523,6 +529,7 @@
     .avatar-container {
       // move it sliiiightly down
       margin-top: 2px;
+      flex-shrink: 0;
     }
   }
 }
