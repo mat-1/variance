@@ -1,7 +1,29 @@
 import { getScrollInfo } from '../../../util/common';
 
 class TimelineScroll {
-  constructor(target) {
+  scroll: HTMLElement;
+
+  backwards: boolean;
+
+  inTopHalf: boolean;
+
+  isScrollable: boolean;
+
+  top: number;
+
+  bottom: number;
+
+  height: number;
+
+  viewHeight: number;
+
+  topMsg: HTMLElement | null;
+
+  bottomMsg: HTMLElement | null;
+
+  diff: number;
+
+  constructor(target: HTMLElement | null) {
     if (target === null) {
       throw new Error('Can not initialize TimelineScroll, target HTMLElement in null');
     }

@@ -17,14 +17,12 @@ import PeopleDrawer from './PeopleDrawer';
 interface RoomInfo {
   roomTimeline: RoomTimeline | null;
   eventId: string | null;
-  thread: Thread | null;
 }
 
 function Room() {
   const [roomInfo, setRoomInfo] = useState<RoomInfo>({
     roomTimeline: null,
     eventId: null,
-    thread: null,
   });
   const [isDrawer, setIsDrawer] = useState(settings.isPeopleDrawer);
 
@@ -44,14 +42,12 @@ function Room() {
         setRoomInfo({
           roomTimeline,
           eventId: eventId ?? null,
-          thread: null,
         });
       } else {
         // TODO: add ability to join room if roomId is invalid
         setRoomInfo({
           roomTimeline: null,
           eventId: null,
-          thread: null,
         });
       }
     };
@@ -70,7 +66,7 @@ function Room() {
     };
   }, []);
 
-  const { roomTimeline, eventId, thread } = roomInfo;
+  const { roomTimeline, eventId } = roomInfo;
   if (roomTimeline === null) {
     setTimeout(() => openNavigation());
     return <Welcome />;

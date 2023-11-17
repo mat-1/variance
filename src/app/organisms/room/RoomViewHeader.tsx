@@ -33,22 +33,16 @@ import BackArrowIC from '../../../../public/res/ic/outlined/chevron-left.svg';
 
 import { useForceUpdate } from '../../hooks/useForceUpdate';
 
-function RoomViewHeader({ roomId }) {
+function RoomViewHeader({ roomId, threadId }: { roomId: string; threadId?: string }) {
   const [, forceUpdate] = useForceUpdate();
   const mx = initMatrix.matrixClient;
   const isDM = initMatrix.roomList.directs.has(roomId);
-  const room = mx.getRoom(roomId);
-  let avatarSrc = room.getAvatarUrl(mx.baseUrl, 36, 36, 'crop');
-  avatarSrc = isDM
-    ? room.getAvatarFallbackMember()?.getAvatarUrl(mx.baseUrl, 36, 36, 'crop')
-    : avatarSrc;
-  const roomName = room.name;
 
   const roomHeaderBtnRef = useRef(null);
   useEffect(() => {
-    const settingsToggle = (isVisibile) => {
+    const settingsToggle = (isVisible: boolean) => {
       const rawIcon = roomHeaderBtnRef.current.lastElementChild;
-      rawIcon.style.transform = isVisibile ? 'rotateX(180deg)' : 'rotateX(0deg)';
+      rawIcon.style.transform = isVisible ? 'rotateX(180deg)' : 'rotateX(0deg)';
     };
     navigation.on(cons.events.navigation.ROOM_SETTINGS_TOGGLED, settingsToggle);
     return () => {
@@ -58,7 +52,7 @@ function RoomViewHeader({ roomId }) {
 
   useEffect(() => {
     const { roomList } = initMatrix;
-    const handleProfileUpdate = (rId) => {
+    const handleProfileUpdate = (rId: string) => {
       if (roomId !== rId) return;
       forceUpdate();
     };
@@ -68,6 +62,21 @@ function RoomViewHeader({ roomId }) {
       roomList.removeListener(cons.events.roomList.ROOM_PROFILE_UPDATED, handleProfileUpdate);
     };
   }, [roomId]);
+
+  const room = mx.getRoom(roomId);
+  if (!room) {
+    console.warn(`RoomViewHeader: Room ${roomId} not found`);
+    return null;
+  }
+
+  const thread = threadId ? room.getThread(threadId) : null;
+
+  const roomName = room.name;
+
+  let avatarSrc = room.getAvatarUrl(mx.baseUrl, 36, 36, 'crop');
+  avatarSrc = isDM
+    ? room.getAvatarFallbackMember()?.getAvatarUrl(mx.baseUrl, 36, 36, 'crop')
+    : avatarSrc;
 
   const openRoomOptions = (e) => {
     openReusableContextMenu('bottom', getEventCords(e, '.ic-btn'), (closeMenu) => (

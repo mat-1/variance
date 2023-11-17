@@ -17,6 +17,7 @@ import { Message } from '../message/Message';
 import SearchIC from '../../../../public/res/ic/outlined/search.svg';
 
 import { useStore } from '../../hooks/useStore';
+import { MatrixEvent } from 'matrix-js-sdk';
 
 const roomIdToBackup = new Map();
 
@@ -120,7 +121,7 @@ function RoomSearch({ roomId }) {
     search(term);
   };
 
-  const renderTimeline = (timeline) => (
+  const renderTimeline = (timeline: MatrixEvent[]) => (
     <div className="room-search__result-item" key={timeline[0].getId()}>
       {timeline.map((mEvent) => {
         const id = mEvent.getId();

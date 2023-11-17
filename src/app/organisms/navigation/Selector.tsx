@@ -100,6 +100,7 @@ function Selector({ roomId, isDM, drawerPostie, onClick }: SelectorProps) {
       />
       {openThreads.map((thread) => (
         <ThreadSelector
+          key={thread.id}
           thread={thread}
           isMuted={isMuted}
           isSelected={navigation.selectedThreadId === thread.id}

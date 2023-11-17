@@ -54,11 +54,23 @@ function loadingMsgPlaceholders(key: string, count: number = 2) {
   return <React.Fragment key={`placeholder-container${key}`}>{genPlaceholders()}</React.Fragment>;
 }
 
-function RoomIntroContainer({ event, timeline }) {
+function RoomIntroContainer({
+  event,
+  timeline,
+}: {
+  event: MatrixEvent | null;
+  timeline: RoomTimeline;
+}) {
   const [, nameForceUpdate] = useForceUpdate();
   const mx = initMatrix.matrixClient;
   const { roomList } = initMatrix;
-  const { room } = timeline;
+  const { room, thread } = timeline;
+
+  // threads don't have a header
+  if (thread !== undefined) {
+    return null;
+  }
+
   const roomTopic = room.currentState.getStateEvents('m.room.topic')[0]?.getContent().topic;
   const isDM = roomList.directs.has(timeline.roomId);
   let avatarSrc = room.getAvatarUrl(mx.baseUrl, 80, 80, 'crop');
@@ -288,12 +300,12 @@ function usePaginate(
 }
 
 function useHandleScroll(
-  roomTimeline,
-  autoPaginate,
-  readUptoEvtStore,
-  forceUpdateLimit,
-  timelineScrollRef,
-  eventLimitRef,
+  roomTimeline: RoomTimeline,
+  autoPaginate: () => void,
+  readUptoEvtStore: Store<MatrixEvent>,
+  forceUpdateLimit: () => void,
+  timelineScrollRef: React.MutableRefObject<TimelineScroll>,
+  eventLimitRef: React.MutableRefObject<EventLimit>,
 ) {
   const handleScroll = useCallback(() => {
     const timelineScroll = timelineScrollRef.current;

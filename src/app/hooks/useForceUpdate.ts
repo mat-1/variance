@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import { useState } from 'react';
 
-export function useForceUpdate() {
-  const [data, setData] = useState(null);
+export function useForceUpdate(): [null | Record<string, never>, () => void] {
+  const [data, setData] = useState<null | Record<string, never>>(null);
 
   return [
     data,

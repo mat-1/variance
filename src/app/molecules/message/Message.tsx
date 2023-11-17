@@ -55,6 +55,7 @@ import PencilIC from '../../../../public/res/ic/outlined/pencil.svg';
 import TickMarkIC from '../../../../public/res/ic/outlined/tick-mark.svg';
 import CmdIC from '../../../../public/res/ic/outlined/cmd.svg';
 import BinIC from '../../../../public/res/ic/outlined/bin.svg';
+import HashPlusIC from '../../../../public/res/ic/outlined/hash-plus.svg';
 
 import { confirmDialog } from '../confirm-dialog/ConfirmDialog';
 import { getBlobSafeMimeType } from '../../../util/mimetypes';
@@ -566,18 +567,28 @@ MessageReactionGroup.propTypes = {
   mEvent: PropTypes.shape({}).isRequired,
 };
 
-function isMedia(mE) {
+function isMedia(mEvent: MatrixEvent) {
   return (
-    mE.getContent()?.msgtype === 'm.file' ||
-    mE.getContent()?.msgtype === 'm.image' ||
-    mE.getContent()?.msgtype === 'm.audio' ||
-    mE.getContent()?.msgtype === 'm.video' ||
-    mE.getType() === 'm.sticker'
+    mEvent.getContent()?.msgtype === 'm.file' ||
+    mEvent.getContent()?.msgtype === 'm.image' ||
+    mEvent.getContent()?.msgtype === 'm.audio' ||
+    mEvent.getContent()?.msgtype === 'm.video' ||
+    mEvent.getType() === 'm.sticker'
+  );
+}
+
+function shouldShowThreadSummary(mEvent: MatrixEvent, roomTimeline: RoomTimeline) {
+  return (
+    mEvent.isThreadRoot &&
+    // there must be events in the threadW
+    (mEvent.getThread()?.length ?? 0) > 0 &&
+    // don't show the thread summary if we're in a thread
+    roomTimeline.thread === undefined
   );
 }
 
 // if editedTimeline has mEventId then pass editedMEvent else pass mEvent to openViewSource
-function handleOpenViewSource(mEvent, roomTimeline) {
+function handleOpenViewSource(mEvent: MatrixEvent, roomTimeline: RoomTimeline) {
   const eventId = mEvent.getId();
   const { editedTimeline } = roomTimeline ?? {};
   let editedMEvent;
@@ -603,22 +614,52 @@ const MessageOptions = React.memo(
     const { roomId, room } = roomTimeline;
     const mx = initMatrix.matrixClient;
     const senderId = mEvent.getSender();
+    const eventId = mEvent.getId();
+    if (!eventId) {
+      console.warn('Message without id', mEvent);
+      return null;
+    }
 
-    const myPowerlevel = room.getMember(mx.getUserId())?.powerLevel;
+    const myUserId = mx.getUserId();
+    if (!myUserId) {
+      console.warn('No user id in MessageOptions, this should not be possible');
+      return null;
+    }
+
+    const myPowerlevel = room.getMember(myUserId)?.powerLevel;
     const canIRedact = room.currentState.hasSufficientPowerLevelFor('redact', myPowerlevel);
-    const canSendReaction = room.currentState.maySendEvent('m.reaction', mx.getUserId());
+    const canSendReaction = room.currentState.maySendEvent('m.reaction', myUserId);
+    const canCreateThread =
+      room.currentState.maySendEvent('m.thread', myUserId) &&
+      // this message is already a thread
+      !shouldShowThreadSummary(mEvent, roomTimeline) &&
+      // can't create threads in threads
+      roomTimeline.thread === undefined;
+
+    const createThread = () => {
+      room.createThread(eventId, mEvent, [mEvent], true);
+      selectRoom(roomId, eventId, eventId);
+    };
 
     return (
       <div className="message__options">
         {canSendReaction && (
           <IconButton
-            onClick={(e) => pickEmoji(e, roomId, mEvent.getId(), roomTimeline)}
+            onClick={(e) => pickEmoji(e, roomId, eventId, roomTimeline)}
             src={EmojiAddIC}
             size="extra-small"
             tooltip="Add reaction"
           />
         )}
         <IconButton onClick={() => reply()} src={ReplyArrowIC} size="extra-small" tooltip="Reply" />
+        {canCreateThread && (
+          <IconButton
+            onClick={() => createThread()}
+            src={HashPlusIC}
+            size="extra-small"
+            tooltip="Create Thread"
+          />
+        )}
         {senderId === mx.getUserId() && !isMedia(mEvent) && (
           <IconButton onClick={() => edit(true)} src={PencilIC} size="extra-small" tooltip="Edit" />
         )}
@@ -649,7 +690,7 @@ const MessageOptions = React.memo(
                         'danger',
                       );
                       if (!isConfirmed) return;
-                      redactEvent(roomId, mEvent.getId());
+                      redactEvent(roomId, eventId);
                     }}
                   >
                     Delete
@@ -674,6 +715,9 @@ const MessageOptions = React.memo(
 
 const MessageThreadSummary = React.memo(({ thread }: { thread: Thread }) => {
   const [lastReply, setLastReply] = useState(thread.lastReply());
+
+  // can't have empty threads
+  if (thread.length === 0) return null;
 
   const lastSender = lastReply?.sender;
   const lastSenderAvatarSrc =
@@ -916,9 +960,6 @@ export function Message({
 
   if (typeof body !== 'string') body = '';
 
-  // don't show the thread summary if we're in a thread
-  const isThreadRoot = mEvent.isThreadRoot && roomTimeline?.thread === undefined;
-
   return (
     <div className={className.join(' ')}>
       {isBodyOnly ? (
@@ -976,7 +1017,9 @@ export function Message({
         {roomTimeline && !isEdit && (
           <MessageOptions roomTimeline={roomTimeline} mEvent={mEvent} edit={edit} reply={reply} />
         )}
-        {isThreadRoot && <MessageThreadSummary thread={mEvent.thread} />}
+        {roomTimeline && shouldShowThreadSummary(mEvent, roomTimeline) && (
+          <MessageThreadSummary thread={mEvent.thread} />
+        )}
       </div>
     </div>
   );
