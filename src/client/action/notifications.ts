@@ -1,20 +1,25 @@
+import { ReceiptType } from 'matrix-js-sdk';
 import initMatrix from '../initMatrix';
 import settings from '../state/settings';
 
-const ReceiptType = {
-  Read: 'm.read',
-  ReadPrivate: 'm.read.private',
-};
-
 // eslint-disable-next-line import/prefer-default-export
-export async function markAsRead(roomId) {
+export async function markAsRead(roomId: string, threadId?: string) {
   const mx = initMatrix.matrixClient;
   const room = mx.getRoom(roomId);
   if (!room) return;
+
+  const thread = threadId ? room.getThread(threadId) : null;
+
   initMatrix.notifications.deleteNoti(roomId);
 
+  const userId = mx.getUserId();
+  if (!userId) {
+    console.warn('Tried to markAsRead without a userId');
+    return;
+  }
+
   const timeline = room.getLiveTimeline().getEvents();
-  const readEventId = room.getEventReadUpTo(mx.getUserId());
+  const readEventId = room.getEventReadUpTo(userId);
 
   const getLatestValidEvent = () => {
     for (let i = timeline.length - 1; i >= 0; i -= 1) {

@@ -31,8 +31,8 @@ function ShortcutSpacesContent() {
     .filter((spaceId) => !spaceShortcut.includes(spaceId))
     .sort(roomIdByAtoZ);
 
-  const [process, setProcess] = useState(null);
-  const [selected, setSelected] = useState([]);
+  const [process, setProcess] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
 
   useEffect(() => {
     if (process !== null) {
@@ -41,7 +41,7 @@ function ShortcutSpacesContent() {
     }
   }, [spaceShortcut]);
 
-  const toggleSelection = (sId) => {
+  const toggleSelection = (sId: string) => {
     if (process !== null) return;
     const newSelected = [...selected];
     const selectedIndex = newSelected.indexOf(sId);
@@ -60,7 +60,7 @@ function ShortcutSpacesContent() {
     createSpaceShortcut(selected);
   };
 
-  const renderSpace = (spaceId, isShortcut) => {
+  const renderSpace = (spaceId: string, isShortcut: boolean) => {
     const room = mx.getRoom(spaceId);
     if (!room) return null;
 
@@ -73,13 +73,16 @@ function ShortcutSpacesContent() {
     const toggleSelected = () => toggleSelection(spaceId);
     const deleteShortcut = () => deleteSpaceShortcut(spaceId);
 
+    let imageSrc = room.getAvatarFallbackMember()?.getAvatarUrl(mx.baseUrl, 24, 24, 'crop') || null;
+    if (imageSrc === null) imageSrc = room.getAvatarUrl(mx.baseUrl, 24, 24, 'crop') || null;
+
     return (
       <RoomSelector
         key={spaceId}
         name={room.name}
         parentName={parents}
         roomId={spaceId}
-        imageSrc={null}
+        imageSrc={imageSrc}
         iconSrc={joinRuleToIconSrc(room.getJoinRule(), true)}
         isUnread={false}
         notificationCount={0}

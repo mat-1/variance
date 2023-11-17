@@ -251,7 +251,7 @@ const MessageBody = React.memo(
     isCustomHTML?: boolean;
     isEdited?: boolean;
     msgType?: string;
-    messageStatus?: string;
+    messageStatus: string | null;
   }) => {
     // if body is not string it is a React element.
     if (typeof body !== 'string') return <div className="message__body">{body}</div>;
@@ -907,11 +907,6 @@ export function Message({
   // make the message transparent while sending and red if it failed sending
   const [messageStatus, setMessageStatus] = useState(mEvent.status);
 
-  if (!eventId) {
-    // if the message doesn't have an id then there's nothing to do
-    console.warn('Message without id', mEvent);
-    return null;
-  }
   const msgType = content?.msgtype;
 
   mEvent.once(MatrixEventEvent.Status, (e: MatrixEvent) => {
@@ -929,16 +924,22 @@ export function Message({
   let customHTML = isCustomHTML ? content.formatted_body : null;
 
   const edit = useCallback(() => {
-    setEdit(eventId);
+    if (eventId && setEdit) setEdit(eventId);
   }, [setEdit, eventId]);
   const reply = useCallback(() => {
-    replyTo(senderId, mEvent.getId(), body, customHTML);
-  }, [body, customHTML, mEvent, senderId]);
+    if (eventId && senderId) replyTo(senderId, eventId, body, customHTML);
+  }, [body, customHTML, eventId, senderId]);
+
+  if (!eventId) {
+    // if the message doesn't have an id then there's nothing to do
+    console.warn('Message without id', mEvent);
+    return null;
+  }
 
   if (msgType === 'm.emote') className.push('message--type-emote');
 
-  const isEdited = roomTimeline ? editedTimeline.has(eventId) : false;
-  const haveReactions = roomTimeline
+  const isEdited = editedTimeline ? editedTimeline.has(eventId) : false;
+  const haveReactions = reactionTimeline
     ? reactionTimeline.has(eventId) || !!mEvent.getServerAggregatedRelation('m.annotation')
     : false;
   const eventRelation = mEvent.getRelation();

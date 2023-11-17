@@ -120,21 +120,21 @@ class Notifications extends EventEmitter {
     return total;
   }
 
-  getHighlightNoti(roomId) {
+  getHighlightNoti(roomId: string) {
     const { highlight } = this.getNoti(roomId);
     return highlight;
   }
 
-  getFromNoti(roomId) {
+  getFromNoti(roomId: string) {
     const { from } = this.getNoti(roomId);
     return from;
   }
 
-  hasNoti(roomId) {
+  hasNoti(roomId: string) {
     return this.roomIdToNoti.has(roomId);
   }
 
-  deleteNoti(roomId) {
+  deleteNoti(roomId: string) {
     if (this.hasNoti(roomId)) {
       const noti = this.getNoti(roomId);
       this._deleteNoti(roomId, noti.total, noti.highlight);

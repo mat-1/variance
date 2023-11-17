@@ -75,7 +75,7 @@ function RoomsCategory({ spaceId, name, hideHeader, roomIds, drawerPostie }: Roo
             type="button"
           >
             <RawIcon src={isOpen ? ChevronBottomIC : ChevronRightIC} size="extra-small" />
-            <Text className="cat-header" variant="b3" weight="medium">
+            <Text variant="b3" weight="medium">
               {name}
             </Text>
           </button>

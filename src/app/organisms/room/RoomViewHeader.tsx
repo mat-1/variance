@@ -69,8 +69,6 @@ function RoomViewHeader({ roomId, threadId }: { roomId: string; threadId?: strin
     return null;
   }
 
-  const thread = threadId ? room.getThread(threadId) : null;
-
   const roomName = room.name;
 
   let avatarSrc = room.getAvatarUrl(mx.baseUrl, 36, 36, 'crop');
@@ -112,7 +110,7 @@ function RoomViewHeader({ roomId, threadId }: { roomId: string; threadId?: strin
         </TitleWrapper>
         <RawIcon src={ChevronBottomIC} />
       </button>
-      {mx.isRoomEncrypted(roomId) === false && (
+      {!mx.isRoomEncrypted(roomId) && (
         <IconButton
           onClick={() => toggleRoomSettings(tabText.SEARCH)}
           tooltip="Search"

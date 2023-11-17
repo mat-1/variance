@@ -35,6 +35,15 @@ function Selector({ roomId, isDM, drawerPostie, onClick }: SelectorProps) {
 
   const [, forceUpdate] = useForceUpdate();
 
+  useEffect(() => {
+    const unSub1 = drawerPostie.subscribe('selector-change', roomId, forceUpdate);
+    const unSub2 = drawerPostie.subscribe('unread-change', roomId, forceUpdate);
+    return () => {
+      unSub1();
+      unSub2();
+    };
+  }, []);
+
   if (!room) {
     console.warn(`Selector: Room ${roomId} not found`);
     return null;
@@ -44,15 +53,6 @@ function Selector({ roomId, isDM, drawerPostie, onClick }: SelectorProps) {
   if (imageSrc === null) imageSrc = room.getAvatarUrl(mx.baseUrl, 24, 24, 'crop') || null;
 
   const isMuted = noti.getNotiType(roomId) === cons.notifs.MUTE;
-
-  useEffect(() => {
-    const unSub1 = drawerPostie.subscribe('selector-change', roomId, forceUpdate);
-    const unSub2 = drawerPostie.subscribe('unread-change', roomId, forceUpdate);
-    return () => {
-      unSub1();
-      unSub2();
-    };
-  }, []);
 
   const openOptions = (e) => {
     e.preventDefault();
