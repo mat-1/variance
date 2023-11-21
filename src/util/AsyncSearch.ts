@@ -1,6 +1,8 @@
 import EventEmitter from 'events';
 
 class AsyncSearch extends EventEmitter {
+  RESULT_SENT: string;
+
   constructor() {
     super();
 

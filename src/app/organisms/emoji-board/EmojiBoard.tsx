@@ -38,7 +38,7 @@ const EmojiGroup = React.memo(
     name,
     groupEmojis,
   }: {
-    name: string;
+    name?: string;
     groupEmojis: {
       length: number;
       unicode: string;
@@ -98,9 +98,11 @@ const EmojiGroup = React.memo(
 
     return (
       <div className="emoji-group">
-        <Text className="emoji-group__header" variant="b2" weight="bold">
-          {name}
-        </Text>
+        {name && (
+          <Text className="emoji-group__header" variant="b2" weight="bold">
+            {name}
+          </Text>
+        )}
         {groupEmojis.length !== 0 && <div className="emoji-set noselect">{getEmojiBoard()}</div>}
       </div>
     );
@@ -123,31 +125,13 @@ EmojiGroup.propTypes = {
 
 const asyncSearch = new AsyncSearch();
 asyncSearch.setup(emojis, { keys: ['shortcode'], isContain: true, limit: 40 });
-function SearchedEmoji() {
-  const [searchedEmojis, setSearchedEmojis] = useState(null);
-
-  function handleSearchEmoji(resultEmojis, term) {
-    if (term === '' || resultEmojis.length === 0) {
-      if (term === '') setSearchedEmojis(null);
-      else setSearchedEmojis({ emojis: [] });
-      return;
-    }
-    setSearchedEmojis({ emojis: resultEmojis });
-  }
-
-  useEffect(() => {
-    asyncSearch.on(asyncSearch.RESULT_SENT, handleSearchEmoji);
-    return () => {
-      asyncSearch.removeListener(asyncSearch.RESULT_SENT, handleSearchEmoji);
-    };
-  }, []);
-
+function SearchedEmoji({ searchedEmojis }) {
   if (searchedEmojis === null) return false;
 
   return (
     <EmojiGroup
       key="-1"
-      name={searchedEmojis.emojis.length === 0 ? 'No search result found' : 'Search results'}
+      name={searchedEmojis.emojis.length === 0 ? 'No search result found' : undefined}
       groupEmojis={searchedEmojis.emojis}
     />
   );
@@ -169,8 +153,8 @@ function EmojiBoard({
   searchRef: React.MutableRefObject<HTMLInputElement>;
   allowTextReactions: boolean;
 }) {
-  const scrollEmojisRef = useRef(null);
-  const emojiInfo = useRef(null);
+  const scrollEmojisRef = useRef<HTMLDivElement>(null);
+  const emojiInfo = useRef<HTMLDivElement>(null);
 
   function isTargetNotEmoji(target: HTMLElement) {
     return target.classList.contains('emoji') === false;
@@ -248,6 +232,7 @@ function EmojiBoard({
 
   const [availableEmojis, setAvailableEmojis] = useState([]);
   const [recentEmojis, setRecentEmojis] = useState([]);
+  const [searchedEmojis, setSearchedEmojis] = useState(null);
 
   const recentOffset = recentEmojis.length > 0 ? 1 : 0;
 
@@ -290,6 +275,39 @@ function EmojiBoard({
       navigation.removeListener(cons.events.navigation.EMOJIBOARD_OPENED, onOpen);
     };
   }, []);
+
+  function handleSearchEmoji(resultEmojis, term) {
+    if (term === '' || resultEmojis.length === 0) {
+      if (term === '') setSearchedEmojis(null);
+      else setSearchedEmojis({ emojis: [] });
+      return;
+    }
+    setSearchedEmojis({ emojis: resultEmojis });
+  }
+
+  useEffect(() => {
+    asyncSearch.on(asyncSearch.RESULT_SENT, handleSearchEmoji);
+    return () => {
+      asyncSearch.removeListener(asyncSearch.RESULT_SENT, handleSearchEmoji);
+    };
+  }, []);
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    // on enter key select the first emoji
+    if (e.key === 'Enter') {
+      if (!scrollEmojisRef.current) {
+        return;
+      }
+      const firstEmojiEl = scrollEmojisRef.current.querySelector('.emoji');
+      if (firstEmojiEl) {
+        firstEmojiEl.click();
+        e.preventDefault();
+      } else if (allowTextReactions) {
+        // if no emoji is present, react with text
+        reactWithText();
+      }
+    }
+  }
 
   function openGroup(groupOrder) {
     let tabIndex = groupOrder;
@@ -355,31 +373,45 @@ function EmojiBoard({
       <div className="emoji-board__content">
         <div className="emoji-board__content__search">
           <RawIcon size="small" src={SearchIC} />
-          <Input onChange={handleSearchChange} forwardRef={searchRef} placeholder="Search" />
+          <Input
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
+            forwardRef={searchRef}
+            placeholder="Search"
+          />
         </div>
         <div className="emoji-board__content__emojis">
           <ScrollView ref={scrollEmojisRef} autoHide>
             <div onMouseMove={hoverEmoji} onClick={selectEmoji}>
-              <SearchedEmoji />
-              {recentEmojis.length > 0 && (
-                <EmojiGroup name="Recently used" groupEmojis={recentEmojis} />
+              <SearchedEmoji searchedEmojis={searchedEmojis} />
+              {/* don't show other categories when searching */}
+              {searchTerm === '' && (
+                <>
+                  {recentEmojis.length > 0 && (
+                    <EmojiGroup name="Recently used" groupEmojis={recentEmojis} />
+                  )}
+                  {availableEmojis.map((pack) => (
+                    <EmojiGroup
+                      name={pack.displayName ?? 'Unknown'}
+                      key={pack.packIndex}
+                      groupEmojis={pack.getEmojis()}
+                      className="custom-emoji-group"
+                    />
+                  ))}
+                  {emojiGroups.map((group) => (
+                    <EmojiGroup key={group.name} name={group.name} groupEmojis={group.emojis} />
+                  ))}
+                </>
               )}
-              {availableEmojis.map((pack) => (
-                <EmojiGroup
-                  name={pack.displayName ?? 'Unknown'}
-                  key={pack.packIndex}
-                  groupEmojis={pack.getEmojis()}
-                  className="custom-emoji-group"
-                />
-              ))}
-              {emojiGroups.map((group) => (
-                <EmojiGroup key={group.name} name={group.name} groupEmojis={group.emojis} />
-              ))}
             </div>
           </ScrollView>
         </div>
         {allowTextReactions && searchTerm !== '' && (
-          <button onClick={reactWithText} type="button" className="emoji-board__content__react">
+          <button
+            onClick={reactWithText}
+            type="button"
+            className="emoji-board__content__react-with-text"
+          >
             <Text>React with &quot;{searchTerm}&quot;</Text>
           </button>
         )}

@@ -11,7 +11,7 @@ import LogoSVG from '../../../public/res/svg/cinny.svg';
 import LogoUnreadSVG from '../../../public/res/svg/cinny-unread.svg';
 import LogoHighlightSVG from '../../../public/res/svg/cinny-highlight.svg';
 import { html, plain } from '../../util/markdown';
-import { RoomEvent } from 'matrix-js-sdk';
+import { MatrixEvent, Room, RoomEvent } from 'matrix-js-sdk';
 import RoomList from './RoomList';
 
 function isNotifEvent(mEvent) {
@@ -322,7 +322,7 @@ class Notifications extends EventEmitter {
   }
 
   _listenEvents() {
-    this.matrixClient.on(RoomEvent.Timeline, (mEvent, room) => {
+    this.matrixClient.on(RoomEvent.Timeline, (mEvent: MatrixEvent, room: Room) => {
       if (mEvent.isRedaction()) this._deletePopupNoti(mEvent.event.redacts);
 
       if (room.isSpaceRoom()) return;
@@ -331,6 +331,10 @@ class Notifications extends EventEmitter {
       const liveEvents = room.getLiveTimeline().getEvents();
 
       const lastTimelineEvent = liveEvents[liveEvents.length - 1];
+      if (!lastTimelineEvent) {
+        console.warn('lastTimelineEvent is null for room', room.roomId);
+        return;
+      }
       if (lastTimelineEvent.getId() !== mEvent.getId()) return;
       if (mEvent.getSender() === this.matrixClient.getUserId()) return;
 

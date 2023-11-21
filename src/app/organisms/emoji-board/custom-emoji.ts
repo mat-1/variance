@@ -1,3 +1,4 @@
+import { MatrixClient } from 'matrix-js-sdk';
 import { emojis } from './emoji';
 
 // https://github.com/Sorunome/matrix-doc/blob/soru/emotes/proposals/2545-emotes.md
@@ -176,7 +177,7 @@ function getGlobalImagePacks(mx) {
   return packs;
 }
 
-function getUserImagePack(mx) {
+function getUserImagePack(mx: MatrixClient) {
   const accountDataEmoji = mx.getAccountData('im.ponies.user_emotes');
   if (!accountDataEmoji) {
     return null;
@@ -207,7 +208,7 @@ function getRoomImagePacks(room) {
  * @param {Room[]} rooms Provide rooms if you want to include rooms pack
  * @returns {ImagePack[]} packs
  */
-function getRelevantPacks(mx, rooms) {
+function getRelevantPacks(mx: MatrixClient, rooms) {
   const userPack = mx ? getUserImagePack(mx) : [];
   const globalPacks = mx ? getGlobalImagePacks(mx) : [];
   const globalPackIds = new Set(globalPacks.map((pack) => pack.id));

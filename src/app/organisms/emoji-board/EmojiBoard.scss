@@ -92,11 +92,12 @@
     margin: 0 var(--sp-tight);
   }
 }
-.emoji-board__content__react {
+.emoji-board__content__react-with-text {
   cursor: pointer;
 
   p {
     color: var(--tc-link);
+    text-align: center;
   }
   :hover {
     text-decoration: underline;
