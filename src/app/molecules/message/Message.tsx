@@ -672,7 +672,7 @@ const MessageOptions = React.memo(
             onClick={() => createThread()}
             src={HashPlusIC}
             size="extra-small"
-            tooltip="Create Thread"
+            tooltip="Create thread"
           />
         )}
         {senderId === mx.getUserId() && !isMedia(mEvent) && (

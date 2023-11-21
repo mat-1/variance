@@ -8,6 +8,7 @@ import React, {
   useCallback,
   useRef,
   ReactElement,
+  MutableRefObject,
 } from 'react';
 import PropTypes from 'prop-types';
 import './RoomViewContent.scss';
@@ -181,7 +182,7 @@ function useTimeline(
   roomTimeline: RoomTimeline,
   eventId: string | null,
   readUptoEvtStore: Store<MatrixEvent>,
-  eventLimitRef: React.MutableRefObject<EventLimit>,
+  eventLimitRef: React.RefObject<EventLimit>,
 ) {
   const [timelineInfo, setTimelineInfo] = useState(null);
 
@@ -236,14 +237,19 @@ function useTimeline(
   return timelineInfo;
 }
 
+interface PageinateInfo {
+  backwards: boolean;
+  loaded: number;
+}
+
 function usePaginate(
   roomTimeline: RoomTimeline,
   readUptoEvtStore: Store<MatrixEvent>,
   forceUpdateLimit: () => void,
-  timelineScrollRef: React.MutableRefObject<TimelineScroll>,
-  eventLimitRef: React.MutableRefObject<EventLimit>,
-) {
-  const [info, setInfo] = useState<{ backwards: boolean; loaded: number } | null>(null);
+  timelineScrollRef: React.RefObject<TimelineScroll>,
+  eventLimitRef: React.RefObject<EventLimit>,
+): [PageinateInfo | null, () => void] {
+  const [info, setInfo] = useState<PageinateInfo | null>(null);
 
   useEffect(() => {
     const handlePaginatedFromServer = (backwards: boolean, loaded: number) => {
@@ -301,11 +307,11 @@ function usePaginate(
 
 function useHandleScroll(
   roomTimeline: RoomTimeline,
-  autoPaginate: () => void,
+  autoPaginate: (info: PageinateInfo) => void,
   readUptoEvtStore: Store<MatrixEvent>,
   forceUpdateLimit: () => void,
-  timelineScrollRef: React.MutableRefObject<TimelineScroll>,
-  eventLimitRef: React.MutableRefObject<EventLimit>,
+  timelineScrollRef: React.RefObject<TimelineScroll>,
+  eventLimitRef: React.RefObject<EventLimit>,
 ) {
   const handleScroll = useCallback(() => {
     const timelineScroll = timelineScrollRef.current;
@@ -587,10 +593,10 @@ function RoomViewContent({
     }, 200)();
   };
 
-  const renderTimeline = () => {
-    const tl = [];
+  const renderTimeline = (): ReactElement[] => {
+    const tl: ReactElement[] = [];
     const limit = eventLimitRef.current;
-    if (limit === null) return;
+    if (limit === null) return [];
 
     let itemCountIndex = 0;
     jumpToItemIndex = -1;
@@ -645,7 +651,7 @@ function RoomViewContent({
       }
 
       if (timelineInfo === null) {
-        return;
+        return [];
       }
       const focusId = timelineInfo?.focusEventId;
       const isFocus = focusId === mEvent.getId();

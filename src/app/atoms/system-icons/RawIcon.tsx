@@ -8,13 +8,13 @@ function RawIcon({
   src,
   isImage,
 }: {
-  color?: string | null;
+  color?: string;
   size?: 'large' | 'normal' | 'small' | 'extra-small' | 'ultra-small';
   src: string;
   isImage?: boolean;
 }) {
   const style = {};
-  if (color !== null) style.backgroundColor = color;
+  if (color) style.backgroundColor = color;
   if (isImage) {
     style.backgroundColor = 'transparent';
     style.backgroundImage = `url("${src}")`;

@@ -419,7 +419,6 @@
     @include scrollbar.scroll--auto-hide;
     & code {
       color: var(--tc-surface-normal) !important;
-      white-space: pre;
     }
   }
   & blockquote {
