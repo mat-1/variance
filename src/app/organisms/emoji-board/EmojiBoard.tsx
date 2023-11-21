@@ -153,20 +153,34 @@ function SearchedEmoji() {
   );
 }
 
-function EmojiBoard({ onSelect, searchRef }) {
+export interface EmojiData {
+  unicode: string;
+  hexcode: string;
+  shortcodes: string[];
+  mxc: string | null;
+}
+
+function EmojiBoard({
+  onSelect,
+  searchRef,
+  allowTextReactions,
+}: {
+  onSelect: (emoji: EmojiData) => void;
+  searchRef: React.MutableRefObject<HTMLInputElement>;
+  allowTextReactions: boolean;
+}) {
   const scrollEmojisRef = useRef(null);
   const emojiInfo = useRef(null);
 
   function isTargetNotEmoji(target: HTMLElement) {
     return target.classList.contains('emoji') === false;
   }
-  function getEmojiDataFromTarget(target: HTMLElement) {
+  function getEmojiDataFromTarget(target: HTMLElement): EmojiData {
     const unicode = target.getAttribute('unicode');
     const hexcode = target.getAttribute('hexcode');
     const mxc = target.getAttribute('data-mx-emoticon');
-    let shortcodes = target.getAttribute('shortcodes');
-    if (typeof shortcodes === 'undefined') shortcodes = undefined;
-    else shortcodes = shortcodes.split(',');
+    const shortcodesString: string | null = target.getAttribute('shortcodes') ?? null;
+    const shortcodes = shortcodesString ? shortcodesString.split(',') : [];
     return {
       unicode,
       hexcode,
@@ -175,15 +189,16 @@ function EmojiBoard({ onSelect, searchRef }) {
     };
   }
 
-  function selectEmoji(e) {
-    if (isTargetNotEmoji(e.target)) return;
+  function selectEmoji(e: MouseEvent) {
+    const target = e.target as HTMLElement | null;
+    if (!target || isTargetNotEmoji(target)) return;
 
-    const emoji = getEmojiDataFromTarget(e.target);
+    const emoji = getEmojiDataFromTarget(target);
     onSelect(emoji);
     if (emoji.hexcode) addRecentEmoji(emoji.unicode);
   }
 
-  function setEmojiInfo(emoji) {
+  function setEmojiInfo(emoji: { shortcode: string; src: string | HTMLElement; unicode: string }) {
     const infoEmoji = emojiInfo.current.firstElementChild.firstElementChild;
     const infoShortcode = emojiInfo.current.lastElementChild;
 
@@ -193,11 +208,11 @@ function EmojiBoard({ onSelect, searchRef }) {
   }
 
   function hoverEmoji(e: MouseEvent) {
-    if (isTargetNotEmoji(e.target)) return;
+    const target = e.target as HTMLImageElement | null;
+    if (!target || isTargetNotEmoji(target)) return;
 
-    const emoji = e.target;
-    const { shortcodes, unicode } = getEmojiDataFromTarget(emoji);
-    const { src } = e.target;
+    const { shortcodes, unicode } = getEmojiDataFromTarget(target);
+    const { src } = target;
 
     if (shortcodes === undefined) {
       searchRef.current.placeholder = 'Search';
@@ -213,10 +228,22 @@ function EmojiBoard({ onSelect, searchRef }) {
     setEmojiInfo({ shortcode: shortcodes[0], src, unicode });
   }
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   function handleSearchChange() {
     const term = searchRef.current.value;
     asyncSearch.search(term);
     scrollEmojisRef.current.scrollTop = 0;
+    setSearchTerm(term);
+  }
+
+  function reactWithText() {
+    onSelect({
+      unicode: searchTerm,
+      hexcode: '',
+      shortcodes: [],
+      mxc: null,
+    });
   }
 
   const [availableEmojis, setAvailableEmojis] = useState([]);
@@ -225,7 +252,7 @@ function EmojiBoard({ onSelect, searchRef }) {
   const recentOffset = recentEmojis.length > 0 ? 1 : 0;
 
   useEffect(() => {
-    const updateAvailableEmoji = (selectedRoomId) => {
+    const updateAvailableEmoji = (selectedRoomId: string) => {
       if (!selectedRoomId) {
         setAvailableEmojis([]);
         return;
@@ -351,6 +378,11 @@ function EmojiBoard({ onSelect, searchRef }) {
             </div>
           </ScrollView>
         </div>
+        {allowTextReactions && searchTerm !== '' && (
+          <button onClick={reactWithText} type="button" className="emoji-board__content__react">
+            <Text>React with &quot;{searchTerm}&quot;</Text>
+          </button>
+        )}
         <div ref={emojiInfo} className="emoji-board__content__info">
           <div>
             <img alt=":slight_smile:" src={`${TWEMOJI_BASE_URL}1f642.svg`} className="emoji" />

@@ -1,3 +1,4 @@
+import { EmojiData } from '../../app/organisms/emoji-board/EmojiBoard';
 import appDispatcher from '../dispatcher';
 import cons from '../state/cons';
 
@@ -117,11 +118,16 @@ export function openSettings(tabText: string) {
   });
 }
 
-export function openEmojiBoard(cords, requestEmojiCallback: (emoji: string) => void) {
+export function openEmojiBoard(
+  cords,
+  requestEmojiCallback: (emoji: EmojiData) => void,
+  allowTextReactions: boolean,
+) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_EMOJIBOARD,
     cords,
     requestEmojiCallback,
+    allowTextReactions,
   });
 }
 

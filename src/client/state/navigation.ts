@@ -359,6 +359,7 @@ class Navigation extends EventEmitter {
           cons.events.navigation.EMOJIBOARD_OPENED,
           action.cords,
           action.requestEmojiCallback,
+          action.allowTextReactions,
         );
       },
       [cons.actions.navigation.OPEN_READRECEIPTS]: () => {

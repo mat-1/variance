@@ -92,6 +92,16 @@
     margin: 0 var(--sp-tight);
   }
 }
+.emoji-board__content__react {
+  cursor: pointer;
+
+  p {
+    color: var(--tc-link);
+  }
+  :hover {
+    text-decoration: underline;
+  }
+}
 
 .emoji-row {
   display: flex;

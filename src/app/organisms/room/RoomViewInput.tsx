@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
 import './RoomViewInput.scss';
 
 import { ReactEditor } from 'slate-react';
@@ -38,6 +37,7 @@ import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
 import commands from './commands';
 import RoomTimeline from '../../../client/state/RoomTimeline';
+import { EmojiData } from '../emoji-board/EmojiBoard';
 
 const CMD_REGEX = /(^\/|:|@)(\S*)$/;
 let isTyping = false;
@@ -386,7 +386,7 @@ function RoomViewInput({
     }
   };
 
-  function addEmoji(emoji) {
+  function addEmoji(emoji: EmojiData) {
     editor.current.insertText(emoji.unicode);
     ReactEditor.focus(editor.current);
   }
@@ -486,7 +486,7 @@ function RoomViewInput({
               const cords = getEventCords(e);
               cords.x += document.dir === 'rtl' ? -80 : 80;
               cords.y -= 250;
-              openEmojiBoard(cords, addEmoji);
+              openEmojiBoard(cords, addEmoji, false);
             }}
             tooltip="Emoji"
             src={EmojiIC}

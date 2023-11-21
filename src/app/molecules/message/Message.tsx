@@ -381,10 +381,14 @@ MessageEdit.propTypes = {
   onCancel: PropTypes.func.isRequired,
 };
 
-function getMyEmojiEvent(emojiKey, eventId, roomTimeline) {
+function getMyEmojiEvent(
+  emojiKey: string,
+  eventId: string,
+  roomTimeline: RoomTimeline,
+): MatrixEvent | null {
   const mx = initMatrix.matrixClient;
   const rEvents = roomTimeline.reactionTimeline.get(eventId);
-  let rEvent = null;
+  let rEvent: MatrixEvent | null = null;
   rEvents?.find((rE) => {
     if (rE.getRelation() === null) return false;
     if (rE.getRelation().key === emojiKey && rE.getSender() === mx.getUserId()) {
@@ -396,7 +400,13 @@ function getMyEmojiEvent(emojiKey, eventId, roomTimeline) {
   return rEvent;
 }
 
-function toggleEmoji(roomId, eventId, emojiKey, shortcode, roomTimeline) {
+function toggleEmoji(
+  roomId: string,
+  eventId: string,
+  emojiKey: string,
+  shortcode: string,
+  roomTimeline: RoomTimeline,
+) {
   const myAlreadyReactEvent = getMyEmojiEvent(emojiKey, eventId, roomTimeline);
   if (myAlreadyReactEvent) {
     const rId = myAlreadyReactEvent.getId();
@@ -413,11 +423,16 @@ function pickEmoji(
   eventId: string,
   roomTimeline: RoomTimeline,
 ) {
-  openEmojiBoard(getEventCords(e), (emoji) => {
-    toggleEmoji(roomId, eventId, emoji.mxc ?? emoji.unicode, emoji.shortcodes[0], roomTimeline);
-    const target = e.target as HTMLButtonElement;
-    target.click();
-  });
+  openEmojiBoard(
+    getEventCords(e),
+    (emoji) => {
+      toggleEmoji(roomId, eventId, emoji.mxc ?? emoji.unicode, emoji.shortcodes[0], roomTimeline);
+      // simulate a click to the react button to hide the emojiboard
+      const target = e.target as HTMLButtonElement;
+      target.click();
+    },
+    true,
+  );
 }
 
 function genReactionMsg(userIds: string[], reaction: string, shortcode: string) {
