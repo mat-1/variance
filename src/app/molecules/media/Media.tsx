@@ -44,8 +44,8 @@ async function getUrl(link, type, decryptData) {
 function getNativeHeight(
   width: number,
   height: number,
-  maxWidth: number = 296,
-  maxHeight: number = 460,
+  maxWidth: number = 460,
+  maxHeight: number = 296,
 ) {
   const ratio = width / height;
   const newWidth = Math.min(width, maxWidth);
