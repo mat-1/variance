@@ -904,7 +904,7 @@ function findLinksFromFormattedBody(body: string): string[] {
   // also get the links from <a> tags
   doc.querySelectorAll('a').forEach((e) => {
     const href = e.getAttribute('href');
-    if (href) matches.push(href);
+    if (href && !/^https?:\/\/matrix.to/.test(href)) matches.push(href);
   });
 
   // deduplicate
