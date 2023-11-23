@@ -899,7 +899,7 @@ function findLinksFromFormattedBody(body: string): string[] {
   // convert back to plaintext
   const plaintext = doc.body.textContent ?? '';
   // find links
-  const matches = plaintext.match(/((https?:\/\/[^\s)]+))/g) ?? [];
+  const matches: string[] = plaintext.match(/((https?:\/\/[^\s)]+))/g) ?? [];
 
   // also get the links from <a> tags
   doc.querySelectorAll('a').forEach((e) => {
@@ -945,7 +945,6 @@ export function Message({
 
   mEvent.once(MatrixEventEvent.Status, (e: MatrixEvent) => {
     setMessageStatus(e.status);
-    console.log('Message status changed', e.status);
   });
 
   const senderId = mEvent.getSender();

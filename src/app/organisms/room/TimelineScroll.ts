@@ -56,15 +56,6 @@ class TimelineScroll {
 
     const offsetTop = this.inTopHalf ? this.topMsg?.offsetTop : this.bottomMsg?.offsetTop;
 
-    console.log(
-      'tryRestoringScroll',
-      'bottom',
-      this.bottom,
-      'inTopHalf',
-      this.inTopHalf,
-      'offsetTop',
-      offsetTop,
-    );
     const scrollTop = offsetTop ? offsetTop - this.diff : Math.round(this.height - this.viewHeight);
 
     this._scrollTo(scrollInfo, scrollTop);

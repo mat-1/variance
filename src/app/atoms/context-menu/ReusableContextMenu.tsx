@@ -59,8 +59,6 @@ function ReusableContextMenu() {
     }, 200);
   };
 
-  console.log('ReusableContextMenu', ReusableContextMenu);
-
   return (
     <ContextMenu
       afterToggle={handleAfterToggle}
