@@ -167,7 +167,6 @@ function Image({ name, width, height, link, file, type, blurhash }: ImageProps) 
     <>
       <div className="file-container">
         <div
-          // style={{ height: width !== null ? getNativeHeight(width, height) : 'unset' }}
           className="image-container"
           role="button"
           tabIndex="0"
@@ -577,27 +576,32 @@ function Embed({ roomTimeline, link }: { roomTimeline: RoomTimeline; link: strin
   }
 
   const embedTitle = urlPreviewInfo['og:title'] || urlPreviewInfo['og:site_name'];
+  const embedDescription = urlPreviewInfo['og:description'];
+
+  const embedTextEl = (
+    <div className="embed-text">
+      {embedTitle != null && (
+        <Text className="embed-title" variant="b1">
+          <a href={link} target="_blank" rel="noreferrer">
+            {embedTitle}
+          </a>
+        </Text>
+      )}
+
+      {embedDescription && (
+        <Text className="embed-description" variant="b3">
+          {embedDescription}
+        </Text>
+      )}
+    </div>
+  );
 
   return (
     <div className="embed-container">
-      <div className="file-container embed">
+      <div className={`file-container embed ${!embedDescription ? 'embed-no-description' : ''}`}>
+        {!embedDescription && <div>{embedTextEl}</div>}
         <div className="embed-media">{image}</div>
-
-        <div className="embed-text">
-          {embedTitle != null && (
-            <Text className="embed-title" variant="b1">
-              <a href={link} target="_blank" rel="noreferrer">
-                {embedTitle}
-              </a>
-            </Text>
-          )}
-
-          {urlPreviewInfo['og:description'] != null && (
-            <Text className="embed-description" variant="b3">
-              {urlPreviewInfo['og:description']}
-            </Text>
-          )}
-        </div>
+        {embedDescription && embedTextEl}
       </div>
     </div>
   );

@@ -107,11 +107,9 @@
     padding: var(--sp-ultra-tight);
     display: flex;
     gap: var(--sp-extra-tight);
-    height: 100px;
 
     .embed-media {
-      height: 100%;
-      flex: 0;
+      height: 100px;
 
       img {
         border-radius: calc(var(--bo-radius) / 2);
@@ -141,5 +139,9 @@
         height: 100%;
       }
     }
+  }
+
+  .embed-no-description {
+    flex-direction: column;
   }
 }
