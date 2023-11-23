@@ -1037,8 +1037,8 @@ export function Message({
         {settings.showUrlPreview &&
           msgType === 'm.text' &&
           (customHTML
-            ? findLinksFromPlaintextBody(body)
-            : findLinksFromFormattedBody(customHTML)
+            ? findLinksFromPlaintextBody(customHTML)
+            : findLinksFromFormattedBody(body)
           ).map((link) => <Embed key={link} roomTimeline={roomTimeline} link={link} />)}
         {isEdit && (
           <MessageEdit

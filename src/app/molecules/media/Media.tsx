@@ -172,9 +172,14 @@ function Image({ name, width, height, link, file, type, blurhash }: ImageProps) 
           tabIndex="0"
           onClick={toggleLightbox}
           onKeyDown={toggleLightbox}
+          style={{ maxHeight: width !== null ? getNativeHeight(width, height) : 'unset' }}
         >
-          {blurhash && blur && <BlurhashCanvas hash={blurhash} punch={1} width={32} height={32} />}
-          {url !== null && (
+          {blurhash && blur && (
+            <div style={{ height: width !== null ? getNativeHeight(width, height) : 'unset' }}>
+              <BlurhashCanvas hash={blurhash} punch={1} width={32} height={32} />
+            </div>
+          )}
+          {url && (
             <img
               style={{ display: blur ? 'none' : 'unset' }}
               onLoad={() => setBlur(false)}
@@ -435,12 +440,8 @@ IframePlayer.propTypes = {
 function YouTubeEmbed({ link }: { link: string }) {
   const [urlPreviewInfo, setUrlPreviewInfo] = useState(null);
   const mx = initMatrix.matrixClient;
-  const url = new URL(link);
 
-  // fix for no embed information on www.youtu.be
-  if (url.host === 'www.youtu.be') {
-    url.host = 'youtu.be';
-  }
+  let url: URL;
 
   useEffect(() => {
     let unmounted = false;
@@ -458,6 +459,17 @@ function YouTubeEmbed({ link }: { link: string }) {
       unmounted = true;
     };
   });
+
+  try {
+    url = new URL(link);
+  } catch {
+    return null;
+  }
+
+  // fix for no embed information on www.youtu.be
+  if (url.host === 'www.youtu.be') {
+    url.host = 'youtu.be';
+  }
 
   let videoID;
   if (url.host === 'youtu.be' || url.host === 'www.youtu.be') {
@@ -502,7 +514,7 @@ YouTubeEmbed.propTypes = {
 };
 
 function Embed({ roomTimeline, link }: { roomTimeline: RoomTimeline; link: string }) {
-  const url = new URL(link);
+  let url: URL;
   const mx = initMatrix.matrixClient;
 
   const [urlPreviewInfo, setUrlPreviewInfo] = useState<IPreviewUrlResponse | null>(null);
@@ -528,6 +540,12 @@ function Embed({ roomTimeline, link }: { roomTimeline: RoomTimeline; link: strin
       unmounted = true;
     };
   });
+
+  try {
+    url = new URL(link);
+  } catch {
+    return null;
+  }
 
   if (
     settings.showYoutubeEmbedPlayer &&
