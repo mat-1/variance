@@ -888,6 +888,12 @@ function getEditedBody(editedMEvent: MatrixEvent) {
   return [parsedContent.body, isCustomHTML, newContent.formatted_body ?? null];
 }
 
+function findLinksFromPlaintextBody(body: string): string[] {
+  const matches: string[] = body.match(/((https?:\/\/[^\s)]+))/g) ?? [];
+  // deduplicate
+  return [...new Set(matches)];
+}
+
 function findLinksFromFormattedBody(body: string): string[] {
   // parse as html
   const doc = new DOMParser().parseFromString(body, 'text/html');
@@ -899,7 +905,7 @@ function findLinksFromFormattedBody(body: string): string[] {
   // convert back to plaintext
   const plaintext = doc.body.textContent ?? '';
   // find links
-  const matches: string[] = plaintext.match(/((https?:\/\/[^\s)]+))/g) ?? [];
+  const matches: string[] = findLinksFromPlaintextBody(plaintext);
 
   // also get the links from <a> tags
   doc.querySelectorAll('a').forEach((e) => {
@@ -1030,9 +1036,10 @@ export function Message({
         )}
         {settings.showUrlPreview &&
           msgType === 'm.text' &&
-          findLinksFromFormattedBody(customHTML ?? body).map((link) => (
-            <Embed key={link} roomTimeline={roomTimeline} link={link} />
-          ))}
+          (customHTML
+            ? findLinksFromPlaintextBody(body)
+            : findLinksFromFormattedBody(customHTML)
+          ).map((link) => <Embed key={link} roomTimeline={roomTimeline} link={link} />)}
         {isEdit && (
           <MessageEdit
             body={
