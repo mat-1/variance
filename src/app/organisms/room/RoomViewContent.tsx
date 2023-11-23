@@ -515,7 +515,7 @@ function RoomViewContent({
 
   useEffect(() => {
     const timelineScroll = timelineScrollRef.current;
-    if (!roomTimeline.initialized) return;
+    if (!timelineScroll || !roomTimeline.initialized) return;
     if (
       timelineScroll.bottom < 16 &&
       !roomTimeline.canPaginateForward() &&
@@ -526,6 +526,22 @@ function RoomViewContent({
       timelineScroll.tryRestoringScroll();
     }
   }, [newEvent]);
+
+  useEffect(() => {
+    const timelineScroll = timelineScrollRef.current;
+
+    const handleUrlPreviewLoaded = () => {
+      if (timelineScroll) timelineScroll.tryRestoringScroll();
+    };
+
+    roomTimeline.on(cons.events.roomTimeline.URL_PREVIEW_LOADED, handleUrlPreviewLoaded);
+    return () => {
+      roomTimeline.removeListener(
+        cons.events.roomTimeline.URL_PREVIEW_LOADED,
+        handleUrlPreviewLoaded,
+      );
+    };
+  }, [roomTimeline]);
 
   // up arrow to edit previous message
   const listenKeyArrowUp = useCallback(

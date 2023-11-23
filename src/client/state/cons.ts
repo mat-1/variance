@@ -142,6 +142,7 @@ const cons = {
       EVENT_REDACTED: 'EVENT_REDACTED',
       AT_BOTTOM: 'AT_BOTTOM',
       SCROLL_TO_LIVE: 'SCROLL_TO_LIVE',
+      URL_PREVIEW_LOADED: 'URL_PREVIEW_LOADED',
     },
     roomsInput: {
       MESSAGE_SENT: 'MESSAGE_SENT',

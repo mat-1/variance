@@ -17,6 +17,9 @@ import PlaySVG from '../../../../public/res/ic/outlined/play.svg';
 import { getBlobSafeMimeType } from '../../../util/mimetypes';
 import initMatrix from '../../../client/initMatrix';
 import settings from '../../../client/state/settings';
+import { IPreviewUrlResponse } from 'matrix-js-sdk';
+import RoomTimeline from '../../../client/state/RoomTimeline';
+import cons from '../../../client/state/cons';
 
 async function getDecryptedBlob(response, type, decryptData) {
   const arrayBuffer = await response.arrayBuffer();
@@ -38,9 +41,19 @@ async function getUrl(link, type, decryptData) {
   }
 }
 
-function getNativeHeight(width, height, maxWidth = 296) {
-  const scale = maxWidth / width;
-  return scale * height;
+function getNativeHeight(
+  width: number,
+  height: number,
+  maxWidth: number = 296,
+  maxHeight: number = 460,
+) {
+  const ratio = width / height;
+  const newWidth = Math.min(width, maxWidth);
+  const newHeight = Math.min(height, maxHeight);
+  if (newWidth / newHeight > ratio) {
+    return newHeight;
+  }
+  return newWidth / ratio;
 }
 
 function FileHeader({ name, link, external, file, type }) {
@@ -117,7 +130,17 @@ File.propTypes = {
   file: PropTypes.shape({}),
 };
 
-function Image({ name, width, height, link, file, type, blurhash }) {
+interface ImageProps {
+  name: string;
+  width: number;
+  height: number;
+  link: string;
+  file: File;
+  type: string;
+  blurhash: string;
+}
+
+function Image({ name, width, height, link, file, type, blurhash }: ImageProps) {
   const [url, setUrl] = useState(null);
   const [blur, setBlur] = useState(true);
   const [lightbox, setLightbox] = useState(false);
@@ -144,7 +167,7 @@ function Image({ name, width, height, link, file, type, blurhash }) {
     <>
       <div className="file-container">
         <div
-          style={{ height: width !== null ? getNativeHeight(width, height) : 'unset' }}
+          // style={{ height: width !== null ? getNativeHeight(width, height) : 'unset' }}
           className="image-container"
           role="button"
           tabIndex="0"
@@ -313,10 +336,8 @@ function Video({
     <div className="file-container">
       <FileHeader name={name} link={file !== null ? url : url || link} type={type} external />
       <div
-        style={{
-          height: width !== null ? getNativeHeight(width, height) : 'unset',
-        }}
         className="video-container"
+        style={{ height: width !== null ? getNativeHeight(width, height) : 'unset' }}
       >
         {url === null ? (
           <>
@@ -412,108 +433,7 @@ IframePlayer.propTypes = {
   thumbnail: PropTypes.string.isRequired,
 };
 
-function Embed({ link }) {
-  const url = new URL(link);
-
-  if (
-    settings.showYoutubeEmbedPlayer &&
-    (((url.host === 'www.youtube.com' || url.host === 'youtube.com') &&
-      (url.pathname === '/watch' || url.pathname.startsWith('/shorts/'))) ||
-      url.host === 'youtu.be' ||
-      url.host === 'www.youtu.be')
-  ) {
-    return <YoutubeEmbed link={link} />;
-  }
-
-  const [urlPreviewInfo, setUrlPreviewInfo] = useState();
-  const mx = initMatrix.matrixClient;
-
-  useEffect(() => {
-    let unmounted = false;
-
-    async function getUrlPreview() {
-      try {
-        const info = await mx.getUrlPreview(link, 0);
-        if (unmounted) return;
-        setUrlPreviewInfo(info);
-      } catch {
-        setUrlPreviewInfo();
-      }
-    }
-
-    getUrlPreview();
-
-    return () => {
-      unmounted = true;
-    };
-  });
-
-  if (urlPreviewInfo != null) {
-    const imageURL = urlPreviewInfo['og:image'] || urlPreviewInfo['og:image:secure_url'];
-    const image =
-      imageURL != null ? (
-        <Image
-          link={mx.mxcUrlToHttp(imageURL)}
-          height={
-            urlPreviewInfo['og:image:height'] != null
-              ? parseInt(urlPreviewInfo['og:image:height'], 10)
-              : null
-          }
-          width={
-            urlPreviewInfo['og:image:width'] != null
-              ? parseInt(urlPreviewInfo['og:image:width'], 10)
-              : null
-          }
-          name={urlPreviewInfo['og:image:alt'] || urlPreviewInfo['og:site_name'] || ''}
-          type={urlPreviewInfo['og:image:type'] != null ? urlPreviewInfo['og:image:type'] : null}
-        />
-      ) : null;
-
-    // Image only embed
-    if (
-      image != null &&
-      urlPreviewInfo['og:title'] == null &&
-      urlPreviewInfo['og:description'] == null
-    ) {
-      return (
-        <div className="embed-container">
-          <div className="file-container">{image}</div>
-        </div>
-      );
-    }
-
-    const embedTitle = urlPreviewInfo['og:title'] || urlPreviewInfo['og:site_name'];
-
-    return (
-      <div className="embed-container">
-        <div className="file-container embed">
-          <div className="embed-text">
-            {embedTitle != null && (
-              <Text className="embed-title" variant="h2">
-                {embedTitle}
-              </Text>
-            )}
-
-            {urlPreviewInfo['og:description'] != null && (
-              <Text className="embed-description" variant="b3">
-                {urlPreviewInfo['og:description']}
-              </Text>
-            )}
-          </div>
-
-          <div className="embed-media">{image}</div>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
-}
-Embed.propTypes = {
-  link: PropTypes.string.isRequired,
-};
-
-function YoutubeEmbed({ link }) {
+function YouTubeEmbed({ link }: { link: string }) {
   const [urlPreviewInfo, setUrlPreviewInfo] = useState(null);
   const mx = initMatrix.matrixClient;
   const url = new URL(link);
@@ -578,8 +498,112 @@ function YoutubeEmbed({ link }) {
 
   return null;
 }
-YoutubeEmbed.propTypes = {
+YouTubeEmbed.propTypes = {
   link: PropTypes.string.isRequired,
 };
 
-export { File, Image, Sticker, Audio, Video, YoutubeEmbed, Embed, IframePlayer };
+function Embed({ roomTimeline, link }: { roomTimeline: RoomTimeline; link: string }) {
+  const url = new URL(link);
+  const mx = initMatrix.matrixClient;
+
+  const [urlPreviewInfo, setUrlPreviewInfo] = useState<IPreviewUrlResponse | null>(null);
+
+  useEffect(() => {
+    let unmounted = false;
+
+    async function getUrlPreview() {
+      try {
+        const info = await mx.getUrlPreview(link, 0);
+        if (unmounted) return;
+        setUrlPreviewInfo(info);
+        // this makes it fix the scroll when the embed is loaded
+        roomTimeline.emit(cons.events.roomTimeline.URL_PREVIEW_LOADED);
+      } catch {
+        setUrlPreviewInfo(null);
+      }
+    }
+
+    getUrlPreview();
+
+    return () => {
+      unmounted = true;
+    };
+  });
+
+  if (
+    settings.showYoutubeEmbedPlayer &&
+    (((url.host === 'www.youtube.com' || url.host === 'youtube.com') &&
+      (url.pathname === '/watch' || url.pathname.startsWith('/shorts/'))) ||
+      url.host === 'youtu.be' ||
+      url.host === 'www.youtu.be')
+  ) {
+    return <YouTubeEmbed link={link} />;
+  }
+
+  if (urlPreviewInfo === null) {
+    return null;
+  }
+
+  const untypedImageUrl = urlPreviewInfo['og:image'] || urlPreviewInfo['og:image:secure_url'];
+  const imageUrl = typeof untypedImageUrl === 'string' ? untypedImageUrl : null;
+
+  const actualImageHeight = urlPreviewInfo['og:image:height']
+    ? parseInt(urlPreviewInfo['og:image:height'], 10)
+    : null;
+  const actualImageWidth = urlPreviewInfo['og:image:width']
+    ? parseInt(urlPreviewInfo['og:image:width'], 10)
+    : null;
+
+  // whether the embed only has an image and no text
+  const isImageOnlyEmbed =
+    imageUrl && !urlPreviewInfo['og:title'] && !urlPreviewInfo['og:description'];
+
+  const image = imageUrl ? (
+    <Image
+      link={mx.mxcUrlToHttp(imageUrl)}
+      height={actualImageHeight}
+      width={actualImageWidth}
+      name={urlPreviewInfo['og:image:alt'] || urlPreviewInfo['og:site_name'] || ''}
+      type={urlPreviewInfo['og:image:type'] != null ? urlPreviewInfo['og:image:type'] : null}
+    />
+  ) : null;
+
+  if (isImageOnlyEmbed) {
+    return (
+      <div className="embed-container">
+        <div className="file-container">{image}</div>
+      </div>
+    );
+  }
+
+  const embedTitle = urlPreviewInfo['og:title'] || urlPreviewInfo['og:site_name'];
+
+  return (
+    <div className="embed-container">
+      <div className="file-container embed">
+        <div className="embed-media">{image}</div>
+
+        <div className="embed-text">
+          {embedTitle != null && (
+            <Text className="embed-title" variant="b1">
+              <a href={link} target="_blank" rel="noreferrer">
+                {embedTitle}
+              </a>
+            </Text>
+          )}
+
+          {urlPreviewInfo['og:description'] != null && (
+            <Text className="embed-description" variant="b3">
+              {urlPreviewInfo['og:description']}
+            </Text>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+Embed.propTypes = {
+  link: PropTypes.string.isRequired,
+};
+
+export { File, Image, Sticker, Audio, Video, YouTubeEmbed as YoutubeEmbed, Embed, IframePlayer };

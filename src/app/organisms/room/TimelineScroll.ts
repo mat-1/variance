@@ -1,4 +1,4 @@
-import { getScrollInfo } from '../../../util/common';
+import { ScrollInfo, getScrollInfo } from '../../../util/common';
 
 class TimelineScroll {
   scroll: HTMLElement;
@@ -54,15 +54,23 @@ class TimelineScroll {
   tryRestoringScroll() {
     const scrollInfo = getScrollInfo(this.scroll);
 
-    let scrollTop = 0;
-    const ot = this.inTopHalf ? this.topMsg?.offsetTop : this.bottomMsg?.offsetTop;
-    if (!ot) scrollTop = Math.round(this.height - this.viewHeight);
-    else scrollTop = ot - this.diff;
+    const offsetTop = this.inTopHalf ? this.topMsg?.offsetTop : this.bottomMsg?.offsetTop;
+
+    console.log(
+      'tryRestoringScroll',
+      'bottom',
+      this.bottom,
+      'inTopHalf',
+      this.inTopHalf,
+      'offsetTop',
+      offsetTop,
+    );
+    const scrollTop = offsetTop ? offsetTop - this.diff : Math.round(this.height - this.viewHeight);
 
     this._scrollTo(scrollInfo, scrollTop);
   }
 
-  scrollToIndex(index, offset = 0) {
+  scrollToIndex(index: number, offset: number = 0) {
     const scrollInfo = getScrollInfo(this.scroll);
     const msgs = this.scroll.lastElementChild.lastElementChild.children;
     const offsetTop = msgs[index]?.offsetTop;
@@ -75,7 +83,7 @@ class TimelineScroll {
     this._scrollTo(scrollInfo, to);
   }
 
-  _scrollTo(scrollInfo, scrollTop) {
+  _scrollTo(scrollInfo: ScrollInfo, scrollTop: number) {
     this.scroll.scrollTop = scrollTop;
 
     // browser emit 'onscroll' event only if the 'element.scrollTop' value changes.
@@ -115,7 +123,7 @@ class TimelineScroll {
   // else otherwise.
   // NOTE: This will help to restore the scroll when msgs get's removed
   // from one end and added to other end
-  _calcDiff(scrollInfo) {
+  _calcDiff(scrollInfo: ScrollInfo) {
     if (!this.topMsg || !this.bottomMsg) return 0;
     if (this.inTopHalf) {
       return this.topMsg.offsetTop - scrollInfo.top;
@@ -123,7 +131,7 @@ class TimelineScroll {
     return this.bottomMsg.offsetTop - scrollInfo.top;
   }
 
-  _updateCalc(scrollInfo) {
+  _updateCalc(scrollInfo: ScrollInfo) {
     const halfViewHeight = Math.round(scrollInfo.viewHeight / 2);
     const scrollMiddle = scrollInfo.top + halfViewHeight;
     const lastMiddle = this.top + halfViewHeight;
