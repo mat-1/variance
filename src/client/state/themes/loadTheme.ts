@@ -120,5 +120,7 @@ export async function loadThemeFromUrl(url: string): Promise<ThemeStyle> {
     JSON.parse(JSON.stringify(partial)),
   ) as unknown as ThemeStyle;
 
+  console.log(mergedTheme);
+
   return mergedTheme;
 }

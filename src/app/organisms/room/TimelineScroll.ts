@@ -1,4 +1,4 @@
-import { ScrollInfo, getScrollInfo } from '../../../util/common';
+import { getScrollInfo } from '../../../util/common';
 
 class TimelineScroll {
   scroll: HTMLElement;
@@ -54,14 +54,15 @@ class TimelineScroll {
   tryRestoringScroll() {
     const scrollInfo = getScrollInfo(this.scroll);
 
-    const offsetTop = this.inTopHalf ? this.topMsg?.offsetTop : this.bottomMsg?.offsetTop;
-
-    const scrollTop = offsetTop ? offsetTop - this.diff : Math.round(this.height - this.viewHeight);
+    let scrollTop = 0;
+    const ot = this.inTopHalf ? this.topMsg?.offsetTop : this.bottomMsg?.offsetTop;
+    if (!ot) scrollTop = Math.round(this.height - this.viewHeight);
+    else scrollTop = ot - this.diff;
 
     this._scrollTo(scrollInfo, scrollTop);
   }
 
-  scrollToIndex(index: number, offset: number = 0) {
+  scrollToIndex(index, offset = 0) {
     const scrollInfo = getScrollInfo(this.scroll);
     const msgs = this.scroll.lastElementChild.lastElementChild.children;
     const offsetTop = msgs[index]?.offsetTop;
@@ -74,7 +75,7 @@ class TimelineScroll {
     this._scrollTo(scrollInfo, to);
   }
 
-  _scrollTo(scrollInfo: ScrollInfo, scrollTop: number) {
+  _scrollTo(scrollInfo, scrollTop) {
     this.scroll.scrollTop = scrollTop;
 
     // browser emit 'onscroll' event only if the 'element.scrollTop' value changes.
@@ -114,7 +115,7 @@ class TimelineScroll {
   // else otherwise.
   // NOTE: This will help to restore the scroll when msgs get's removed
   // from one end and added to other end
-  _calcDiff(scrollInfo: ScrollInfo) {
+  _calcDiff(scrollInfo) {
     if (!this.topMsg || !this.bottomMsg) return 0;
     if (this.inTopHalf) {
       return this.topMsg.offsetTop - scrollInfo.top;
@@ -122,7 +123,7 @@ class TimelineScroll {
     return this.bottomMsg.offsetTop - scrollInfo.top;
   }
 
-  _updateCalc(scrollInfo: ScrollInfo) {
+  _updateCalc(scrollInfo) {
     const halfViewHeight = Math.round(scrollInfo.viewHeight / 2);
     const scrollMiddle = scrollInfo.top + halfViewHeight;
     const lastMiddle = this.top + halfViewHeight;

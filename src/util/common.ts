@@ -109,7 +109,7 @@ export function getUrlPrams(paramName) {
   return urlParams.get(paramName);
 }
 
-export interface ScrollInfo {
+interface ScrollInfo {
   top: number;
   height: number;
   viewHeight: number;
