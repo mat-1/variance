@@ -225,6 +225,7 @@
     color: var(--tc-surface-low);
     margin-left: var(--sp-ultra-tight);
     bottom: 1px;
+    user-select: none;
   }
 
   // https://github.com/matrix-org/matrix-js-sdk/blob/develop/src/models/event-status.ts#L21
