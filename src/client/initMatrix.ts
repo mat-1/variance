@@ -43,7 +43,6 @@ export class InitMatrix extends EventEmitter {
       localStorage: global.localStorage,
       dbName: 'web-sync-store',
     });
-    await indexedDBStore.startup();
 
     if (!secret.baseUrl) {
       throw new Error('baseUrl must be set when calling startClient');
@@ -61,6 +60,7 @@ export class InitMatrix extends EventEmitter {
       verificationMethods: ['m.sas.v1'],
     });
 
+    await indexedDBStore.startup();
     await this.matrixClient.initCrypto();
 
     await this.matrixClient.startClient({
