@@ -19,7 +19,7 @@ export async function markAsRead(roomId: string, threadId?: string) {
   }
 
   const timeline = room.getLiveTimeline().getEvents();
-  const readEventId = room.getEventReadUpTo(userId);
+  const readEventId = room.getEventReadUpTo(userId, true);
 
   const getLatestValidEvent = () => {
     for (let i = timeline.length - 1; i >= 0; i -= 1) {
