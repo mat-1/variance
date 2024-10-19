@@ -454,12 +454,15 @@
     @include scrollbar.scroll__h;
     @include scrollbar.scroll--auto-hide;
 
+    // we want to be able to have multi-line table values, but not headers
+    & th {
+      white-space: pre;
+    }
     & td,
     & th {
       padding: var(--sp-extra-tight);
       border: 1px solid var(--bg-surface-border);
       border-width: 0 1px 1px 0;
-      white-space: pre;
       &:last-child {
         border-width: 0;
         border-bottom-width: 1px;
