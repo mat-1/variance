@@ -4,7 +4,7 @@ FROM node:20-alpine as builder
 WORKDIR /src
 
 COPY . /src/
-RUN yarn install
+RUN corepack enable && yarn install
 ENV NODE_OPTIONS=--max_old_space_size=4096
 RUN yarn build
 
