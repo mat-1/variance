@@ -124,7 +124,7 @@ function DrawerHeader({ selectedTab, spaceId = null }) {
   const room = mx.getRoom(spaceId);
   const spaceName = isDMTab ? null : room?.name || null;
 
-  const openSpaceOptions = (e) => {
+  const openSpaceOptions = (e: MouseEvent) => {
     e.preventDefault();
     openReusableContextMenu('bottom', getEventCords(e, '.header'), (closeMenu) => (
       <SpaceOptions roomId={spaceId} afterOptionSelect={closeMenu} />

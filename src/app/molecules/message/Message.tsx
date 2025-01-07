@@ -939,13 +939,17 @@ export function Message({
   // make the message transparent while sending and red if it failed sending
   const [messageStatus, setMessageStatus] = useState(mEvent.status);
 
-  const msgType = content?.msgtype;
-
   useEffect(() => {
-    mEvent.once(MatrixEventEvent.Status, (e: MatrixEvent) => {
+    const onStatusEvent = (e: MatrixEvent) => {
       setMessageStatus(e.status);
-    });
+    };
+    mEvent.once(MatrixEventEvent.Status, onStatusEvent);
+    return () => {
+      mEvent.removeListener(MatrixEventEvent.Status, onStatusEvent);
+    };
   }, [mEvent]);
+
+  const msgType = content?.msgtype;
 
   const senderId = mEvent.getSender();
   let { body } = content;
