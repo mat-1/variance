@@ -4,7 +4,15 @@ import './SettingTile.scss';
 
 import Text from '../../atoms/text/Text';
 
-function SettingTile({ title, options, content }) {
+function SettingTile({
+  title,
+  options,
+  content,
+}: {
+  title: React.ReactNode;
+  options: React.ReactNode;
+  content: React.ReactNode;
+}) {
   return (
     <div className="setting-tile">
       <div className="setting-tile__content">

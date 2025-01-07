@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './IconButton.scss';
 
-import RawIcon from '../system-icons/RawIcon';
+import RawIcon, { IconSize } from '../system-icons/RawIcon';
 import Tooltip from '../tooltip/Tooltip';
 import { blurOnBubbling } from './script';
 import Text from '../text/Text';
@@ -23,7 +23,7 @@ const IconButton = React.forwardRef(
       className,
     }: {
       variant?: string;
-      size?: string;
+      size?: IconSize;
       type?: 'button' | 'submit' | 'reset';
       tooltip?: string;
       tooltipPlacement?: string;

@@ -26,13 +26,14 @@ import { useStore } from '../../hooks/useStore';
 import { useDeviceList } from '../../hooks/useDeviceList';
 import { useCrossSigningStatus } from '../../hooks/useCrossSigningStatus';
 import { accessSecretStorage } from './SecretStorageAccess';
+import { CryptoEvent, IMyDevice } from 'matrix-js-sdk';
 
-const promptDeviceName = async (deviceName) =>
+const promptDeviceName = async (deviceName: string): Promise<string | null> =>
   new Promise((resolve) => {
     let isCompleted = false;
 
-    const renderContent = (onComplete) => {
-      const handleSubmit = (e) => {
+    const renderContent = (onComplete: (name: string | null) => void) => {
+      const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const name = e.target.session.value;
         if (typeof name !== 'string') onComplete(null);
@@ -74,7 +75,8 @@ function DeviceManage() {
   const deviceList = useDeviceList();
   const [processing, setProcessing] = useState([]);
   const [truncated, setTruncated] = useState(true);
-  const mountStore = useStore();
+  /** Used to tell whether this component is mounted. */
+  const mountStore = useStore<boolean>();
   mountStore.setItem(true);
   const isMeVerified = isCrossVerified(mx.deviceId);
 
@@ -82,14 +84,15 @@ function DeviceManage() {
     setProcessing([]);
   }, [deviceList]);
 
-  const addToProcessing = (device) => {
+  const addToProcessing = (device: IMyDevice) => {
     const old = [...processing];
     old.push(device.device_id);
     setProcessing(old);
   };
 
-  const removeFromProcessing = () => {
-    setProcessing([]);
+  const removeFromProcessing = (device: IMyDevice) => {
+    const newProcessing = processing.filter((id) => id !== device.device_id);
+    setProcessing(newProcessing);
   };
 
   if (deviceList === null) {
@@ -103,8 +106,8 @@ function DeviceManage() {
     );
   }
 
-  const handleRename = async (device) => {
-    const newName = await promptDeviceName(device.display_name);
+  const handleRename = async (device: IMyDevice) => {
+    const newName = await promptDeviceName(device.display_name ?? '');
     if (newName === null || newName.trim() === '') return;
     if (newName.trim() === device.display_name) return;
     addToProcessing(device);
@@ -112,8 +115,14 @@ function DeviceManage() {
       await mx.setDeviceDetails(device.device_id, {
         display_name: newName,
       });
-    } catch {
-      if (!mountStore.getItem()) return;
+    } catch (err) {
+      // ignore errors
+      console.error("Couldn't rename device:", err);
+    }
+    // not all homeservers send this event when we update devices, so we need to send it ourselves to make the ui update
+    mx.emit(CryptoEvent.DevicesUpdated, [mx.getUserId()!], true);
+
+    if (mountStore.getItem()) {
       removeFromProcessing(device);
     }
   };
@@ -135,7 +144,7 @@ function DeviceManage() {
     removeFromProcessing(device);
   };
 
-  const verifyWithKey = async (device) => {
+  const verifyWithKey = async (device: IMyDevice) => {
     const keyData = await accessSecretStorage('Session verification');
     if (!keyData) return;
     addToProcessing(device);

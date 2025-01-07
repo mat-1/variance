@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './RawIcon.scss';
 
+export type IconSize = 'large' | 'normal' | 'small' | 'extra-small' | 'ultra-small';
+
 function RawIcon({
   color,
   size,
@@ -9,11 +11,11 @@ function RawIcon({
   isImage,
 }: {
   color?: string;
-  size?: 'large' | 'normal' | 'small' | 'extra-small' | 'ultra-small';
+  size?: IconSize;
   src: string;
   isImage?: boolean;
 }) {
-  const style = {};
+  const style: React.CSSProperties = {};
   if (color) style.backgroundColor = color;
   if (isImage) {
     style.backgroundColor = 'transparent';
