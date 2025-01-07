@@ -927,7 +927,6 @@ export function Message({
 
   // make the message transparent while sending and red if it failed sending
   const [messageStatus, setMessageStatus] = useState(mEvent.status);
-  console.log('message content', eventId, content);
   const [decrypted, setDecrypted] = useState<boolean>(!!content.msgtype);
 
   const msgType = content?.msgtype;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Client.scss';
 
-import { initHotkeys } from '../../../client/event/hotkeys';
+import { initHotkeys, removeHotkeys } from '../../../client/event/hotkeys';
 import { initRoomListListener } from '../../../client/event/roomList';
 
 import Text from '../../atoms/text/Text';
@@ -69,6 +69,10 @@ function Client() {
       changeLoading(false);
     });
     initMatrix.init();
+
+    return () => {
+      removeHotkeys();
+    };
   }, []);
 
   if (isLoading) {

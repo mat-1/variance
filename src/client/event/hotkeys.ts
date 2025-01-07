@@ -2,13 +2,12 @@ import { openSearch, toggleRoomSettings } from '../action/navigation';
 import navigation from '../state/navigation';
 import { markAsRead } from '../action/notifications';
 
-function shouldFocusMessageField(code) {
+function shouldFocusMessageField(code: string) {
   // do not focus on F keys
   if (/^F\d+$/.test(code)) return false;
 
   // do not focus on numlock/scroll lock
   if (
-    code.metaKey ||
     code.startsWith('OS') ||
     code.startsWith('Meta') ||
     code.startsWith('Shift') ||
@@ -34,7 +33,7 @@ function listenKeyboard(e: KeyboardEvent) {
     if (e.key === 'k') {
       e.preventDefault();
       if (navigation.isRawModalVisible) return;
-      openSearch();
+      openSearch('');
     }
 
     // focus message field on paste
@@ -43,11 +42,62 @@ function listenKeyboard(e: KeyboardEvent) {
       const msgTextarea = document.getElementById('message-textarea');
       const { activeElement } = document;
       if (
+        activeElement &&
         activeElement !== msgTextarea &&
         ['input', 'textarea'].includes(activeElement.tagName.toLowerCase())
       )
         return;
       msgTextarea?.focus();
+    }
+  }
+
+  function navigateRoomSelector(direction: 'up' | 'down') {
+    // find the room-selector--selected and then select the one before/after it
+
+    const selectedRoomSelector = document.querySelector('.room-selector--selected');
+    const allRoomSelectors = document.querySelectorAll('.room-selector');
+
+    if (selectedRoomSelector) {
+      const selectedRoomIndex = Array.from(allRoomSelectors).indexOf(selectedRoomSelector);
+      const nextRoomSelector = allRoomSelectors[
+        selectedRoomIndex + (direction === 'up' ? -1 : 1)
+      ] as HTMLDivElement;
+      if (nextRoomSelector) {
+        // click the inner .room-selector__content
+        const roomSelectorContent = nextRoomSelector.querySelector(
+          '.room-selector__content',
+        ) as HTMLDivElement;
+        roomSelectorContent.click();
+      }
+    }
+  }
+  function navigateSpaceSelector(index: number) {
+    const allSpaceSelectors = document.querySelectorAll('.sidebar-avatar');
+    // skip the first one for consistency with discord since it's "Home"
+    const spaceIndex = index + 1;
+
+    const spaceSelector = allSpaceSelectors[spaceIndex] as HTMLDivElement;
+    if (spaceSelector) spaceSelector.click();
+  }
+
+  if (e.altKey) {
+    // alt + arrow navigates rooms
+    if (e.key === 'ArrowUp') {
+      navigateRoomSelector('up');
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      navigateRoomSelector('down');
+      return;
+    }
+  }
+
+  if (e.ctrlKey) {
+    // ctrl + number navigates spaces
+    if (Number.isInteger(+e.key)) {
+      const index = +e.key - 1;
+      navigateSpaceSelector(index);
+      return;
     }
   }
 
@@ -65,7 +115,10 @@ function listenKeyboard(e: KeyboardEvent) {
       }
     }
 
-    if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) {
+    if (
+      document.activeElement &&
+      ['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())
+    ) {
       return;
     }
 
