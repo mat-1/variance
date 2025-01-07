@@ -57,6 +57,7 @@ import TickMarkIC from '../../../../public/res/ic/outlined/tick-mark.svg';
 import CmdIC from '../../../../public/res/ic/outlined/cmd.svg';
 import BinIC from '../../../../public/res/ic/outlined/bin.svg';
 import HashPlusIC from '../../../../public/res/ic/outlined/hash-plus.svg';
+import LockIC from '../../../../public/res/ic/outlined/lock.svg';
 
 import { confirmDialog } from '../confirm-dialog/ConfirmDialog';
 import { getBlobSafeMimeType } from '../../../util/mimetypes';
@@ -314,8 +315,15 @@ const MessageBody = React.memo(
     }
 
     return (
-      <div className={`message__body message__body-status-${messageStatus}`}>
+      <div
+        className={`message__body message__body-status-${messageStatus} ${msgType === 'm.bad.encrypted' ? 'message__body-bad-encryption' : ''}`}
+      >
         <div dir="auto" className={`text ${emojiOnly ? 'text-h1' : 'text-b1'}`}>
+          {msgType === 'm.bad.encrypted' && (
+            <>
+              <RawIcon size="extra-small" src={LockIC} color="var(--tc-danger-high)" />{' '}
+            </>
+          )}
           {msgType === 'm.emote' && (
             <>
               {'* '}

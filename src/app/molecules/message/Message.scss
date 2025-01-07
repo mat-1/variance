@@ -239,6 +239,18 @@
   &-status-cancelled > .text {
     color: var(--tc-danger-high);
   }
+
+  &-bad-encryption > .text {
+    color: var(--tc-danger-high);
+    border-left: 4px solid var(--tc-danger-high);
+    padding-left: calc(var(--sp-ultra-tight) * 1.5);
+    border-radius: calc(var(--bo-radius) / 2);
+
+    .ic-raw {
+      stroke: var(--tc-danger-high);
+      vertical-align: text-top;
+    }
+  }
 }
 .message__edit {
   padding: var(--sp-extra-tight) 0;
