@@ -1447,13 +1447,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browser-encrypt-attachment@npm:0.3.0":
-  version: 0.3.0
-  resolution: "browser-encrypt-attachment@npm:0.3.0"
-  checksum: 10/4a55ffc0f0aaf4912366a5b82037834c32d2928df62125a7cf8e1d8078b4756cf6d4bb349107c443874e1b4b26ef65f464ea1333455e94e3edbc0cb5e7f48b9e
-  languageName: node
-  linkType: hard
-
 "browserslist@npm:^4.23.1":
   version: 4.23.3
   resolution: "browserslist@npm:4.23.3"
@@ -3746,6 +3739,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"matrix-encrypt-attachment@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "matrix-encrypt-attachment@npm:1.0.3"
+  checksum: 10/0d9b31f80cb167980d41f478f037c9e920ba1ab73f7ce3fe57ba57a67ac26ddc4fd2323c21e22bceb6fafd0497592ed6632f93176c68b39cfc5cfce043f5ed9c
+  languageName: node
+  linkType: hard
+
 "matrix-events-sdk@npm:0.0.1":
   version: 0.0.1
   resolution: "matrix-events-sdk@npm:0.0.1"
@@ -5446,7 +5446,6 @@ __metadata:
     "@typescript-eslint/parser": "npm:8.3.0"
     "@vitejs/plugin-react": "npm:4.3.1"
     blurhash: "npm:2.0.5"
-    browser-encrypt-attachment: "npm:0.3.0"
     buffer: "npm:6.0.3"
     dateformat: "npm:5.0.3"
     emojibase-data: "npm:15.3.2"
@@ -5464,6 +5463,7 @@ __metadata:
     katex: "npm:0.16.11"
     linkify-html: "npm:4.1.3"
     linkifyjs: "npm:4.1.3"
+    matrix-encrypt-attachment: "npm:^1.0.3"
     matrix-js-sdk: "npm:34.9.0"
     mini-svg-data-uri: "npm:1.4.4"
     prettier: "npm:3.3.3"

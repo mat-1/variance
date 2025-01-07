@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import encrypt from 'browser-encrypt-attachment';
+import encrypt from 'matrix-encrypt-attachment';
 import { encode } from 'blurhash';
 import { EventTimeline, MatrixClient, MatrixEvent } from 'matrix-js-sdk';
 import { getShortcodeToEmoji } from '../../app/organisms/emoji-board/custom-emoji';
@@ -23,7 +23,7 @@ function encodeBlurhash(img) {
   return encode(data.data, data.width, data.height, 4, 4);
 }
 
-function loadImage(url) {
+function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
@@ -369,9 +369,27 @@ class RoomsInput extends EventEmitter {
     this.emit(cons.events.roomsInput.MESSAGE_SENT, roomId);
   }
 
-  async sendFile(roomId, file) {
+  async sendFile(roomId: string, file: File) {
     const fileType = getBlobSafeMimeType(file.type).slice(0, file.type.indexOf('/'));
-    const info = {
+    const info: {
+      mimetype: string;
+      size: number;
+      w?: number;
+      h?: number;
+      [blurhashField]?: string;
+      thumbnail_info?: {
+        mimetype: string;
+        size: number;
+        w?: number;
+        h?: number;
+        [blurhashField]?: string;
+      };
+      thumbnail_url?: string;
+      thumbnail_file?: {
+        url: string;
+        mimetype: string;
+      };
+    } = {
       mimetype: file.type,
       size: file.size,
     };
@@ -406,7 +424,7 @@ class RoomsInput extends EventEmitter {
         );
         const thumbnailUploadData = await this.uploadFile(roomId, thumbnailData.thumbnail);
         info.thumbnail_info = thumbnailData.info;
-        if (this.matrixClient.isRoomEncrypted(roomId)) {
+        if (this.matrixClient.getRoom(roomId)?.hasEncryptionStateEvent()) {
           info.thumbnail_file = thumbnailUploadData.file;
         } else {
           info.thumbnail_url = thumbnailUploadData.url;

@@ -96,18 +96,34 @@ const MessageAvatar = React.memo(
     avatarSrc: string;
     userId: string;
     username: string;
-  }) => (
-    <div className="message__avatar-container">
-      <button type="button" onClick={() => openProfileViewer(userId, roomId)}>
-        <Avatar
-          imageSrc={avatarSrc}
-          text={username}
-          bgColor={backgroundColorMXID(userId)}
-          size="small"
-        />
-      </button>
-    </div>
-  ),
+  }) => {
+    // fetch avatar
+    const decryptedAvatarSrcPromise = avatarSrc
+      ? Media.getUrl(avatarSrc, undefined, undefined)
+      : undefined;
+
+    const [decryptedAvatarSrc, setDecryptedAvatarSrc] = useState<string | undefined>(undefined);
+    useEffect(() => {
+      decryptedAvatarSrcPromise?.then((src) => setDecryptedAvatarSrc(src));
+    }, [decryptedAvatarSrcPromise]);
+
+    return (
+      <div className="message__avatar-container">
+        <button
+          type="button"
+          aria-label="View profile"
+          onClick={() => openProfileViewer(userId, roomId)}
+        >
+          <Avatar
+            imageSrc={decryptedAvatarSrc}
+            text={username}
+            bgColor={backgroundColorMXID(userId)}
+            size="small"
+          />
+        </button>
+      </div>
+    );
+  },
 );
 
 const MessageHeader = React.memo(
@@ -841,7 +857,15 @@ function genMediaContent(matrixEvent: MatrixEvent) {
           name={mContent.body}
           width={typeof mContent.info?.w === 'number' ? mContent.info?.w : null}
           height={typeof mContent.info?.h === 'number' ? mContent.info?.h : null}
-          link={mx.mxcUrlToHttp(mediaMXC)}
+          link={mx.mxcUrlToHttp(
+            mediaMXC,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            true,
+          )}
           file={isEncryptedFile ? mContent.file : null}
           type={mContent.info?.mimetype}
           blurhash={blurhash}
@@ -984,6 +1008,7 @@ export function Message({
     'crop',
     true,
     false,
+    true,
   );
 
   let isCustomHTML = content.format === 'org.matrix.custom.html';

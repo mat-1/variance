@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './Media.scss';
 
-import encrypt from 'browser-encrypt-attachment';
+import encrypt from 'matrix-encrypt-attachment';
 
 import { BlurhashCanvas } from 'react-blurhash';
 import Text from '../../atoms/text/Text';
@@ -18,22 +18,70 @@ import { getBlobSafeMimeType } from '../../../util/mimetypes';
 import initMatrix from '../../../client/initMatrix';
 import settings from '../../../client/state/settings';
 
-async function getDecryptedBlob(response, type, decryptData) {
+async function getDecryptedBlob(
+  response: Response,
+  type: string,
+  decryptData: encrypt.IEncryptedFile,
+) {
   const arrayBuffer = await response.arrayBuffer();
   const dataArray = await encrypt.decryptAttachment(arrayBuffer, decryptData);
   const blob = new Blob([dataArray], { type: getBlobSafeMimeType(type) });
   return blob;
 }
 
-async function getUrl(link, type, decryptData) {
+const cachedUnencryptedMedia = new Map<string, string | Promise<string>>();
+
+export async function getUrl(
+  link: string,
+  contentType?: string,
+  decryptionData?: encrypt.IEncryptedFile,
+): Promise<string> {
   try {
-    const response = await fetch(link, { method: 'GET' });
-    if (decryptData !== null) {
-      return URL.createObjectURL(await getDecryptedBlob(response, type, decryptData));
+    // make sure the link is the homeserver we expect
+    if (!link.startsWith(initMatrix.matrixClient.getHomeserverUrl())) {
+      console.error(
+        "got media link to unexpected homeserver, aborting so we don't send them our token",
+        link,
+      );
+      return link;
+    }
+
+    if (cachedUnencryptedMedia.has(link)) {
+      const cachedValue = cachedUnencryptedMedia.get(link);
+      if (typeof cachedValue === 'string') return cachedValue;
+      return (await cachedValue)!;
+    }
+
+    // insert a promise
+    let resolvePromise;
+    const promise = new Promise<string>((resolve) => {
+      resolvePromise = resolve;
+    });
+    cachedUnencryptedMedia.set(link, promise);
+    if (cachedUnencryptedMedia.size > 10000) {
+      console.info('cachedUnencryptedMedia is too large, clearing');
+      cachedUnencryptedMedia.clear();
+    }
+
+    const response = await fetch(link, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${initMatrix.matrixClient.getAccessToken()}`,
+      },
+    });
+    if (decryptionData) {
+      if (!contentType) {
+        throw new Error('Cannot decrypt media without a content type');
+      }
+      return URL.createObjectURL(await getDecryptedBlob(response, contentType, decryptionData));
     }
     const blob = await response.blob();
-    return URL.createObjectURL(blob);
+    const objectUrl = URL.createObjectURL(blob);
+    cachedUnencryptedMedia.set(link, objectUrl);
+    resolvePromise(objectUrl);
+    return objectUrl;
   } catch (e) {
+    console.error(e);
     return link;
   }
 }
@@ -109,14 +157,23 @@ File.propTypes = {
   file: PropTypes.shape({}),
 };
 
-// {
-//   file: null,
-//   width: null,
-//   height: null,
-//   type: '',
-//   blurhash: '',
-// }
-function Image({ name, width, height, link, file = null, type, blurhash }) {
+function Image({
+  name,
+  width,
+  height,
+  link,
+  file = null,
+  type,
+  blurhash = '',
+}: {
+  name: string;
+  width: number;
+  height: number;
+  link: string;
+  file: unknown;
+  type: string;
+  blurhash: string;
+}) {
   const [url, setUrl] = useState(null);
   const [blur, setBlur] = useState(true);
   const [lightbox, setLightbox] = useState(false);
@@ -132,7 +189,7 @@ function Image({ name, width, height, link, file = null, type, blurhash }) {
     return () => {
       unmounted = true;
     };
-  }, []);
+  }, [file, link, type]);
 
   const toggleLightbox = () => {
     if (!url) return;
@@ -146,7 +203,7 @@ function Image({ name, width, height, link, file = null, type, blurhash }) {
           style={{ height: width !== null ? getNativeHeight(width, height) : 'unset' }}
           className="image-container"
           role="button"
-          tabIndex="0"
+          tabIndex={0}
           onClick={toggleLightbox}
           onKeyDown={toggleLightbox}
         >
