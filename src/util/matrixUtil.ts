@@ -6,6 +6,7 @@ import HashLockIC from '../../public/res/ic/outlined/hash-lock.svg';
 import SpaceIC from '../../public/res/ic/outlined/space.svg';
 import SpaceGlobeIC from '../../public/res/ic/outlined/space-globe.svg';
 import SpaceLockIC from '../../public/res/ic/outlined/space-lock.svg';
+import { RoomMember } from 'matrix-js-sdk';
 
 const WELL_KNOWN_URI = '/.well-known/matrix/client';
 
@@ -50,13 +51,13 @@ export function getUsername(userId: string): string {
   return username;
 }
 
-export function getUsernameOfRoomMember(roomMember) {
+export function getUsernameOfRoomMember(roomMember: RoomMember) {
   return roomMember.name || roomMember.userId;
 }
 
-export async function isRoomAliasAvailable(alias) {
+export async function isRoomAliasAvailable(alias: string): Promise<boolean> {
   try {
-    const result = await initMatrix.matrixClient.resolveRoomAlias(alias);
+    const result = await initMatrix.matrixClient.getRoomIdForAlias(alias);
     if (result.room_id) return false;
     return false;
   } catch (e) {
@@ -131,8 +132,9 @@ export function joinRuleToIconSrc(joinRule, isSpace) {
 
 // NOTE: it gives userId with minimum power level 50;
 function getHighestPowerUserId(room) {
-  const userIdToPower = room.currentState.getStateEvents('m.room.power_levels', '')?.getContent()
-    .users;
+  const userIdToPower = room.currentState
+    .getStateEvents('m.room.power_levels', '')
+    ?.getContent().users;
   let powerUserId = null;
   if (!userIdToPower) return powerUserId;
 

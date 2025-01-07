@@ -7,7 +7,7 @@ A Matrix client that aims to be user-friendly and provide an experience similar 
 ## Notable features
 
 - Markdown preview like Discord
-- More keybinds like Discord (esc to focus input, alt+arrow to navigate, etc)
+- More keybinds like Discord (esc to focus input and scroll down, alt+arrow to navigate rooms, etc)
 - Better markdown support like Discord
 - Indicator for when a message is still being sent, like Discord
 - Real support for threads

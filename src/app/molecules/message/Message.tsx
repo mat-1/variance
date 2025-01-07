@@ -10,6 +10,7 @@ import {
   RoomEvent,
   THREAD_RELATION_TYPE,
   Thread,
+  getHttpUriForMxc,
 } from 'matrix-js-sdk';
 import { twemojify } from '../../../util/twemojify';
 
@@ -159,7 +160,12 @@ MessageReply.propTypes = {
 
 const MessageReplyWrapper = React.memo(
   ({ roomTimeline, eventId }: { roomTimeline: RoomTimeline; eventId: string }) => {
-    const [reply, setReply] = useState(null);
+    const [reply, setReply] = useState<{
+      to: string;
+      color: string;
+      body: string;
+      event: MatrixEvent | null;
+    } | null>(null);
     const isMountedRef = useRef(true);
 
     useEffect(() => {
@@ -171,9 +177,9 @@ const MessageReplyWrapper = React.memo(
           if (!eTimeline) return;
           await roomTimeline.decryptAllEventsOfTimeline(eTimeline);
 
-          let mEvent = eTimeline.getTimelineSet().findEventById(eventId);
+          let mEvent = eTimeline.getTimelineSet().findEventById(eventId)!;
 
-          const editedList = roomTimeline.editedTimeline.get(mEvent.getId());
+          const editedList = roomTimeline.editedTimeline.get(mEvent.getId()!);
           if (editedList) {
             mEvent = editedList[editedList.length - 1];
           }
@@ -930,17 +936,42 @@ export function Message({
 
   const msgType = content?.msgtype;
 
-  mEvent.once(MatrixEventEvent.Status, (e: MatrixEvent) => {
-    setMessageStatus(e.status);
-    console.log('Message status changed', e.status);
-  });
+  useEffect(() => {
+    mEvent.once(MatrixEventEvent.Status, (e: MatrixEvent) => {
+      setMessageStatus(e.status);
+    });
+  }, [mEvent]);
 
   const senderId = mEvent.getSender();
   let { body } = content;
-  const username = mEvent.sender ? getUsernameOfRoomMember(mEvent.sender) : getUsername(senderId!);
-  const avatarSrc =
-    mEvent.sender?.getAvatarUrl(initMatrix.matrixClient.baseUrl, 36, 36, 'crop', true, false) ??
-    null;
+
+  // we do this instead of mEvent.sender since that one is sometimes incomplete (like, missing username or avatar).
+  // also guarantees that the username/avatar is always the newest one.
+  const sender = senderId ? roomTimeline?.room.getMember(senderId) : undefined;
+
+  let username = sender ? getUsernameOfRoomMember(sender) : getUsername(senderId!);
+  let avatarMxcUrl = sender?.getMxcAvatarUrl();
+
+  // used by mautrix discord bridge
+  const beeperProfile = mEvent.getContent()['com.beeper.per_message_profile'];
+  if (beeperProfile) {
+    if (beeperProfile.displayname) {
+      username = beeperProfile.displayname;
+    }
+    if (beeperProfile.avatar_url) {
+      avatarMxcUrl = beeperProfile.avatar_url;
+    }
+  }
+  const avatarSrc = getHttpUriForMxc(
+    initMatrix.matrixClient.baseUrl,
+    avatarMxcUrl,
+    36,
+    36,
+    'crop',
+    true,
+    false,
+  );
+
   let isCustomHTML = content.format === 'org.matrix.custom.html';
   let customHTML = isCustomHTML ? content.formatted_body : null;
 
