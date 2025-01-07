@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './DeviceManage.scss';
 import dateFormat from 'dateformat';
 
+import { CryptoEvent, IMyDevice } from 'matrix-js-sdk';
+import { OwnDeviceKeys } from 'matrix-js-sdk/lib/crypto-api';
+
 import initMatrix from '../../../client/initMatrix';
 import { isCrossVerified } from '../../../util/matrixUtil';
 import { openReusableDialog, openEmojiVerification } from '../../../client/action/navigation';
@@ -26,7 +29,6 @@ import { useStore } from '../../hooks/useStore';
 import { useDeviceList } from '../../hooks/useDeviceList';
 import { useCrossSigningStatus } from '../../hooks/useCrossSigningStatus';
 import { accessSecretStorage } from './SecretStorageAccess';
-import { CryptoEvent, IMyDevice } from 'matrix-js-sdk';
 
 const promptDeviceName = async (deviceName: string): Promise<string | null> =>
   new Promise((resolve) => {
@@ -94,6 +96,18 @@ function DeviceManage() {
     const newProcessing = processing.filter((id) => id !== device.device_id);
     setProcessing(newProcessing);
   };
+
+  const [ownDeviceKeys, setOwnDeviceKeys] = useState<OwnDeviceKeys>({
+    ed25519: '',
+    curve25519: '',
+  });
+  useEffect(() => {
+    mx.getCrypto()!
+      .getOwnDeviceKeys()
+      .then((keys) => {
+        setOwnDeviceKeys(keys);
+      });
+  }, [mx]);
 
   if (deviceList === null) {
     return (
@@ -167,11 +181,11 @@ function DeviceManage() {
     verifyWithEmojis(deviceId);
   };
 
-  const renderDevice = (device, isVerified) => {
+  const renderDevice = (device: IMyDevice, isVerified: boolean, ownDeviceKeys: OwnDeviceKeys) => {
     const deviceId = device.device_id;
     const displayName = device.display_name;
     const lastIP = device.last_seen_ip;
-    const lastTS = device.last_seen_ts;
+    const lastTS = device.last_seen_ts ?? 0;
     const isCurrentDevice = mx.deviceId === deviceId;
     const canVerify = isVerified === false && (isMeVerified || isCurrentDevice);
 
@@ -237,10 +251,7 @@ function DeviceManage() {
             )}
             {isCurrentDevice && (
               <Text style={{ marginTop: 'var(--sp-ultra-tight)' }} variant="b3">
-                {`Session Key: ${initMatrix.matrixClient
-                  .getDeviceEd25519Key()
-                  .match(/.{1,4}/g)
-                  .join(' ')}`}
+                {`Session Key: ${ownDeviceKeys.ed25519.match(/.{1,4}/g)?.join(' ')}`}
               </Text>
             )}
           </>
@@ -264,6 +275,7 @@ function DeviceManage() {
         noEncryption.push(device);
       }
     });
+
   return (
     <div className="device-manage">
       <div>
@@ -279,7 +291,7 @@ function DeviceManage() {
           </div>
         )}
         {unverified.length > 0 ? (
-          unverified.map((device) => renderDevice(device, false))
+          unverified.map((device) => renderDevice(device, false, ownDeviceKeys))
         ) : (
           <Text className="device-manage__info">No unverified sessions</Text>
         )}
@@ -287,7 +299,7 @@ function DeviceManage() {
       {noEncryption.length > 0 && (
         <div>
           <MenuHeader>Sessions without encryption support</MenuHeader>
-          {noEncryption.map((device) => renderDevice(device, null))}
+          {noEncryption.map((device) => renderDevice(device, null, ownDeviceKeys))}
         </div>
       )}
       <div>
@@ -295,7 +307,7 @@ function DeviceManage() {
         {verified.length > 0 ? (
           verified.map((device, index) => {
             if (truncated && index >= TRUNCATED_COUNT) return null;
-            return renderDevice(device, true);
+            return renderDevice(device, true, ownDeviceKeys);
           })
         ) : (
           <Text className="device-manage__info">No verified sessions</Text>

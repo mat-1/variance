@@ -4,6 +4,17 @@ A Matrix client that aims to be user-friendly and provide an experience similar 
 
 - [Contributing](./CONTRIBUTING.md)
 
+## Notable features
+
+- Markdown preview like Discord
+- More keybinds like Discord (esc to focus input, alt+arrow to navigate, etc)
+- Better markdown support like Discord
+- Indicator for when a message is still being sent, like Discord
+- Real support for threads
+- Element-compatible theming
+- Private read receipts support
+- Text reactions
+
 ## Getting started
 A web app is available at https://variance.matdoes.dev and is updated on every commit.
 
