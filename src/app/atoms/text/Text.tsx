@@ -2,23 +2,33 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './Text.scss';
 
-function Text({
-  className,
-  style,
-  variant,
-  weight,
-  primary,
-  span,
-  children,
-}: {
-  className: string | null;
-  style: React.CSSProperties | undefined;
-  variant: 'h1' | 'h2' | 's1' | 'b1' | 'b2' | 'b3' | 'b4';
-  weight: 'light' | 'normal' | 'medium' | 'bold';
-  primary: boolean;
-  span: boolean;
-  children: React.ReactNode;
-}) {
+function Text(
+  {
+    className,
+    style,
+    variant,
+    weight,
+    primary,
+    span,
+    children,
+  }: {
+    className: string | null;
+    style: React.CSSProperties | undefined;
+    variant: 'h1' | 'h2' | 's1' | 'b1' | 'b2' | 'b3' | 'b4';
+    weight: 'light' | 'normal' | 'medium' | 'bold';
+    primary: boolean;
+    span: boolean;
+    children: React.ReactNode;
+  } = {
+    className: null,
+    style: undefined,
+    variant: 'b1',
+    weight: 'normal',
+    primary: false,
+    span: false,
+    children: undefined,
+  },
+) {
   const classes = [];
   if (className) classes.push(className);
 
@@ -56,15 +66,6 @@ function Text({
     </p>
   );
 }
-
-Text.defaultProps = {
-  className: null,
-  style: null,
-  variant: 'b1',
-  weight: 'normal',
-  primary: false,
-  span: false,
-};
 
 Text.propTypes = {
   className: PropTypes.string,
