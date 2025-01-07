@@ -19,6 +19,7 @@ import Dialog from '../../molecules/dialog/Dialog';
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 import { useStore } from '../../hooks/useStore';
 import { accessSecretStorage } from '../settings/SecretStorageAccess';
+import { CrossSigningKey } from 'matrix-js-sdk/lib/crypto-api';
 
 function EmojiVerificationContent({ data, requestClose }) {
   const [sas, setSas] = useState(null);
@@ -31,8 +32,8 @@ function EmojiVerificationContent({ data, requestClose }) {
   const beginVerification = async () => {
     if (
       isCrossVerified(mx.deviceId) &&
-      (mx.getCrossSigningId() === null ||
-        (await mx.crypto.crossSigningInfo.isStoredInKeyCache('self_signing')) === false)
+      (mx.getCrypto()?.getCrossSigningKeyId() === null ||
+        (await mx.getCrypto()?.getCrossSigningKeyId(CrossSigningKey.SelfSigning)) === null)
     ) {
       if (!hasPrivateKey(getDefaultSSKey())) {
         const keyData = await accessSecretStorage('Emoji verification');

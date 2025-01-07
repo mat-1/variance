@@ -11,8 +11,9 @@ import LogoSVG from '../../../public/res/svg/cinny.svg';
 import LogoUnreadSVG from '../../../public/res/svg/cinny-unread.svg';
 import LogoHighlightSVG from '../../../public/res/svg/cinny-highlight.svg';
 import { html, plain } from '../../util/markdown';
-import { MatrixEvent, Room, RoomEvent } from 'matrix-js-sdk';
+import { MatrixClient, MatrixEvent, Room, RoomEvent } from 'matrix-js-sdk';
 import RoomList from './RoomList';
+import { CryptoBackend } from 'matrix-js-sdk/lib/common-crypto/CryptoBackend';
 
 function isNotifEvent(mEvent) {
   const eType = mEvent.getType();
@@ -34,6 +35,20 @@ function findMutedRule(overrideRules, roomId) {
 }
 
 class Notifications extends EventEmitter {
+  initialized: boolean;
+
+  favicon: string;
+
+  matrixClient: MatrixClient;
+
+  roomList: RoomList;
+
+  roomIdToNoti: Map<string, { total: number; highlight: number; from: Set<string> }>;
+
+  roomIdToPopupNotis: Map<string, Notification[]>;
+
+  eventIdToPopupNoti: Map<string, Notification>;
+
   constructor(roomList: RoomList) {
     super();
 
@@ -227,7 +242,7 @@ class Notifications extends EventEmitter {
     this._updateFavicon();
   }
 
-  async _displayPopupNoti(mEvent, room) {
+  async _displayPopupNoti(mEvent: MatrixEvent, room: Room) {
     if (!settings.showNotifications && !settings.isNotificationSounds) return;
 
     const actions = this.matrixClient.getPushActionsForEvent(mEvent);
@@ -236,7 +251,7 @@ class Notifications extends EventEmitter {
     if (navigation.selectedRoomId === room.roomId && document.visibilityState === 'visible') return;
 
     if (mEvent.isEncrypted()) {
-      await mEvent.attemptDecryption(this.matrixClient.crypto);
+      await mEvent.attemptDecryption(this.matrixClient.getCrypto() as CryptoBackend);
     }
 
     if (settings.showNotifications) {
