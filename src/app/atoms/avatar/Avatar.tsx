@@ -4,7 +4,7 @@ import './Avatar.scss';
 
 import { twemojify } from '../../../util/twemojify';
 
-import Text from '../text/Text';
+import Text, { TextVariant } from '../text/Text';
 import RawIcon from '../system-icons/RawIcon';
 
 import ImageBrokenSVG from '../../../../public/res/svg/image-broken.svg';
@@ -19,7 +19,7 @@ const Avatar = React.forwardRef(
       iconSrc,
       iconColor,
       imageSrc,
-      size,
+      size = 'normal',
     }: {
       text?: string;
       bgColor?: string;
@@ -27,24 +27,17 @@ const Avatar = React.forwardRef(
       iconColor?: string;
       imageSrc?: string;
       size?: 'large' | 'normal' | 'small' | 'extra-small' | 'ultra-small';
-    } = {
-      text: undefined,
-      bgColor: 'transparent',
-      iconSrc: undefined,
-      iconColor: undefined,
-      imageSrc: undefined,
-      size: 'normal',
     },
     ref: React.Ref<HTMLDivElement> | undefined = undefined,
   ) => {
-    let textSize = 's1';
+    let textSize: TextVariant = 's1';
     if (size === 'large') textSize = 'h1';
     if (size === 'small') textSize = 'b1';
     if (size === 'extra-small') textSize = 'b3';
     if (size === 'ultra-small') textSize = 'b4';
 
     // matrix (or at least synapse) lets us replace .gif with .png in the url to make it static
-    const pausedImageSrc = imageSrc?.replace(/\.gif\b/, '.png') ?? null;
+    const pausedImageSrc = imageSrc?.replace(/\.gif\b/, '.png');
     const { onlyAnimateOnHover } = settings;
 
     const [activeImageSrc, setActiveImageSrc] = React.useState(
@@ -58,7 +51,7 @@ const Avatar = React.forwardRef(
 
     return (
       <div ref={ref} className={`avatar-container avatar-container__${size} noselect`}>
-        {activeImageSrc !== null ? (
+        {activeImageSrc ? (
           <img
             loading="lazy"
             draggable="false"
@@ -85,13 +78,13 @@ const Avatar = React.forwardRef(
           />
         ) : (
           <span
-            style={{ backgroundColor: iconSrc === null ? bgColor : 'transparent' }}
-            className={`avatar__border${iconSrc !== null ? '--active' : ''}`}
+            style={{ backgroundColor: !iconSrc ? bgColor : 'transparent' }}
+            className={`avatar__border${!iconSrc ? '--active' : ''}`}
           >
-            {iconSrc ? (
+            {typeof iconSrc === 'string' ? (
               <RawIcon size={size} src={iconSrc} color={iconColor} />
             ) : (
-              text && (
+              typeof text === 'string' && (
                 <Text variant={textSize} primary>
                   {twemojify(avatarInitials(text))}
                 </Text>
