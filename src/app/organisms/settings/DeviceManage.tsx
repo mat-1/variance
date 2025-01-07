@@ -142,6 +142,9 @@ function DeviceManage() {
 
     if (!mountStore.getItem()) return;
     removeFromProcessing(device);
+
+    // not all homeservers send this event when we update devices, so we need to send it ourselves to make the ui update
+    mx.emit(CryptoEvent.DevicesUpdated, [mx.getUserId()!], true);
   };
 
   const verifyWithKey = async (device: IMyDevice) => {
@@ -171,6 +174,9 @@ function DeviceManage() {
     const lastTS = device.last_seen_ts;
     const isCurrentDevice = mx.deviceId === deviceId;
     const canVerify = isVerified === false && (isMeVerified || isCurrentDevice);
+
+    // more than 90 days old
+    const isLastTimestampOld = lastTS < Date.now() - 1000 * 60 * 60 * 24 * 90;
 
     return (
       <SettingTile
@@ -216,8 +222,15 @@ function DeviceManage() {
             {lastTS && (
               <Text variant="b3">
                 Last activity
-                <span style={{ color: 'var(--tc-surface-normal)' }}>
+                <span
+                  style={{
+                    color: isLastTimestampOld
+                      ? 'var(--tc-danger-high)'
+                      : 'var(--tc-surface-normal)',
+                  }}
+                >
                   {dateFormat(new Date(lastTS), ' hh:MM TT, dd/mm/yyyy')}
+                  {isLastTimestampOld ? ' (old)' : ''}
                 </span>
                 {lastIP ? ` at ${lastIP}` : ''}
               </Text>

@@ -1,6 +1,7 @@
 # Variance
 
-A Matrix client that aims to be user-friendly and provide an experience similar to Discord. It's based on [Cinny](https://github.com/cinnyapp/cinny).
+A Matrix client that aims to be user-friendly and provide an experience similar to Discord. It's a hard-fork of [Cinny](https://github.com/cinnyapp/cinny).
+
 - [Contributing](./CONTRIBUTING.md)
 
 ## Getting started

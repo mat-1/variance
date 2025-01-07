@@ -68,6 +68,12 @@ function listenKeyboard(e: KeyboardEvent) {
           '.room-selector__content',
         ) as HTMLDivElement;
         roomSelectorContent.click();
+        // scroll the room into view
+        nextRoomSelector.scrollIntoView({
+          behavior: 'instant',
+          block: 'nearest',
+          inline: 'nearest',
+        });
       }
     }
   }

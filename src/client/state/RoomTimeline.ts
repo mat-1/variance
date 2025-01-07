@@ -16,6 +16,7 @@ import initMatrix from '../initMatrix';
 import cons from './cons';
 
 import settings from './settings';
+import { CryptoBackend } from 'matrix-js-sdk/lib/common-crypto/CryptoBackend';
 
 function isEdited(mEvent: MatrixEvent) {
   return mEvent.getRelation()?.rel_type === 'm.replace';
@@ -271,7 +272,9 @@ class RoomTimeline extends EventEmitter {
     try {
       await this.matrixClient.paginateEventTimeline(timelineToPaginate, { backwards, limit });
 
-      if (this.isEncrypted()) await this.decryptAllEventsOfTimeline(this.activeTimeline);
+      if (this.isEncrypted()) {
+        await this.decryptAllEventsOfTimeline(this.activeTimeline);
+      }
       this._populateTimelines();
 
       const loaded = this.timeline.length - oldSize;
@@ -288,9 +291,13 @@ class RoomTimeline extends EventEmitter {
   decryptAllEventsOfTimeline(eventTimeline: EventTimeline) {
     const decryptionPromises = eventTimeline
       .getEvents()
-      .filter((event) => event.shouldAttemptDecryption())
+      .filter((event) => event.shouldAttemptDecryption() || event.isBeingDecrypted())
       .reverse()
-      .map((event) => event.attemptDecryption(this.matrixClient.getCrypto(), { isRetry: true }));
+      .map(
+        (event) =>
+          event.getDecryptionPromise() ||
+          event.attemptDecryption(this.matrixClient.getCrypto() as CryptoBackend),
+      );
 
     return Promise.allSettled(decryptionPromises);
   }
