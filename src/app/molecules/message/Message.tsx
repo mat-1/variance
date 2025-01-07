@@ -942,8 +942,12 @@ export function Message({
   useEffect(() => {
     const onStatusEvent = (e: MatrixEvent) => {
       setMessageStatus(e.status);
+      if (e.status === 'sent') {
+        // only remove the listener after it's actually sent
+        mEvent.removeListener(MatrixEventEvent.Status, onStatusEvent);
+      }
     };
-    mEvent.once(MatrixEventEvent.Status, onStatusEvent);
+    mEvent.addListener(MatrixEventEvent.Status, onStatusEvent);
     return () => {
       mEvent.removeListener(MatrixEventEvent.Status, onStatusEvent);
     };
