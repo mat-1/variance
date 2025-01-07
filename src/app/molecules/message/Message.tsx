@@ -697,16 +697,7 @@ const MessageOptions = React.memo(
                   <MenuItem
                     variant="danger"
                     iconSrc={BinIC}
-                    onClick={async () => {
-                      const isConfirmed = await confirmDialog(
-                        'Delete message',
-                        'Are you sure that you want to delete this message?',
-                        'Delete',
-                        'danger',
-                      );
-                      if (!isConfirmed) return;
-                      redactEvent(roomId, eventId);
-                    }}
+                    onClick={(ev) => confirmRedact(eventId, roomId, ev)}
                   >
                     Delete
                   </MenuItem>
@@ -727,6 +718,18 @@ const MessageOptions = React.memo(
     );
   },
 );
+
+async function confirmRedact(eventId: string, roomId: string, ev?: MouseEvent) {
+  const isConfirmed = await confirmDialog(
+    'Delete message',
+    'Are you sure that you want to delete this message?',
+    'Delete',
+    'danger',
+    ev,
+  );
+  if (!isConfirmed) return;
+  redactEvent(roomId, eventId);
+}
 
 const MessageThreadSummary = React.memo(({ thread }: { thread: Thread }) => {
   const [lastReply, setLastReply] = useState(thread.lastReply());
@@ -912,6 +915,10 @@ export function Message({
   cancelEdit?: () => void;
 }) {
   const roomId = mEvent.getRoomId();
+  if (!roomId) {
+    console.warn('Message without room id', mEvent);
+    return null;
+  }
   const { editedTimeline, reactionTimeline } = roomTimeline ?? {};
 
   const className = ['message', isBodyOnly ? 'message--body-only' : 'message--full'];
@@ -931,7 +938,7 @@ export function Message({
 
   const senderId = mEvent.getSender();
   let { body } = content;
-  const username = mEvent.sender ? getUsernameOfRoomMember(mEvent.sender) : getUsername(senderId);
+  const username = mEvent.sender ? getUsernameOfRoomMember(mEvent.sender) : getUsername(senderId!);
   const avatarSrc =
     mEvent.sender?.getAvatarUrl(initMatrix.matrixClient.baseUrl, 36, 36, 'crop', true, false) ??
     null;
@@ -1004,7 +1011,7 @@ export function Message({
           <MessageBody
             senderName={username}
             isCustomHTML={isCustomHTML}
-            body={isMedia(mEvent) ? genMediaContent(mEvent) : customHTML ?? body}
+            body={isMedia(mEvent) ? genMediaContent(mEvent) : (customHTML ?? body)}
             msgType={msgType}
             isEdited={isEdited}
             messageStatus={messageStatus}
@@ -1021,10 +1028,14 @@ export function Message({
                 : plain(body, { kind: 'edit', onlyPlain: true }).plain
             }
             onSave={(newBody, oldBody) => {
+              cancelEdit?.();
+              if (newBody === '') {
+                confirmRedact(eventId, roomId);
+                return;
+              }
               if (newBody !== oldBody) {
                 initMatrix.roomsInput.sendEditedMessage(roomId, mEvent, newBody);
               }
-              cancelEdit();
             }}
             onCancel={cancelEdit}
           />

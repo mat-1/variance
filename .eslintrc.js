@@ -51,5 +51,6 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'error',
 
     'no-console': 'off',
+    'no-use-before-define': 'off',
   },
 };

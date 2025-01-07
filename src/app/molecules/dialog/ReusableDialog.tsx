@@ -8,12 +8,22 @@ import Dialog from './Dialog';
 
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
+interface DialogueData {
+  title: string;
+  render: (close: () => void) => React.ReactNode;
+  afterClose?: () => void;
+}
+
 function ReusableDialog() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [data, setData] = useState(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [data, setData] = useState<DialogueData | null>(null);
 
   useEffect(() => {
-    const handleOpen = (title, render, afterClose) => {
+    const handleOpen = (
+      title: string,
+      render: (close: () => void) => React.ReactNode,
+      afterClose?: () => void,
+    ) => {
       setIsOpen(true);
       setData({ title, render, afterClose });
     };
@@ -24,7 +34,7 @@ function ReusableDialog() {
   }, []);
 
   const handleAfterClose = () => {
-    data.afterClose?.();
+    data!.afterClose?.();
     setData(null);
   };
 

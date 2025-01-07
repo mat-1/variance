@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import './ConfirmDialog.scss';
 
@@ -7,7 +7,39 @@ import { openReusableDialog } from '../../../client/action/navigation';
 import Text from '../../atoms/text/Text';
 import Button from '../../atoms/button/Button';
 
-function ConfirmDialog({ desc, actionTitle, actionType, onComplete }) {
+function ConfirmDialog({
+  desc,
+  actionTitle,
+  actionType,
+  onComplete,
+}: {
+  desc: string;
+  actionTitle: string;
+  actionType: 'primary' | 'positive' | 'danger' | 'caution';
+  onComplete: (isConfirmed: boolean) => void;
+}) {
+  // on enter pressed
+  const acceptingInputs = useRef(false);
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!acceptingInputs.current) {
+        return;
+      }
+      if (e.key === 'Enter') onComplete(true);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+
+    // this is just so the event doesn't happen immediately (like if we pressed enter to open the dialog)
+    const timeout = setTimeout(() => {
+      acceptingInputs.current = true;
+    }, 50);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      clearTimeout(timeout);
+    };
+  }, [onComplete]);
+
   return (
     <div className="confirm-dialog">
       <Text>{desc}</Text>
@@ -35,14 +67,23 @@ ConfirmDialog.propTypes = {
  * @return {Promise<boolean>} does it get's confirmed or not
  */
 // eslint-disable-next-line import/prefer-default-export
-export const confirmDialog = (title, desc, actionTitle, actionType = 'primary') =>
-  new Promise((resolve) => {
-    let isCompleted = false;
+export const confirmDialog = async (
+  title: string,
+  desc: string,
+  actionTitle: string,
+  actionType: string = 'primary',
+  event: MouseEvent | undefined = undefined,
+) => {
+  // if shift is held, always skip confirmation dialogues
+  if (event?.shiftKey) return true;
+
+  let isCompleted = false;
+  const confirmed = await new Promise((resolve) => {
     openReusableDialog(
       <Text variant="s1" weight="medium">
         {title}
       </Text>,
-      (requestClose) => (
+      (requestClose: () => void) => (
         <ConfirmDialog
           desc={desc}
           actionTitle={actionTitle}
@@ -59,3 +100,5 @@ export const confirmDialog = (title, desc, actionTitle, actionType = 'primary') 
       },
     );
   });
+  return confirmed;
+};
