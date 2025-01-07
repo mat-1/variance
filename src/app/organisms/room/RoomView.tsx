@@ -18,7 +18,7 @@ const viewEvent = new EventEmitter();
 
 function RoomView({
   roomTimeline,
-  eventId,
+  eventId = null,
 }: {
   roomTimeline: RoomTimeline;
   eventId: string | null;
@@ -68,9 +68,6 @@ function RoomView({
   );
 }
 
-RoomView.defaultProps = {
-  eventId: null,
-};
 RoomView.propTypes = {
   roomTimeline: PropTypes.shape({}).isRequired,
   eventId: PropTypes.string,

@@ -21,7 +21,7 @@ import { useStore } from '../../hooks/useStore';
 
 const ALIAS_OR_ID_REG = /^[#|!].+:.+\..+$/;
 
-function JoinAliasContent({ term, requestClose }) {
+function JoinAliasContent({ term = undefined, requestClose }) {
   const [process, setProcess] = useState(false);
   const [error, setError] = useState(undefined);
   const [lastJoinId, setLastJoinId] = useState(undefined);
@@ -110,9 +110,6 @@ function JoinAliasContent({ term, requestClose }) {
     </form>
   );
 }
-JoinAliasContent.defaultProps = {
-  term: undefined,
-};
 JoinAliasContent.propTypes = {
   term: PropTypes.string,
   requestClose: PropTypes.func.isRequired,

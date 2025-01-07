@@ -9,14 +9,14 @@ import { blurOnBubbling } from './script';
 const Button = React.forwardRef(
   (
     {
-      id,
+      id = '',
       className,
-      variant,
+      variant = 'surface',
       iconSrc,
-      type,
+      type = 'button',
       onClick,
       children,
-      disabled,
+      disabled = false,
       leftAligned,
     }: {
       id?: string;
@@ -52,13 +52,6 @@ const Button = React.forwardRef(
     );
   },
 );
-
-Button.defaultProps = {
-  id: '',
-  variant: 'surface',
-  type: 'button',
-  disabled: false,
-};
 
 Button.propTypes = {
   id: PropTypes.string,

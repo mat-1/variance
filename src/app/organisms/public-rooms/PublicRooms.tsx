@@ -104,7 +104,7 @@ TryJoinWithAlias.propTypes = {
   onRequestClose: PropTypes.func.isRequired,
 };
 
-function PublicRooms({ isOpen, searchTerm, onRequestClose }) {
+function PublicRooms({ isOpen, searchTerm = undefined, onRequestClose }) {
   const [isSearching, updateIsSearching] = useState(false);
   const [isViewMore, updateIsViewMore] = useState(false);
   const [publicRooms, updatePublicRooms] = useState([]);
@@ -325,10 +325,6 @@ function PublicRooms({ isOpen, searchTerm, onRequestClose }) {
     </PopupWindow>
   );
 }
-
-PublicRooms.defaultProps = {
-  searchTerm: undefined,
-};
 
 PublicRooms.propTypes = {
   isOpen: PropTypes.bool.isRequired,

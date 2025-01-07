@@ -6,15 +6,15 @@ import Button from '../button/Button';
 import ScrollView from '../scroll/ScrollView';
 
 function TabItem({
-  selected,
-  iconSrc,
-  onClick,
+  selected = false,
+  iconSrc = undefined,
+  onClick = undefined,
   children,
-  disabled,
+  disabled = false,
 }: {
   selected: boolean;
-  iconSrc: string;
-  onClick: () => void;
+  iconSrc?: string;
+  onClick?: () => void;
   children: React.ReactNode;
   disabled: boolean;
 }) {
@@ -32,13 +32,6 @@ function TabItem({
     </Button>
   );
 }
-
-TabItem.defaultProps = {
-  selected: false,
-  iconSrc: null,
-  onClick: null,
-  disabled: false,
-};
 
 TabItem.propTypes = {
   selected: PropTypes.bool,
@@ -102,10 +95,6 @@ function Tabs<D = undefined>({
     </div>
   );
 }
-
-Tabs.defaultProps = {
-  defaultSelected: 0,
-};
 
 Tabs.propTypes = {
   items: PropTypes.arrayOf(

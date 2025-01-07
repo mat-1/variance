@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './Toggle.scss';
 
-function Toggle({ isActive, onToggle, disabled }) {
+function Toggle({ isActive = false, onToggle = null, disabled = false }) {
   const className = `toggle${isActive ? ' toggle--active' : ''}`;
   if (onToggle === null) return <span className={className} />;
   return (
@@ -15,12 +15,6 @@ function Toggle({ isActive, onToggle, disabled }) {
     />
   );
 }
-
-Toggle.defaultProps = {
-  isActive: false,
-  disabled: false,
-  onToggle: null,
-};
 
 Toggle.propTypes = {
   isActive: PropTypes.bool,

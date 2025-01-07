@@ -5,10 +5,10 @@ import './ScrollView.scss';
 const ScrollView = React.forwardRef(
   (
     {
-      horizontal,
-      vertical,
-      autoHide,
-      invisible,
+      horizontal = false,
+      vertical = true,
+      autoHide = false,
+      invisible = false,
       onScroll,
       children,
     }: {
@@ -33,13 +33,6 @@ const ScrollView = React.forwardRef(
     );
   },
 );
-
-ScrollView.defaultProps = {
-  horizontal: false,
-  vertical: true,
-  autoHide: false,
-  invisible: false,
-};
 
 ScrollView.propTypes = {
   horizontal: PropTypes.bool,

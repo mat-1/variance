@@ -13,7 +13,14 @@ import RawModal from '../../atoms/modal/RawModal';
 
 import ChevronLeftIC from '../../../../public/res/ic/outlined/chevron-left.svg';
 
-function PWContentSelector({ selected, variant, iconSrc, type, onClick, children }) {
+function PWContentSelector({
+  selected = false,
+  variant = 'surface',
+  iconSrc = 'none',
+  type = 'button',
+  onClick,
+  children,
+}) {
   const pwcsClass = selected ? ' pw-content-selector--selected' : '';
   return (
     <div className={`pw-content-selector${pwcsClass}`}>
@@ -24,13 +31,6 @@ function PWContentSelector({ selected, variant, iconSrc, type, onClick, children
   );
 }
 
-PWContentSelector.defaultProps = {
-  selected: false,
-  variant: 'surface',
-  iconSrc: 'none',
-  type: 'button',
-};
-
 PWContentSelector.propTypes = {
   selected: PropTypes.bool,
   variant: PropTypes.oneOf(['surface', 'caution', 'danger']),
@@ -40,16 +40,25 @@ PWContentSelector.propTypes = {
   children: PropTypes.string.isRequired,
 };
 
+// {
+//   className: null,
+//   drawer: null,
+//   contentTitle: null,
+//   drawerOptions: null,
+//   contentOptions: null,
+//   onAfterClose: null,
+//   onRequestClose: null,
+// }
 function PopupWindow({
-  className,
+  className = null,
   isOpen,
   title,
-  contentTitle,
-  drawer,
-  drawerOptions,
-  contentOptions,
-  onAfterClose,
-  onRequestClose,
+  contentTitle = null,
+  drawer = null,
+  drawerOptions = null,
+  contentOptions = null,
+  onAfterClose = null,
+  onRequestClose = null,
   children,
   extraLarge,
 }) {
@@ -125,16 +134,6 @@ function PopupWindow({
     </RawModal>
   );
 }
-
-PopupWindow.defaultProps = {
-  className: null,
-  drawer: null,
-  contentTitle: null,
-  drawerOptions: null,
-  contentOptions: null,
-  onAfterClose: null,
-  onRequestClose: null,
-};
 
 PopupWindow.propTypes = {
   className: PropTypes.string,

@@ -18,7 +18,7 @@ import NotificationBadge from '../../atoms/badge/NotificationBadge';
 
 import ChevronRightIC from '../../../../public/res/ic/outlined/chevron-right.svg';
 
-function DrawerBreadcrumb({ spaceId }) {
+function DrawerBreadcrumb({ spaceId = null }) {
   const [, forceUpdate] = useState({});
   const scrollRef = useRef(null);
   const { roomList, notifications, accountData } = initMatrix;
@@ -132,10 +132,6 @@ function DrawerBreadcrumb({ spaceId }) {
     </div>
   );
 }
-
-DrawerBreadcrumb.defaultProps = {
-  spaceId: null,
-};
 
 DrawerBreadcrumb.propTypes = {
   spaceId: PropTypes.string,

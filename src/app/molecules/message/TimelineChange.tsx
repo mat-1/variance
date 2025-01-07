@@ -13,10 +13,10 @@ import InviteCancelArraowIC from '../../../../public/res/ic/outlined/invite-canc
 import UserIC from '../../../../public/res/ic/outlined/user.svg';
 
 function TimelineChange({
-  variant,
+  variant = 'other',
   content,
   timestamp,
-  onClick,
+  onClick = null,
 }: {
   variant: 'join' | 'leave' | 'invite' | 'invite-cancel' | 'avatar' | 'other';
   content: string | React.ReactNode;
@@ -67,11 +67,6 @@ function TimelineChange({
     </button>
   );
 }
-
-TimelineChange.defaultProps = {
-  variant: 'other',
-  onClick: null,
-};
 
 TimelineChange.propTypes = {
   variant: PropTypes.oneOf(['join', 'leave', 'invite', 'invite-cancel', 'avatar', 'other']),

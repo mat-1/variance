@@ -4,7 +4,7 @@ import './NotificationBadge.scss';
 
 import Text from '../text/Text';
 
-function NotificationBadge({ alert, content }) {
+function NotificationBadge({ alert = false, content = null }) {
   const notificationClass = alert ? ' notification-badge--alert' : '';
   return (
     <div className={`notification-badge${notificationClass}`}>
@@ -16,11 +16,6 @@ function NotificationBadge({ alert, content }) {
     </div>
   );
 }
-
-NotificationBadge.defaultProps = {
-  alert: false,
-  content: null,
-};
 
 NotificationBadge.propTypes = {
   alert: PropTypes.bool,

@@ -17,13 +17,13 @@ import ChevronBottomIC from '../../../../public/res/ic/outlined/chevron-bottom.s
 import PencilIC from '../../../../public/res/ic/outlined/pencil.svg';
 
 function ImagePackProfile({
-  avatarUrl,
+  avatarUrl = null,
   displayName,
-  attribution,
+  attribution = null,
   usage,
-  onUsageChange,
-  onAvatarChange,
-  onEditProfile,
+  onUsageChange = null,
+  onAvatarChange = null,
+  onEditProfile = null,
 }) {
   const [isEdit, setIsEdit] = useState(false);
 
@@ -110,13 +110,6 @@ function ImagePackProfile({
   );
 }
 
-ImagePackProfile.defaultProps = {
-  avatarUrl: null,
-  attribution: null,
-  onUsageChange: null,
-  onAvatarChange: null,
-  onEditProfile: null,
-};
 ImagePackProfile.propTypes = {
   avatarUrl: PropTypes.string,
   displayName: PropTypes.string.isRequired,

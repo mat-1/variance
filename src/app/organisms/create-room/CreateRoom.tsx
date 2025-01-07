@@ -33,7 +33,7 @@ import SpaceGlobeIC from '../../../../public/res/ic/outlined/space-globe.svg';
 import ChevronBottomIC from '../../../../public/res/ic/outlined/chevron-bottom.svg';
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
-function CreateRoomContent({ isSpace, parentId, onRequestClose }) {
+function CreateRoomContent({ isSpace, parentId = null, onRequestClose }) {
   const [joinRule, setJoinRule] = useState(parentId ? 'restricted' : 'invite');
   const [isEncrypted, setIsEncrypted] = useState(true);
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
@@ -253,9 +253,7 @@ function CreateRoomContent({ isSpace, parentId, onRequestClose }) {
     </div>
   );
 }
-CreateRoomContent.defaultProps = {
-  parentId: null,
-};
+
 CreateRoomContent.propTypes = {
   isSpace: PropTypes.bool.isRequired,
   parentId: PropTypes.string,

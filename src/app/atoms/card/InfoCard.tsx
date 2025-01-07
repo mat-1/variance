@@ -8,7 +8,26 @@ import IconButton from '../button/IconButton';
 
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
-function InfoCard({ className, style, variant, iconSrc, title, content, rounded, requestClose }) {
+// {
+//   className: null,
+//   style: null,
+//   variant: 'surface',
+//   iconSrc: null,
+//   content: null,
+//   rounded: false,
+//   requestClose: null,
+// }
+
+function InfoCard({
+  className = null,
+  style = null,
+  variant = 'surface',
+  iconSrc = null,
+  title,
+  content = null,
+  rounded = false,
+  requestClose = null,
+}) {
   const classes = [`info-card info-card--${variant}`];
   if (rounded) classes.push('info-card--rounded');
   if (className) classes.push(className);
@@ -27,16 +46,6 @@ function InfoCard({ className, style, variant, iconSrc, title, content, rounded,
     </div>
   );
 }
-
-InfoCard.defaultProps = {
-  className: null,
-  style: null,
-  variant: 'surface',
-  iconSrc: null,
-  content: null,
-  rounded: false,
-  requestClose: null,
-};
 
 InfoCard.propTypes = {
   className: PropTypes.string,

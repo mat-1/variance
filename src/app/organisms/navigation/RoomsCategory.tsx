@@ -32,7 +32,13 @@ interface RoomsCategoryProps {
   };
 }
 
-function RoomsCategory({ spaceId, name, hideHeader, roomIds, drawerPostie }: RoomsCategoryProps) {
+function RoomsCategory({
+  spaceId = null,
+  name,
+  hideHeader = false,
+  roomIds,
+  drawerPostie,
+}: RoomsCategoryProps) {
   const { spaces, directs } = initMatrix.roomList;
   const [isOpen, setIsOpen] = useState(true);
 
@@ -103,10 +109,6 @@ function RoomsCategory({ spaceId, name, hideHeader, roomIds, drawerPostie }: Roo
     </div>
   );
 }
-RoomsCategory.defaultProps = {
-  spaceId: null,
-  hideHeader: false,
-};
 RoomsCategory.propTypes = {
   spaceId: PropTypes.string,
   name: PropTypes.string.isRequired,

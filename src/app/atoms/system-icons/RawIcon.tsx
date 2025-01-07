@@ -5,10 +5,10 @@ import './RawIcon.scss';
 export type IconSize = 'large' | 'normal' | 'small' | 'extra-small' | 'ultra-small';
 
 function RawIcon({
-  color,
-  size,
+  color = undefined,
+  size = 'normal',
   src,
-  isImage,
+  isImage = false,
 }: {
   color?: string;
   size?: IconSize;
@@ -27,12 +27,6 @@ function RawIcon({
 
   return <span className={`ic-raw ic-raw-${size}`} style={style} />;
 }
-
-RawIcon.defaultProps = {
-  color: null,
-  size: 'normal',
-  isImage: false,
-};
 
 RawIcon.propTypes = {
   color: PropTypes.string,

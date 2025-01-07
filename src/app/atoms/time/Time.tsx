@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import dateFormat from 'dateformat';
 import { isInSameDay } from '../../../util/common';
 
-function Time({ timestamp, fullTime }) {
+function Time({ timestamp, fullTime = false }: { timestamp: number; fullTime?: boolean }) {
   const date = new Date(timestamp);
 
   const formattedFullTime = dateFormat(date, 'dd mmmm yyyy, hh:MM TT');
@@ -28,10 +28,6 @@ function Time({ timestamp, fullTime }) {
     </time>
   );
 }
-
-Time.defaultProps = {
-  fullTime: false,
-};
 
 Time.propTypes = {
   timestamp: PropTypes.number.isRequired,

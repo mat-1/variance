@@ -8,11 +8,11 @@ import { backgroundColorMXID } from '../../../util/colorMXID';
 
 function RoomIntro({
   roomId,
-  avatarSrc,
+  avatarSrc = null,
   name,
   heading,
   desc,
-  time,
+  time = null,
 }: {
   roomId: string;
   avatarSrc: string | boolean | null;
@@ -40,11 +40,6 @@ function RoomIntro({
     </div>
   );
 }
-
-RoomIntro.defaultProps = {
-  avatarSrc: null,
-  time: null,
-};
 
 RoomIntro.propTypes = {
   roomId: PropTypes.string.isRequired,

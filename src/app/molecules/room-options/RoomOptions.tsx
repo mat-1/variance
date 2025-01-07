@@ -17,7 +17,7 @@ import LeaveArrowIC from '../../../../public/res/ic/outlined/leave-arrow.svg';
 
 import { confirmDialog } from '../confirm-dialog/ConfirmDialog';
 
-function RoomOptions({ roomId, afterOptionSelect }) {
+function RoomOptions({ roomId, afterOptionSelect = null }) {
   const mx = initMatrix.matrixClient;
   const room = mx.getRoom(roomId);
   const canInvite = room?.canInvite(mx.getUserId());
@@ -62,10 +62,6 @@ function RoomOptions({ roomId, afterOptionSelect }) {
     </div>
   );
 }
-
-RoomOptions.defaultProps = {
-  afterOptionSelect: null,
-};
 
 RoomOptions.propTypes = {
   roomId: PropTypes.string.isRequired,

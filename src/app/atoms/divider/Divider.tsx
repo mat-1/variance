@@ -4,7 +4,7 @@ import './Divider.scss';
 
 import Text from '../text/Text';
 
-function Divider({ text, variant, align }) {
+function Divider({ text = null, variant = 'surface', align = 'center' }) {
   const dividerClass = ` divider--${variant} divider--${align}`;
   return (
     <div className={`divider${dividerClass}`}>
@@ -16,12 +16,6 @@ function Divider({ text, variant, align }) {
     </div>
   );
 }
-
-Divider.defaultProps = {
-  text: null,
-  variant: 'surface',
-  align: 'center',
-};
 
 Divider.propTypes = {
   text: PropTypes.string,

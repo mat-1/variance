@@ -458,7 +458,7 @@ function genReactionMsg(userIds: string[], reaction: string, shortcode: string) 
   );
 }
 
-function MessageReaction({ reaction, shortcode, count, users, isActive, onClick }) {
+function MessageReaction({ reaction, shortcode = undefined, count, users, isActive, onClick }) {
   let customEmojiUrl = null;
   if (reaction.match(/^mxc:\/\/\S+$/)) {
     customEmojiUrl = initMatrix.matrixClient.mxcUrlToHttp(reaction);
@@ -496,9 +496,6 @@ function MessageReaction({ reaction, shortcode, count, users, isActive, onClick 
     </Tooltip>
   );
 }
-MessageReaction.defaultProps = {
-  shortcode: undefined,
-};
 MessageReaction.propTypes = {
   reaction: PropTypes.node.isRequired,
   shortcode: PropTypes.string,
@@ -903,13 +900,13 @@ function findLinks(body: string) {
 
 export function Message({
   mEvent,
-  isBodyOnly,
-  roomTimeline,
-  focus,
-  fullTime,
-  isEdit,
-  setEdit,
-  cancelEdit,
+  isBodyOnly = false,
+  roomTimeline = null,
+  focus = false,
+  fullTime = false,
+  isEdit = false,
+  setEdit = null,
+  cancelEdit = null,
 }: {
   mEvent: MatrixEvent;
   isBodyOnly?: boolean;
@@ -950,7 +947,7 @@ export function Message({
   const sender = senderId ? roomTimeline?.room.getMember(senderId) : undefined;
 
   let username = sender ? getUsernameOfRoomMember(sender) : getUsername(senderId!);
-  let avatarMxcUrl = sender?.getMxcAvatarUrl();
+  const avatarMxcUrl = sender?.getMxcAvatarUrl() || mEvent.sender?.getMxcAvatarUrl();
 
   // used by mautrix discord bridge
   const beeperProfile = mEvent.getContent()['com.beeper.per_message_profile'];
@@ -958,9 +955,10 @@ export function Message({
     if (beeperProfile.displayname) {
       username = beeperProfile.displayname;
     }
-    if (beeperProfile.avatar_url) {
-      avatarMxcUrl = beeperProfile.avatar_url;
-    }
+    // this sometimes 404s so we don't use it
+    // if (beeperProfile.avatar_url) {
+    //   avatarMxcUrl = beeperProfile.avatar_url;
+    // }
   }
   const avatarSrc = getHttpUriForMxc(
     initMatrix.matrixClient.baseUrl,
@@ -1082,15 +1080,6 @@ export function Message({
     </div>
   );
 }
-Message.defaultProps = {
-  isBodyOnly: false,
-  focus: false,
-  roomTimeline: null,
-  fullTime: false,
-  isEdit: false,
-  setEdit: null,
-  cancelEdit: null,
-};
 Message.propTypes = {
   mEvent: PropTypes.shape({}).isRequired,
   isBodyOnly: PropTypes.bool,

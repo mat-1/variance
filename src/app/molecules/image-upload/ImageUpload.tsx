@@ -11,7 +11,14 @@ import RawIcon from '../../atoms/system-icons/RawIcon';
 
 import PlusIC from '../../../../public/res/ic/outlined/plus.svg';
 
-function ImageUpload({ text, bgColor, imageSrc, onUpload, onRequestRemove, size }) {
+function ImageUpload({
+  text = null,
+  bgColor = 'transparent',
+  imageSrc = null,
+  onUpload,
+  onRequestRemove,
+  size = 'large',
+}) {
   const [uploadPromise, setUploadPromise] = useState(null);
   const uploadImageRef = useRef(null);
 
@@ -83,13 +90,6 @@ function ImageUpload({ text, bgColor, imageSrc, onUpload, onRequestRemove, size 
     </div>
   );
 }
-
-ImageUpload.defaultProps = {
-  text: null,
-  bgColor: 'transparent',
-  imageSrc: null,
-  size: 'large',
-};
 
 ImageUpload.propTypes = {
   text: PropTypes.string,

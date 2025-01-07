@@ -28,7 +28,7 @@ interface SelectorProps {
   onClick: () => void;
 }
 
-function Selector({ roomId, isDM, drawerPostie, onClick }: SelectorProps) {
+function Selector({ roomId, isDM = true, drawerPostie, onClick }: SelectorProps) {
   const mx = initMatrix.matrixClient;
   const noti = initMatrix.notifications;
   const room = mx.getRoom(roomId);
@@ -109,10 +109,6 @@ function Selector({ roomId, isDM, drawerPostie, onClick }: SelectorProps) {
     </>
   );
 }
-
-Selector.defaultProps = {
-  isDM: true,
-};
 
 Selector.propTypes = {
   roomId: PropTypes.string.isRequired,

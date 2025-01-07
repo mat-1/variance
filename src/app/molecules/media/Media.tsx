@@ -43,7 +43,7 @@ function getNativeHeight(width, height, maxWidth = 296) {
   return scale * height;
 }
 
-function FileHeader({ name, link, external, file, type }) {
+function FileHeader({ name, link = null, external = false, file = null, type }) {
   const [url, setUrl] = useState(null);
 
   async function getFile() {
@@ -86,11 +86,6 @@ function FileHeader({ name, link, external, file, type }) {
     </div>
   );
 }
-FileHeader.defaultProps = {
-  external: false,
-  file: null,
-  link: null,
-};
 FileHeader.propTypes = {
   name: PropTypes.string.isRequired,
   link: PropTypes.string,
@@ -99,17 +94,14 @@ FileHeader.propTypes = {
   type: PropTypes.string.isRequired,
 };
 
-function File({ name, link, file, type }) {
+function File({ name, link, file = null, type = '' }) {
   return (
     <div className="file-container">
       <FileHeader name={name} link={link} file={file} type={type} />
     </div>
   );
 }
-File.defaultProps = {
-  file: null,
-  type: '',
-};
+
 File.propTypes = {
   name: PropTypes.string.isRequired,
   link: PropTypes.string.isRequired,
@@ -117,7 +109,14 @@ File.propTypes = {
   file: PropTypes.shape({}),
 };
 
-function Image({ name, width, height, link, file, type, blurhash }) {
+// {
+//   file: null,
+//   width: null,
+//   height: null,
+//   type: '',
+//   blurhash: '',
+// }
+function Image({ name, width, height, link, file = null, type, blurhash }) {
   const [url, setUrl] = useState(null);
   const [blur, setBlur] = useState(true);
   const [lightbox, setLightbox] = useState(false);
@@ -168,13 +167,6 @@ function Image({ name, width, height, link, file, type, blurhash }) {
     </>
   );
 }
-Image.defaultProps = {
-  file: null,
-  width: null,
-  height: null,
-  type: '',
-  blurhash: '',
-};
 Image.propTypes = {
   name: PropTypes.string.isRequired,
   width: PropTypes.number,
@@ -185,7 +177,7 @@ Image.propTypes = {
   blurhash: PropTypes.string,
 };
 
-function Sticker({ name, height, width, link, file, type }) {
+function Sticker({ name, height = null, width = null, link, file = null, type = '' }) {
   const [url, setUrl] = useState(null);
 
   useEffect(() => {
@@ -210,12 +202,6 @@ function Sticker({ name, height, width, link, file, type }) {
     </div>
   );
 }
-Sticker.defaultProps = {
-  file: null,
-  type: '',
-  width: null,
-  height: null,
-};
 Sticker.propTypes = {
   name: PropTypes.string.isRequired,
   width: PropTypes.number,
@@ -225,7 +211,7 @@ Sticker.propTypes = {
   type: PropTypes.string,
 };
 
-function Audio({ name, link, type, file }) {
+function Audio({ name, link, type = '', file = null }) {
   const [isLoading, setIsLoading] = useState(false);
   const [url, setUrl] = useState(null);
 
@@ -257,10 +243,6 @@ function Audio({ name, link, type, file }) {
     </div>
   );
 }
-Audio.defaultProps = {
-  file: null,
-  type: '',
-};
 Audio.propTypes = {
   name: PropTypes.string.isRequired,
   link: PropTypes.string.isRequired,
@@ -271,14 +253,14 @@ Audio.propTypes = {
 function Video({
   name,
   link,
-  thumbnail,
-  thumbnailFile,
-  thumbnailType,
-  width,
-  height,
-  file,
-  type,
-  blurhash,
+  thumbnail = null,
+  thumbnailFile = null,
+  thumbnailType = null,
+  width = null,
+  height = null,
+  file = null,
+  type = '',
+  blurhash = null,
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [url, setUrl] = useState(null);
@@ -346,16 +328,6 @@ function Video({
     </div>
   );
 }
-Video.defaultProps = {
-  width: null,
-  height: null,
-  file: null,
-  thumbnail: null,
-  thumbnailType: null,
-  thumbnailFile: null,
-  type: '',
-  blurhash: null,
-};
 Video.propTypes = {
   name: PropTypes.string.isRequired,
   link: PropTypes.string.isRequired,

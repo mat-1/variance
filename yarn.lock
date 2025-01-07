@@ -941,6 +941,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-modal@npm:^3.16.3":
+  version: 3.16.3
+  resolution: "@types/react-modal@npm:3.16.3"
+  dependencies:
+    "@types/react": "npm:*"
+  checksum: 10/9622d1983ade28864a85baffcf068722b24f02ac3ec1485dab6a9005a2e0b2f8af78f860be494523d90ba5e182744d1151461a4cc42120a32ed57ec3b7a4cab9
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:*, @types/react@npm:18.3.4":
   version: 18.3.4
   resolution: "@types/react@npm:18.3.4"
@@ -5432,6 +5441,7 @@ __metadata:
     "@types/node": "npm:22.5.1"
     "@types/react": "npm:18.3.4"
     "@types/react-dom": "npm:18.3.0"
+    "@types/react-modal": "npm:^3.16.3"
     "@typescript-eslint/eslint-plugin": "npm:8.3.0"
     "@typescript-eslint/parser": "npm:8.3.0"
     "@vitejs/plugin-react": "npm:4.3.1"

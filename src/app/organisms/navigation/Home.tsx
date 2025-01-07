@@ -12,7 +12,7 @@ import RoomsCategory from './RoomsCategory';
 import { useCategorizedSpaces } from '../../hooks/useCategorizedSpaces';
 
 const drawerPostie = new Postie();
-function Home({ spaceId }) {
+function Home({ spaceId = null }) {
   const mx = initMatrix.matrixClient;
   const { roomList, notifications, accountData } = initMatrix;
   const { spaces, rooms, directs } = roomList;
@@ -117,9 +117,6 @@ function Home({ spaceId }) {
     </>
   );
 }
-Home.defaultProps = {
-  spaceId: null,
-};
 Home.propTypes = {
   spaceId: PropTypes.string,
 };

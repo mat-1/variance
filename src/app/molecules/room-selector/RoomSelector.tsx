@@ -24,12 +24,12 @@ interface RoomSelectorWrapperProps {
 
 function RoomSelectorWrapper({
   isSelected,
-  isMuted,
+  isMuted = false,
   isUnread,
   onClick,
   content,
-  options,
-  onContextMenu,
+  options = null,
+  onContextMenu = null,
 }: RoomSelectorWrapperProps) {
   const classes = ['room-selector'];
   if (isMuted) classes.push('room-selector--muted');
@@ -51,11 +51,6 @@ function RoomSelectorWrapper({
     </div>
   );
 }
-RoomSelectorWrapper.defaultProps = {
-  isMuted: false,
-  options: null,
-  onContextMenu: null,
-};
 RoomSelectorWrapper.propTypes = {
   isSelected: PropTypes.bool.isRequired,
   isMuted: PropTypes.bool,
@@ -84,18 +79,18 @@ interface RoomSelectorProps {
 
 function RoomSelector({
   name,
-  parentName,
+  parentName = null,
   roomId,
-  imageSrc,
-  iconSrc,
-  isSelected,
-  isMuted,
+  imageSrc = null,
+  iconSrc = null,
+  isSelected = false,
+  isMuted = false,
   isUnread,
   notificationCount,
   isAlert,
-  options,
+  options = null,
   onClick,
-  onContextMenu,
+  onContextMenu = null,
 }: RoomSelectorProps) {
   return (
     <RoomSelectorWrapper
@@ -135,15 +130,6 @@ function RoomSelector({
     />
   );
 }
-RoomSelector.defaultProps = {
-  parentName: null,
-  isSelected: false,
-  imageSrc: null,
-  iconSrc: null,
-  isMuted: false,
-  options: null,
-  onContextMenu: null,
-};
 RoomSelector.propTypes = {
   name: PropTypes.string.isRequired,
   parentName: PropTypes.string,

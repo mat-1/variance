@@ -5,19 +5,18 @@ import './RawModal.scss';
 import Modal from 'react-modal';
 
 import navigation from '../../../client/state/navigation';
-import ScrollView from '../scroll/ScrollView';
 
 Modal.setAppElement('#root');
 
 function RawModal({
-  className,
-  overlayClassName,
+  className = null,
+  overlayClassName = null,
   isOpen,
-  size,
-  onAfterOpen,
-  onAfterClose,
-  onRequestClose,
-  closeFromOutside,
+  size = 'small',
+  onAfterOpen = null,
+  onAfterClose = null,
+  onRequestClose = null,
+  closeFromOutside = true,
   children,
 }) {
   let modalClass = className !== null ? `${className} ` : '';
@@ -57,16 +56,6 @@ function RawModal({
     </Modal>
   );
 }
-
-RawModal.defaultProps = {
-  className: null,
-  overlayClassName: null,
-  size: 'small',
-  onAfterOpen: null,
-  onAfterClose: null,
-  onRequestClose: null,
-  closeFromOutside: true,
-};
 
 RawModal.propTypes = {
   className: PropTypes.string,

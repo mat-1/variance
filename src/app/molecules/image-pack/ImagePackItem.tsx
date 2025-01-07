@@ -16,7 +16,14 @@ import ChevronBottomIC from '../../../../public/res/ic/outlined/chevron-bottom.s
 import PencilIC from '../../../../public/res/ic/outlined/pencil.svg';
 import BinIC from '../../../../public/res/ic/outlined/bin.svg';
 
-function ImagePackItem({ url, shortcode, usage, onUsageChange, onDelete, onRename }) {
+function ImagePackItem({
+  url,
+  shortcode,
+  usage,
+  onUsageChange = null,
+  onDelete = null,
+  onRename = null,
+}) {
   const handleUsageSelect = (event) => {
     openReusableContextMenu('bottom', getEventCords(event, '.btn-surface'), (closeMenu) => (
       <ImagePackUsageSelector
@@ -67,11 +74,6 @@ function ImagePackItem({ url, shortcode, usage, onUsageChange, onDelete, onRenam
   );
 }
 
-ImagePackItem.defaultProps = {
-  onUsageChange: null,
-  onDelete: null,
-  onRename: null,
-};
 ImagePackItem.propTypes = {
   url: PropTypes.string.isRequired,
   shortcode: PropTypes.string.isRequired,

@@ -33,7 +33,7 @@ import HashSearchIC from '../../../../public/res/ic/outlined/hash-search.svg';
 import SpacePlusIC from '../../../../public/res/ic/outlined/space-plus.svg';
 import ChevronBottomIC from '../../../../public/res/ic/outlined/chevron-bottom.svg';
 
-export function HomeSpaceOptions({ spaceId, afterOptionSelect }) {
+export function HomeSpaceOptions({ spaceId = null, afterOptionSelect }) {
   const mx = initMatrix.matrixClient;
   const room = mx.getRoom(spaceId);
   const canManage = room
@@ -111,15 +111,12 @@ export function HomeSpaceOptions({ spaceId, afterOptionSelect }) {
     </>
   );
 }
-HomeSpaceOptions.defaultProps = {
-  spaceId: null,
-};
 HomeSpaceOptions.propTypes = {
   spaceId: PropTypes.string,
   afterOptionSelect: PropTypes.func.isRequired,
 };
 
-function DrawerHeader({ selectedTab, spaceId }) {
+function DrawerHeader({ selectedTab, spaceId = null }) {
   const mx = initMatrix.matrixClient;
   const tabName = selectedTab !== cons.tabs.DIRECTS ? 'Home' : 'Direct messages';
 
@@ -180,9 +177,6 @@ function DrawerHeader({ selectedTab, spaceId }) {
   );
 }
 
-DrawerHeader.defaultProps = {
-  spaceId: null,
-};
 DrawerHeader.propTypes = {
   selectedTab: PropTypes.string.isRequired,
   spaceId: PropTypes.string,

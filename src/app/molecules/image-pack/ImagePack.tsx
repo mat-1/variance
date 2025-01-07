@@ -222,7 +222,7 @@ function removeGlobalImagePack(mx, roomId, stateKey) {
   return mx.setAccountData('im.ponies.emote_rooms', content);
 }
 
-function ImagePack({ roomId, stateKey, handlePackDelete }) {
+function ImagePack({ roomId, stateKey, handlePackDelete = null }) {
   const mx = initMatrix.matrixClient;
   const room = mx.getRoom(roomId);
   const [viewMore, setViewMore] = useState(false);
@@ -318,9 +318,6 @@ function ImagePack({ roomId, stateKey, handlePackDelete }) {
   );
 }
 
-ImagePack.defaultProps = {
-  handlePackDelete: null,
-};
 ImagePack.propTypes = {
   roomId: PropTypes.string.isRequired,
   stateKey: PropTypes.string.isRequired,

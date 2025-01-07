@@ -8,7 +8,6 @@ import React, {
   useCallback,
   useRef,
   ReactElement,
-  MutableRefObject,
 } from 'react';
 import PropTypes from 'prop-types';
 import './RoomViewContent.scss';
@@ -426,7 +425,7 @@ function useEventArrive(
 let jumpToItemIndex = -1;
 
 function RoomViewContent({
-  eventId,
+  eventId = null,
   roomTimeline,
 }: {
   eventId: string | null;
@@ -688,9 +687,6 @@ function RoomViewContent({
   );
 }
 
-RoomViewContent.defaultProps = {
-  eventId: null,
-};
 RoomViewContent.propTypes = {
   eventId: PropTypes.string,
   roomTimeline: PropTypes.shape({}).isRequired,

@@ -11,10 +11,10 @@ import ScrollView from '../scroll/ScrollView';
 
 function ContextMenu({
   content,
-  placement,
-  maxWidth,
+  placement = 'right',
+  maxWidth = 'unset',
   render,
-  afterToggle,
+  afterToggle = undefined,
 }: {
   content: React.ReactNode | ((hideMenu: () => void) => React.ReactNode);
   placement?: 'top' | 'right' | 'bottom' | 'left';
@@ -28,7 +28,7 @@ function ContextMenu({
 
   useEffect(() => {
     if (afterToggle) afterToggle(isVisible);
-  }, [isVisible]);
+  }, [afterToggle, isVisible]);
 
   return (
     <Tippy
@@ -52,12 +52,6 @@ function ContextMenu({
   );
 }
 
-ContextMenu.defaultProps = {
-  maxWidth: 'unset',
-  placement: 'right',
-  afterToggle: null,
-};
-
 ContextMenu.propTypes = {
   content: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
   placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
@@ -78,7 +72,14 @@ MenuHeader.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-function MenuItem({ variant, iconSrc, type, onClick, children, disabled }) {
+function MenuItem({
+  variant = 'surface',
+  iconSrc = null,
+  type = 'button',
+  onClick = null,
+  children,
+  disabled = false,
+}) {
   return (
     <div className="context-menu__item">
       <Button variant={variant} iconSrc={iconSrc} type={type} onClick={onClick} disabled={disabled}>
@@ -87,14 +88,6 @@ function MenuItem({ variant, iconSrc, type, onClick, children, disabled }) {
     </div>
   );
 }
-
-MenuItem.defaultProps = {
-  variant: 'surface',
-  iconSrc: null,
-  type: 'button',
-  disabled: false,
-  onClick: null,
-};
 
 MenuItem.propTypes = {
   variant: PropTypes.oneOf(['surface', 'positive', 'caution', 'danger']),

@@ -19,7 +19,7 @@ import RoomTile from '../../molecules/room-tile/RoomTile';
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 import UserIC from '../../../../public/res/ic/outlined/user.svg';
 
-function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
+function InviteUser({ isOpen, roomId = undefined, searchTerm = undefined, onRequestClose }) {
   const [isSearching, updateIsSearching] = useState(false);
   const [searchQuery, updateSearchQuery] = useState({});
   const [users, updateUsers] = useState([]);
@@ -294,11 +294,6 @@ function InviteUser({ isOpen, roomId, searchTerm, onRequestClose }) {
     </PopupWindow>
   );
 }
-
-InviteUser.defaultProps = {
-  roomId: undefined,
-  searchTerm: undefined,
-};
 
 InviteUser.propTypes = {
   isOpen: PropTypes.bool.isRequired,

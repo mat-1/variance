@@ -9,7 +9,15 @@ import { backgroundColorMXID } from '../../../util/colorMXID';
 import Text from '../../atoms/text/Text';
 import Avatar from '../../atoms/avatar/Avatar';
 
-function RoomTile({ avatarSrc, name, id, inviterName, memberCount, desc, options }) {
+function RoomTile({
+  avatarSrc = null,
+  name,
+  id,
+  inviterName = null,
+  memberCount = null,
+  desc = null,
+  options = null,
+}) {
   return (
     <div className="room-tile">
       <div className="room-tile__avatar">
@@ -37,13 +45,6 @@ function RoomTile({ avatarSrc, name, id, inviterName, memberCount, desc, options
   );
 }
 
-RoomTile.defaultProps = {
-  avatarSrc: null,
-  inviterName: null,
-  options: null,
-  desc: null,
-  memberCount: null,
-};
 RoomTile.propTypes = {
   avatarSrc: PropTypes.string,
   name: PropTypes.string.isRequired,

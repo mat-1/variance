@@ -16,7 +16,7 @@ import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
 
 import './ProfileEditor.scss';
 
-function ProfileEditor({ userId }) {
+function ProfileEditor({ userId = null }) {
   const [isEditing, setIsEditing] = useState(false);
   const mx = initMatrix.matrixClient;
   const user = mx.getUser(mx.getUserId());
@@ -129,10 +129,6 @@ function ProfileEditor({ userId }) {
     </div>
   );
 }
-
-ProfileEditor.defaultProps = {
-  userId: null,
-};
 
 ProfileEditor.propTypes = {
   userId: PropTypes.string,

@@ -10,17 +10,17 @@ import Text from '../text/Text';
 const IconButton = React.forwardRef(
   (
     {
-      variant,
-      size,
-      type,
-      tooltip,
-      tooltipPlacement,
+      variant = 'surface',
+      size = 'normal',
+      type = 'button',
+      tooltip = null,
+      tooltipPlacement = 'top',
       src,
-      onClick,
-      tabIndex,
-      disabled,
-      isImage,
-      className,
+      onClick = null,
+      tabIndex = 0,
+      disabled = false,
+      isImage = false,
+      className = '',
     }: {
       variant?: string;
       size?: IconSize;
@@ -58,19 +58,6 @@ const IconButton = React.forwardRef(
     );
   },
 );
-
-IconButton.defaultProps = {
-  variant: 'surface',
-  size: 'normal',
-  type: 'button',
-  tooltip: null,
-  tooltipPlacement: 'top',
-  onClick: null,
-  tabIndex: 0,
-  disabled: false,
-  isImage: false,
-  className: '',
-};
 
 IconButton.propTypes = {
   variant: PropTypes.oneOf(['surface', 'primary', 'positive', 'caution', 'danger']),

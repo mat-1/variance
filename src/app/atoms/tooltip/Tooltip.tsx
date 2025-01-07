@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './Tooltip.scss';
 import Tippy from '@tippyjs/react';
 
-function Tooltip({ className, placement, content, delay, children }) {
+function Tooltip({ className = '', placement = 'top', content, delay = [200, 0], children }) {
   return (
     <Tippy
       content={content}
@@ -19,12 +19,6 @@ function Tooltip({ className, placement, content, delay, children }) {
     </Tippy>
   );
 }
-
-Tooltip.defaultProps = {
-  placement: 'top',
-  className: '',
-  delay: [200, 0],
-};
 
 Tooltip.propTypes = {
   className: PropTypes.string,

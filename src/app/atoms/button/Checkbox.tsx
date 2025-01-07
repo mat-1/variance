@@ -2,7 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './Checkbox.scss';
 
-function Checkbox({ variant, isActive, onToggle, disabled, tabIndex }) {
+function Checkbox({
+  variant = 'primary',
+  isActive = false,
+  onToggle = null,
+  disabled = false,
+  tabIndex = 0,
+}) {
   const className = `checkbox checkbox-${variant}${isActive ? ' checkbox--active' : ''}`;
   if (onToggle === null) return <span className={className} />;
   return (
@@ -16,14 +22,6 @@ function Checkbox({ variant, isActive, onToggle, disabled, tabIndex }) {
     />
   );
 }
-
-Checkbox.defaultProps = {
-  variant: 'primary',
-  isActive: false,
-  onToggle: null,
-  disabled: false,
-  tabIndex: 0,
-};
 
 Checkbox.propTypes = {
   variant: PropTypes.oneOf(['primary', 'positive', 'caution', 'danger']),
