@@ -16,7 +16,6 @@ import initMatrix from '../initMatrix';
 import cons from './cons';
 
 import settings from './settings';
-import { CryptoBackend } from 'matrix-js-sdk/lib/common-crypto/CryptoBackend';
 
 function isEdited(mEvent: MatrixEvent) {
   return mEvent.getRelation()?.rel_type === 'm.replace';
@@ -180,7 +179,7 @@ class RoomTimeline extends EventEmitter {
   }
 
   isEncrypted(): boolean {
-    return this.matrixClient.isRoomEncrypted(this.roomId);
+    return this.room.hasEncryptionStateEvent();
   }
 
   clearLocalTimelines() {
@@ -263,6 +262,7 @@ class RoomTimeline extends EventEmitter {
       timelineToPaginate.getPaginationToken(backwards ? Direction.Backward : Direction.Forward) ===
       null
     ) {
+      // start or end of the room
       this.emit(cons.events.roomTimeline.PAGINATED, backwards, 0);
       this.isOngoingPagination = false;
       return false;
@@ -273,7 +273,7 @@ class RoomTimeline extends EventEmitter {
       await this.matrixClient.paginateEventTimeline(timelineToPaginate, { backwards, limit });
 
       if (this.isEncrypted()) {
-        await this.decryptAllEventsOfTimeline(this.activeTimeline);
+        await this.decryptAllEventsOfTimeline(timelineToPaginate);
       }
       this._populateTimelines();
 

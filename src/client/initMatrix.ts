@@ -15,15 +15,17 @@ global.Olm = Olm;
 // logger.disableAll();
 
 export class InitMatrix extends EventEmitter {
-  matrixClient: sdk.MatrixClient;
+  // it is possible for these to be undefined in some cases (like while it's loading), but in
+  // almost all cases we already know it's defined so we want to avoid having to add a ! every time
+  matrixClient!: sdk.MatrixClient;
 
-  roomList: RoomList;
+  roomList!: RoomList;
 
-  accountData: AccountData;
+  accountData!: AccountData;
 
-  roomsInput: RoomsInput;
+  roomsInput!: RoomsInput;
 
-  notifications: Notifications;
+  notifications!: Notifications;
 
   constructor() {
     super();

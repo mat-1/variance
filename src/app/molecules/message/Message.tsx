@@ -927,7 +927,6 @@ export function Message({
 
   // make the message transparent while sending and red if it failed sending
   const [messageStatus, setMessageStatus] = useState(mEvent.status);
-  const [decrypted, setDecrypted] = useState<boolean>(!!content.msgtype);
 
   const msgType = content?.msgtype;
 
@@ -935,13 +934,6 @@ export function Message({
     setMessageStatus(e.status);
     console.log('Message status changed', e.status);
   });
-  if (!decrypted) {
-    // messages are sometimes added to the timeline before being decrypted, so we wait for that
-    mEvent.once(MatrixEventEvent.Decrypted, () => {
-      setDecrypted(true);
-      console.log('Message decrypted', eventId);
-    });
-  }
 
   const senderId = mEvent.getSender();
   let { body } = content;
@@ -1013,11 +1005,6 @@ export function Message({
         )}
         {roomTimeline && isReply && (
           <MessageReplyWrapper roomTimeline={roomTimeline} eventId={mEvent.replyEventId} />
-        )}
-        {!decrypted && (
-          <div className="message__body">
-            <div className="text text-b3">Decrypting message...</div>
-          </div>
         )}
 
         {!isEdit && (
