@@ -18,7 +18,7 @@ function Text(
     weight: 'light' | 'normal' | 'medium' | 'bold';
     primary: boolean;
     span: boolean;
-    children: React.ReactNode;
+    children?: React.ReactNode;
   } = {
     className: null,
     style: undefined,
@@ -74,7 +74,7 @@ Text.propTypes = {
   weight: PropTypes.oneOf(['light', 'normal', 'medium', 'bold']),
   primary: PropTypes.bool,
   span: PropTypes.bool,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
 };
 
 export default Text;

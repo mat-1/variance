@@ -27,8 +27,15 @@ const Avatar = React.forwardRef(
       iconColor?: string;
       imageSrc?: string;
       size?: 'large' | 'normal' | 'small' | 'extra-small' | 'ultra-small';
+    } = {
+      text: undefined,
+      bgColor: 'transparent',
+      iconSrc: undefined,
+      iconColor: undefined,
+      imageSrc: undefined,
+      size: 'normal',
     },
-    ref: React.Ref<HTMLDivElement>,
+    ref: React.Ref<HTMLDivElement> | undefined = undefined,
   ) => {
     let textSize = 's1';
     if (size === 'large') textSize = 'h1';
@@ -81,10 +88,10 @@ const Avatar = React.forwardRef(
             style={{ backgroundColor: iconSrc === null ? bgColor : 'transparent' }}
             className={`avatar__border${iconSrc !== null ? '--active' : ''}`}
           >
-            {iconSrc !== null ? (
+            {iconSrc ? (
               <RawIcon size={size} src={iconSrc} color={iconColor} />
             ) : (
-              text !== null && (
+              text && (
                 <Text variant={textSize} primary>
                   {twemojify(avatarInitials(text))}
                 </Text>
@@ -96,15 +103,6 @@ const Avatar = React.forwardRef(
     );
   },
 );
-
-Avatar.defaultProps = {
-  text: null,
-  bgColor: 'transparent',
-  iconSrc: null,
-  iconColor: null,
-  imageSrc: null,
-  size: 'normal',
-};
 
 Avatar.propTypes = {
   text: PropTypes.string,
