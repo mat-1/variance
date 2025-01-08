@@ -50,7 +50,7 @@ export function MarkdownInput({
   placeholder,
   onCreateEditor,
   readOnly,
-  ref,
+  elementRef,
 }: {
   onChange: (value: Descendant[]) => void;
   onPaste: (event: React.ClipboardEvent<HTMLDivElement>) => void;
@@ -58,14 +58,18 @@ export function MarkdownInput({
   placeholder: string;
   onCreateEditor: (editor: ReactEditor) => void;
   readOnly?: boolean;
-  ref?: React.RefObject<HTMLDivElement>;
+  elementRef?: React.RefObject<HTMLDivElement>;
 }) {
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   onCreateEditor(editor);
 
   const decorate = useCallback(([node, path]) => {
-    const ranges = [];
+    const ranges: {
+      anchor: { path: number[]; offset: number };
+      focus: { path: number[]; offset: number };
+      classes: string[];
+    }[] = [];
     if (!Text.isText(node)) {
       return ranges;
     }
@@ -176,7 +180,7 @@ export function MarkdownInput({
   };
 
   return (
-    <div className={`markdown-input${readOnly ? ' read-only' : ''}`} ref={ref}>
+    <div className={`markdown-input${readOnly ? ' read-only' : ''}`} ref={elementRef}>
       {isEmpty && <div className="markdown-input__placeholder">{placeholder}</div>}
       <Slate editor={editor} initialValue={initialValue} onChange={onChangeInternal}>
         <Editable

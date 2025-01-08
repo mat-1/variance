@@ -628,7 +628,7 @@ function RoomViewContent({
       let isNewEvent = false;
       if (!unreadDivider) {
         unreadDivider =
-          readUptoEvent &&
+          !!readUptoEvent &&
           prevMEvent?.getTs() <= readUptoEvent.getTs() &&
           readUptoEvent.getTs() < mEvent.getTs();
         if (unreadDivider) {
