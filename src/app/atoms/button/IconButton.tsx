@@ -34,11 +34,11 @@ const IconButton = React.forwardRef(
       isImage?: boolean;
       className?: string;
     },
-    ref: React.Ref<HTMLButtonElement>,
+    elementRef: React.Ref<HTMLButtonElement>,
   ) => {
     const btn = (
       <button
-        ref={ref}
+        ref={elementRef}
         className={`ic-btn ic-btn-${variant} ${className}`}
         onMouseUp={(e) => blurOnBubbling(e, `.ic-btn-${variant}`)}
         onClick={onClick}

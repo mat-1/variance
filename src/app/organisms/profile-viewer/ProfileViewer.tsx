@@ -119,7 +119,7 @@ function SessionInfo({ userId }: { userId: string }) {
     return (
       <div className="session-info__chips">
         {devices === null && <Text variant="b2">Loading sessions...</Text>}
-        {devices?.length === 0 && <Text variant="b2">No session found.</Text>}
+        {devices?.length === 0 && <Text variant="b2">No sessions found.</Text>}
         {devices !== null &&
           devices.map((device) => (
             <Chip
