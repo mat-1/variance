@@ -75,11 +75,18 @@ MenuHeader.propTypes = {
 
 function MenuItem({
   variant = 'surface',
-  iconSrc = null,
+  iconSrc = undefined,
   type = 'button',
-  onClick = null,
+  onClick = undefined,
   children,
   disabled = false,
+}: {
+  variant?: 'surface' | 'positive' | 'caution' | 'danger';
+  iconSrc?: string;
+  type?: 'button' | 'submit';
+  onClick?: () => void;
+  children: React.ReactNode;
+  disabled?: boolean;
 }) {
   return (
     <div className="context-menu__item">

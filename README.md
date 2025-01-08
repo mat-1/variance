@@ -10,9 +10,9 @@ A Matrix client that aims to be user-friendly and provide an experience similar 
 - More keybinds like Discord (esc to focus input and scroll down, alt+arrow to navigate rooms, etc)
 - Better markdown support like Discord
 - Indicator for when a message is still being sent, like Discord
-- Real support for threads
+- Threads
 - Element-compatible theming
-- Private read receipts support
+- Private read receipts
 - Text reactions
 
 ## Getting started

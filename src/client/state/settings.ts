@@ -244,8 +244,9 @@ class Settings extends EventEmitter {
     if (typeof this.sendReadReceipts === 'boolean') return this.sendReadReceipts;
 
     const settings = getSettings();
-    if (settings === null) return true;
-    if (typeof settings.sendReadReceipts !== 'boolean') return true;
+    // default to using private read receipts
+    if (settings === null) return false;
+    if (typeof settings.sendReadReceipts !== 'boolean') return false;
     return settings.sendReadReceipts;
   }
 
