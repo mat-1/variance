@@ -31,7 +31,7 @@ function EmojiVerificationContent({ data, requestClose }) {
 
   const beginVerification = async () => {
     if (
-      isCrossVerified(mx.deviceId) &&
+      (await isCrossVerified(mx.deviceId)) &&
       (mx.getCrypto()?.getCrossSigningKeyId() === null ||
         (await mx.getCrypto()?.getCrossSigningKeyId(CrossSigningKey.SelfSigning)) === null)
     ) {

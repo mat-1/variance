@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './DeviceManage.scss';
 import dateFormat from 'dateformat';
 
-import { CryptoEvent, IMyDevice } from 'matrix-js-sdk';
+import { AuthDict, CryptoEvent, IMyDevice } from 'matrix-js-sdk';
 import { OwnDeviceKeys } from 'matrix-js-sdk/lib/crypto-api';
 
 import initMatrix from '../../../client/initMatrix';
@@ -58,7 +58,7 @@ const promptDeviceName = async (deviceName: string): Promise<string | null> =>
       <Text variant="s1" weight="medium">
         Edit session name
       </Text>,
-      (requestClose) =>
+      (requestClose: () => void) =>
         renderContent((name) => {
           isCompleted = true;
           resolve(name);
@@ -75,12 +75,16 @@ function DeviceManage() {
   const mx = initMatrix.matrixClient;
   const isCSEnabled = useCrossSigningStatus();
   const deviceList = useDeviceList();
-  const [processing, setProcessing] = useState([]);
+  const [processing, setProcessing] = useState<string[]>([]);
   const [truncated, setTruncated] = useState(true);
   /** Used to tell whether this component is mounted. */
   const mountStore = useStore<boolean>();
   mountStore.setItem(true);
-  const isMeVerified = isCrossVerified(mx.deviceId);
+  // const isMeVerified = await isCrossVerified(mx.deviceId);
+  const [isMeVerified, setIsMeVerified] = useState<boolean | null>(false);
+  useEffect(() => {
+    isCrossVerified(mx.deviceId!).then((verified) => setIsMeVerified(verified));
+  }, [mx.deviceId]);
 
   useEffect(() => {
     setProcessing([]);
@@ -108,6 +112,35 @@ function DeviceManage() {
         setOwnDeviceKeys(keys);
       });
   }, [mx]);
+
+  const [unverified, setUnverified] = useState<IMyDevice[]>([]);
+  const [verified, setVerified] = useState<IMyDevice[]>([]);
+  const [noEncryption, setNoEncryption] = useState<IMyDevice[]>([]);
+
+  useEffect(() => {
+    const verificationStatusPromises =
+      deviceList?.map(async (device) => {
+        const isVerified = await isCrossVerified(device.device_id);
+        return { device, isVerified };
+      }) ?? [];
+    Promise.all(verificationStatusPromises).then((results) => {
+      const unverifiedDevices: IMyDevice[] = [];
+      const verifiedDevices: IMyDevice[] = [];
+      const noEncryptionDevices: IMyDevice[] = [];
+      results.forEach(({ device, isVerified }) => {
+        if (isVerified === true) {
+          verifiedDevices.push(device);
+        } else if (isVerified === false) {
+          unverifiedDevices.push(device);
+        } else {
+          noEncryptionDevices.push(device);
+        }
+      });
+      setUnverified(unverifiedDevices);
+      setVerified(verifiedDevices);
+      setNoEncryption(noEncryptionDevices);
+    });
+  }, [deviceList]);
 
   if (deviceList === null) {
     return (
@@ -141,7 +174,7 @@ function DeviceManage() {
     }
   };
 
-  const handleRemove = async (device) => {
+  const handleRemove = async (device: IMyDevice) => {
     const isConfirmed = await confirmDialog(
       `Logout ${device.display_name}`,
       `You are about to logout "${device.display_name}" session.`,
@@ -150,7 +183,7 @@ function DeviceManage() {
     );
     if (!isConfirmed) return;
     addToProcessing(device);
-    await authRequest(`Logout "${device.display_name}"`, async (auth) => {
+    await authRequest(`Logout "${device.display_name}"`, async (auth: AuthDict) => {
       await mx.deleteDevice(device.device_id, auth);
     });
 
@@ -165,23 +198,26 @@ function DeviceManage() {
     const keyData = await accessSecretStorage('Session verification');
     if (!keyData) return;
     addToProcessing(device);
-    await mx.checkOwnCrossSigningTrust();
   };
 
-  const verifyWithEmojis = async (deviceId) => {
-    const req = await mx.requestVerification(mx.getUserId(), [deviceId]);
+  const verifyWithEmojis = async (deviceId: string) => {
+    const req = await mx.getCrypto()!.requestDeviceVerification(mx.getUserId()!, deviceId);
     openEmojiVerification(req, { userId: mx.getUserId(), deviceId });
   };
 
-  const verify = (deviceId, isCurrentDevice) => {
+  const verify = (device: IMyDevice, isCurrentDevice: boolean) => {
     if (isCurrentDevice) {
-      verifyWithKey(deviceId);
+      verifyWithKey(device);
       return;
     }
-    verifyWithEmojis(deviceId);
+    verifyWithEmojis(device.device_id);
   };
 
-  const renderDevice = (device: IMyDevice, isVerified: boolean, ownDeviceKeys: OwnDeviceKeys) => {
+  const renderDevice = (
+    device: IMyDevice,
+    isVerified: boolean | null,
+    deviceKeys: OwnDeviceKeys,
+  ) => {
     const deviceId = device.device_id;
     const displayName = device.display_name;
     const lastIP = device.last_seen_ip;
@@ -212,7 +248,7 @@ function DeviceManage() {
           ) : (
             <>
               {isCSEnabled && canVerify && (
-                <Button onClick={() => verify(deviceId, isCurrentDevice)} variant="positive">
+                <Button onClick={() => verify(device, isCurrentDevice)} variant="positive">
                   Verify
                 </Button>
               )}
@@ -251,7 +287,7 @@ function DeviceManage() {
             )}
             {isCurrentDevice && (
               <Text style={{ marginTop: 'var(--sp-ultra-tight)' }} variant="b3">
-                {`Session Key: ${ownDeviceKeys.ed25519.match(/.{1,4}/g)?.join(' ')}`}
+                {`Session Key: ${deviceKeys.ed25519.match(/.{1,4}/g)?.join(' ')}`}
               </Text>
             )}
           </>
@@ -259,22 +295,6 @@ function DeviceManage() {
       />
     );
   };
-
-  const unverified = [];
-  const verified = [];
-  const noEncryption = [];
-  deviceList
-    .sort((a, b) => b.last_seen_ts - a.last_seen_ts)
-    .forEach((device) => {
-      const isVerified = isCrossVerified(device.device_id);
-      if (isVerified === true) {
-        verified.push(device);
-      } else if (isVerified === false) {
-        unverified.push(device);
-      } else {
-        noEncryption.push(device);
-      }
-    });
 
   return (
     <div className="device-manage">

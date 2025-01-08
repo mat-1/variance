@@ -8,25 +8,24 @@ import IconButton from '../button/IconButton';
 
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
-// {
-//   className: null,
-//   style: null,
-//   variant: 'surface',
-//   iconSrc: null,
-//   content: null,
-//   rounded: false,
-//   requestClose: null,
-// }
-
 function InfoCard({
-  className = null,
-  style = null,
+  className,
+  style,
   variant = 'surface',
-  iconSrc = null,
+  iconSrc,
   title,
-  content = null,
+  content,
   rounded = false,
-  requestClose = null,
+  requestClose,
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+  variant?: 'surface' | 'primary' | 'positive' | 'caution' | 'danger';
+  iconSrc?: string;
+  title: string;
+  content?: React.ReactNode;
+  rounded?: boolean;
+  requestClose?: () => void;
 }) {
   const classes = [`info-card info-card--${variant}`];
   if (rounded) classes.push('info-card--rounded');

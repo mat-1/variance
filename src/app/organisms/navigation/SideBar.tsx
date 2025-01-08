@@ -99,7 +99,15 @@ function ProfileAvatarMenu() {
 
 function CrossSigninAlert() {
   const deviceList = useDeviceList();
-  const unverified = deviceList?.filter((device) => isCrossVerified(device.device_id) === false);
+  // const unverified = deviceList?.map((device) => isCrossVerified(device.device_id) === false);
+
+  const [unverified, setUnverified] = useState<(boolean | null)[]>([]);
+  useEffect(() => {
+    const promises = deviceList?.map((device) => isCrossVerified(device.device_id)) ?? [];
+    Promise.all(promises).then((result) => {
+      setUnverified(result.filter((verified) => !verified));
+    });
+  }, [deviceList]);
 
   if (!unverified?.length) return null;
 

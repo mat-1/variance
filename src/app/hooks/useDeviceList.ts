@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { CryptoEvent, type IMyDevice } from 'matrix-js-sdk';
 import initMatrix from '../../client/initMatrix';
 
-export function useDeviceList() {
+export function useDeviceList(): IMyDevice[] | null {
   const mx = initMatrix.matrixClient;
   const [deviceList, setDeviceList] = useState<IMyDevice[] | null>(null);
 

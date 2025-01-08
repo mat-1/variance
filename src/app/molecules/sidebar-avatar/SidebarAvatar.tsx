@@ -19,13 +19,13 @@ const SidebarAvatar = React.forwardRef(
       avatar,
       notificationBadge = null,
     }: {
-      className: string;
-      tooltip: string;
-      active: boolean;
+      className?: string;
+      tooltip?: string;
+      active?: boolean;
       onClick?: () => void;
       onContextMenu?: () => void;
-      avatar: React.ReactNode;
-      notificationBadge: React.ReactNode;
+      avatar?: React.ReactNode;
+      notificationBadge?: React.ReactNode;
     },
     ref,
   ) => {
