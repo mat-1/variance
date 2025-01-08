@@ -556,12 +556,20 @@ function AboutSection() {
             <li>
               <Text>
                 The{' '}
-                <a href="https://twemoji.twitter.com" target="_blank" rel="noreferrer noopener">
+                <a
+                  href="https://github.com/discord/twemoji"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
                   Twemoji
                 </a>{' '}
                 emoji art is ©{' '}
-                <a href="https://twemoji.twitter.com" target="_blank" rel="noreferrer noopener">
-                  Twitter, Inc and other contributors
+                <a
+                  href="https://github.com/discord/twemoji"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  Twitter, Discord, and other contributors
                 </a>{' '}
                 used under the terms of{' '}
                 <a
