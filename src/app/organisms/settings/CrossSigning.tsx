@@ -73,15 +73,18 @@ const securityKeyDialog = (key) => {
 
 function CrossSigningSetup() {
   const initialValues = { phrase: '', confirmPhrase: '' };
-  const [genWithPhrase, setGenWithPhrase] = useState(undefined);
+  const [genWithPhrase, setGenWithPhrase] = useState<boolean | undefined>(undefined);
 
-  const setup = async (securityPhrase = undefined) => {
+  const setup = async (securityPhrase?: string) => {
     const mx = initMatrix.matrixClient;
     setGenWithPhrase(typeof securityPhrase === 'string');
-    const recoveryKey = await mx.createRecoveryKeyFromPassphrase(securityPhrase);
+
+    const crypto = mx.getCrypto()!;
+
+    const recoveryKey = await crypto.createRecoveryKeyFromPassphrase(securityPhrase);
     clearSecretStorageKeys();
 
-    await mx.bootstrapSecretStorage({
+    await crypto.bootstrapSecretStorage({
       createSecretStorageKey: async () => recoveryKey,
       setupNewKeyBackup: true,
       setupNewSecretStorage: true,
@@ -97,7 +100,7 @@ function CrossSigningSetup() {
       });
     };
 
-    await mx.bootstrapCrossSigning({
+    await mx.getCrypto()!.bootstrapCrossSigning({
       authUploadDeviceSigningKeys,
       setupNewCrossSigning: true,
     });

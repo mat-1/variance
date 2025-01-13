@@ -18,6 +18,7 @@ import Input from '../../atoms/input/Input';
 import Spinner from '../../atoms/spinner/Spinner';
 
 import { useStore } from '../../hooks/useStore';
+import { decodeRecoveryKey } from 'matrix-js-sdk/lib/crypto-api';
 
 function SecretStorageAccess({ onComplete }) {
   const mx = initMatrix.matrixClient;
@@ -26,7 +27,7 @@ function SecretStorageAccess({ onComplete }) {
   const isPassphrase = !!sSKeyInfo.passphrase;
   const [withPhrase, setWithPhrase] = useState(isPassphrase);
   const [process, setProcess] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const mountStore = useStore();
 
   const toggleWithPhrase = () => setWithPhrase(!withPhrase);
@@ -35,11 +36,14 @@ function SecretStorageAccess({ onComplete }) {
     mountStore.setItem(true);
     setProcess(true);
     try {
+      if (!sSKeyInfo) {
+        console.warn('no sSKeyInfo');
+        return;
+      }
+
       const { salt, iterations } = sSKeyInfo.passphrase || {};
-      const privateKey = key
-        ? mx.keyBackupKeyFromRecoveryKey(key)
-        : await deriveKey(phrase, salt, iterations);
-      const isCorrect = await mx.checkSecretStorageKey(privateKey, sSKeyInfo);
+      const privateKey = key ? decodeRecoveryKey(key) : await deriveKey(phrase, salt, iterations);
+      const isCorrect = await mx.secretStorage.checkKey(privateKey, sSKeyInfo);
 
       if (!mountStore.getItem()) return;
       if (!isCorrect) {
@@ -47,6 +51,7 @@ function SecretStorageAccess({ onComplete }) {
         setProcess(false);
         return;
       }
+
       onComplete({
         keyId: sSKeyId,
         key,
@@ -111,7 +116,7 @@ SecretStorageAccess.propTypes = {
  * @param {string} title Title of secret storage access dialog
  * @returns {Promise<keyData | null>} resolve to keyData or null
  */
-export const accessSecretStorage = (title) =>
+export const accessSecretStorage = (title: string) =>
   new Promise((resolve) => {
     let isCompleted = false;
     const defaultSSKey = getDefaultSSKey();

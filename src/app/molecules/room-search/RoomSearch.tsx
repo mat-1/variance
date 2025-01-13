@@ -109,7 +109,7 @@ function useRoomSearch(roomId) {
 function RoomSearch({ roomId }) {
   const [searchData, search, paginate, status] = useRoomSearch(roomId);
   const mx = initMatrix.matrixClient;
-  const isRoomEncrypted = mx.isRoomEncrypted(roomId);
+  const isRoomEncrypted = mx.getRoom(roomId)?.hasEncryptionStateEvent();
   const searchTerm = searchData?._query.search_categories.room_events.search_term ?? '';
 
   const handleSearch = (e) => {

@@ -451,7 +451,7 @@ class RoomsInput extends EventEmitter {
       this.emit(cons.events.roomsInput.FILE_UPLOAD_CANCELED, roomId);
       return;
     }
-    if (this.matrixClient.isRoomEncrypted(roomId)) {
+    if (mx.getRoom(roomId)?.hasEncryptionStateEvent()) {
       content.file = uploadData.file;
       await this.matrixClient.sendMessage(roomId, content);
     } else {
@@ -461,7 +461,7 @@ class RoomsInput extends EventEmitter {
   }
 
   async uploadFile(roomId, file, progressHandler) {
-    const isEncryptedRoom = this.matrixClient.isRoomEncrypted(roomId);
+    const isEncryptedRoom = mx.getRoom(roomId)?.hasEncryptionStateEvent();
 
     let encryptInfo = null;
     let encryptBlob = null;

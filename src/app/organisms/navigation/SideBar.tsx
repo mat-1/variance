@@ -127,6 +127,8 @@ function FeaturedTab() {
   useNotificationUpdate();
 
   function getHomeNoti() {
+    if (!roomList) return null;
+
     const orphans = roomList.getOrphans();
     let noti = null;
 
@@ -142,7 +144,7 @@ function FeaturedTab() {
     return noti;
   }
   function getDMsNoti() {
-    if (roomList?.directs?.size === 0) return null;
+    if (!roomList || roomList?.directs?.size === 0) return null;
     let noti = null;
 
     [...roomList.directs].forEach((roomId) => {

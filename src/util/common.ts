@@ -143,7 +143,7 @@ export function setFavicon(url) {
   favicon.setAttribute('href', url);
 }
 
-export function copyToClipboard(text) {
+export function copyToClipboard(text: string) {
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text);
   } else {

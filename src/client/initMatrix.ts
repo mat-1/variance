@@ -62,12 +62,16 @@ export class InitMatrix extends EventEmitter {
       verificationMethods: ['m.sas.v1'],
     });
 
+    // variance doesn't support voip / turn, so disable it to avoid the unnecessary requests
+    (this.matrixClient as any).canSupportVoip = false;
+
     await indexedDBStore.startup();
     await this.matrixClient.initRustCrypto();
 
     await this.matrixClient.startClient({
       lazyLoadMembers: true,
       threadSupport: true,
+
       // slidingSync: new SlidingSync(),
     });
     this.matrixClient.setGlobalErrorOnUnknownDevices(false);

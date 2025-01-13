@@ -267,7 +267,13 @@ export async function decryptMegolmKeyFile(data, password) {
  *    key-derivation function.
  * @return {Promise<ArrayBuffer>} promise for encrypted output
  */
-export async function encryptMegolmKeyFile(data, password, options) {
+export async function encryptMegolmKeyFile(
+  data: string,
+  password: string,
+  options?: {
+    kdf_rounds?: number;
+  },
+) {
   options = options || {};
   const kdfRounds = options.kdf_rounds || 500000;
 

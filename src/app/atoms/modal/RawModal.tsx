@@ -9,17 +9,27 @@ import navigation from '../../../client/state/navigation';
 Modal.setAppElement('#root');
 
 function RawModal({
-  className = null,
-  overlayClassName = null,
+  className,
+  overlayClassName,
   isOpen,
   size = 'small',
-  onAfterOpen = null,
-  onAfterClose = null,
-  onRequestClose = null,
-  closeFromOutside = true,
+  onAfterOpen,
+  onAfterClose,
+  onRequestClose,
+  closeFromOutside,
   children,
+}: {
+  className?: string;
+  overlayClassName?: string;
+  isOpen: boolean;
+  size?: 'extra-large' | 'large' | 'medium' | 'small';
+  onAfterOpen?: () => void;
+  onAfterClose?: () => void;
+  onRequestClose?: () => void;
+  closeFromOutside?: boolean;
+  children: React.ReactNode;
 }) {
-  let modalClass = className !== null ? `${className} ` : '';
+  let modalClass = className ? `${className} ` : '';
   switch (size) {
     case 'extra-large':
       modalClass += 'raw-modal__extra-large ';
@@ -39,7 +49,7 @@ function RawModal({
     navigation.setIsRawModalVisible(isOpen);
   }, [isOpen]);
 
-  const modalOverlayClass = overlayClassName !== null ? `${overlayClassName} ` : '';
+  const modalOverlayClass = overlayClassName ? `${overlayClassName} ` : '';
   return (
     <Modal
       className={`${modalClass}raw-modal`}

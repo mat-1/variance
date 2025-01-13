@@ -110,7 +110,7 @@ function RoomViewHeader({ roomId, threadId }: { roomId: string; threadId?: strin
         </TitleWrapper>
         <RawIcon src={ChevronBottomIC} />
       </button>
-      {!mx.isRoomEncrypted(roomId) && (
+      {!mx.getRoom(roomId)?.hasEncryptionStateEvent() && (
         <IconButton
           onClick={() => toggleRoomSettings(tabText.SEARCH)}
           tooltip="Search"

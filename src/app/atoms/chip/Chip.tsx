@@ -5,11 +5,23 @@ import './Chip.scss';
 import Text from '../text/Text';
 import RawIcon from '../system-icons/RawIcon';
 
-function Chip({ iconSrc = null, iconColor = null, text = null, children = null, onClick = null }) {
+function Chip({
+  iconSrc,
+  iconColor,
+  text,
+  children,
+  onClick,
+}: {
+  iconSrc?: string;
+  iconColor?: string;
+  text?: string;
+  children?: React.ReactNode;
+  onClick?: () => void;
+}) {
   return (
     <button className="chip" type="button" onClick={onClick}>
-      {iconSrc != null && <RawIcon src={iconSrc} color={iconColor} size="extra-small" />}
-      {text != null && text !== '' && <Text variant="b3">{text}</Text>}
+      {iconSrc && <RawIcon src={iconSrc} color={iconColor} size="extra-small" />}
+      {text && text !== '' && <Text variant="b3">{text}</Text>}
       {children}
     </button>
   );

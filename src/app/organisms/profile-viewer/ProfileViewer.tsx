@@ -37,6 +37,7 @@ import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
 import { useForceUpdate } from '../../hooks/useForceUpdate';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
+import { Device, DeviceMap } from 'matrix-js-sdk';
 
 function ModerationTools({ roomId, userId }) {
   const mx = initMatrix.matrixClient;
@@ -89,7 +90,7 @@ ModerationTools.propTypes = {
 };
 
 function SessionInfo({ userId }: { userId: string }) {
-  const [devices, setDevices] = useState(null);
+  const [devices, setDevices] = useState<Map<string, Device> | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const mx = initMatrix.matrixClient;
 
@@ -98,13 +99,13 @@ function SessionInfo({ userId }: { userId: string }) {
 
     async function loadDevices() {
       try {
-        await mx.downloadKeys([userId], true);
-        const myDevices = mx.getStoredDevicesForUser(userId);
+        const crypto = mx.getCrypto()!;
+        const myDevices = await crypto.getUserDeviceInfo([userId], true);
 
         if (isUnmounted) return;
-        setDevices(myDevices);
+        setDevices(myDevices.get(userId) ?? new Map());
       } catch {
-        setDevices([]);
+        setDevices(new Map());
       }
     }
     loadDevices();
@@ -119,15 +120,13 @@ function SessionInfo({ userId }: { userId: string }) {
     return (
       <div className="session-info__chips">
         {devices === null && <Text variant="b2">Loading sessions...</Text>}
-        {devices?.length === 0 && <Text variant="b2">No sessions found.</Text>}
+        {devices?.size === 0 && <Text variant="b2">No sessions found.</Text>}
         {devices !== null &&
-          devices.map((device) => (
-            <Chip
-              key={device.deviceId}
-              iconSrc={ShieldEmptyIC}
-              text={device.getDisplayName() || device.deviceId}
-            />
-          ))}
+          devices
+            .entries()
+            .map(([deviceId, device]) => (
+              <Chip key={deviceId} iconSrc={ShieldEmptyIC} text={device.displayName || deviceId} />
+            ))}
       </div>
     );
   }

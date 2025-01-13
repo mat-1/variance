@@ -24,6 +24,7 @@
     "@matrix-org/olm": "^3.2.15",
     "@tippyjs/react": "4.2.6",
     "@types/dateformat": "^5.0.3",
+    "@types/prop-types": "^15.7.14",
     "blurhash": "2.0.5",
     "dateformat": "5.0.3",
     "emojibase-data": "16.0.2",
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "0.2.3",
+    "@eslint/compat": "^1.2.4",
     "@rollup/plugin-inject": "5.0.5",
     "@rollup/plugin-wasm": "6.2.2",
     "@types/node": "22.10.5",
@@ -67,10 +69,12 @@
     "eslint": "9.17.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-deprecation": "^3.0.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.3",
     "eslint-plugin-react-hooks": "5.1.0",
+    "globals": "^15.14.0",
     "mini-svg-data-uri": "1.4.4",
     "prettier": "3.4.2",
     "sass": "1.83.1",
@@ -78,5 +82,6 @@
     "vite": "6.0.7",
     "vite-plugin-static-copy": "2.2.0"
   },
-  "packageManager": "yarn@4.4.1"
+  "packageManager": "yarn@4.4.1",
+  "type": "module"
 }

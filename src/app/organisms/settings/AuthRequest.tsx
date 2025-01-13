@@ -12,8 +12,8 @@ import Spinner from '../../atoms/spinner/Spinner';
 
 import { useStore } from '../../hooks/useStore';
 
-let lastUsedPassword;
-const getAuthId = (password) => ({
+let lastUsedPassword: string | undefined;
+const getAuthId = (password: string) => ({
   type: 'm.login.password',
   password,
   identifier: {
@@ -83,7 +83,7 @@ AuthRequest.propTypes = {
  * @param {(auth) => void} makeRequest request to make
  * @returns {Promise<boolean>} whether the request succeed or not.
  */
-export const authRequest = async (title, makeRequest) => {
+export const authRequest = async (title: string, makeRequest: (auth: unknown) => Promise<void>) => {
   try {
     const auth = lastUsedPassword ? getAuthId(lastUsedPassword) : undefined;
     await makeRequest(auth);

@@ -25,23 +25,21 @@ import { useStore } from '../../hooks/useStore';
 import { useCrossSigningStatus } from '../../hooks/useCrossSigningStatus';
 
 function CreateKeyBackupDialog({ keyData }) {
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState<boolean | null>(false);
   const mx = initMatrix.matrixClient;
   const mountStore = useStore();
 
   const doBackup = async () => {
     setDone(false);
-    let info;
+
+    const crypto = mx.getCrypto()!;
 
     try {
-      info = await mx.prepareKeyBackupVersion(null, { secureSecretStorage: true });
-      info = await mx.createKeyBackupVersion(info);
-      await mx.scheduleAllGroupSessionsForBackup();
+      await crypto.resetKeyBackup();
       if (!mountStore.getItem()) return;
       setDone(true);
     } catch (e) {
       deletePrivateKey(keyData.keyId);
-      await mx.deleteKeyBackupVersion(info.version);
       if (!mountStore.getItem()) return;
       setDone(null);
     }
@@ -99,8 +97,9 @@ function RestoreKeyBackupDialog({ keyData }) {
     };
 
     try {
-      const backupInfo = await mx.getKeyBackupVersion();
-      const info = await mx.restoreKeyBackupWithSecretStorage(backupInfo, undefined, undefined, {
+      const crypto = mx.getCrypto()!;
+      await crypto.loadSessionBackupPrivateKeyFromSecretStorage();
+      const info = await crypto.restoreKeyBackup({
         progressCallback,
       });
       if (!mountStore.getItem()) return;
@@ -157,8 +156,8 @@ function DeleteKeyBackupDialog({ requestClose }) {
     mountStore.setItem(true);
     setIsDeleting(true);
     try {
-      const backupInfo = await mx.getKeyBackupVersion();
-      if (backupInfo) await mx.deleteKeyBackupVersion(backupInfo.version);
+      const backupInfo = await mx.getCrypto()!.getKeyBackupInfo();
+      if (backupInfo) await mx.getCrypto()!.deleteKeyBackupVersion(backupInfo.version!);
       if (!mountStore.getItem()) return;
       requestClose(true);
     } catch {
@@ -193,7 +192,7 @@ function KeyBackup() {
   const mountStore = useStore();
 
   const fetchKeyBackupVersion = async () => {
-    const info = await mx.getKeyBackupVersion();
+    const info = await mx.getCrypto()!.getKeyBackupInfo();
     if (!mountStore.getItem()) return;
     setKeyBackup(info);
   };

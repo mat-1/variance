@@ -199,7 +199,8 @@ export async function isCrossVerified(deviceId: string): Promise<boolean | null>
     const deviceTrust = await mx
       .getCrypto()
       ?.getDeviceVerificationStatus(mx.getUserId()!, deviceId);
-    return deviceTrust?.crossSigningVerified === true;
+    if (!deviceTrust) return null;
+    return deviceTrust.crossSigningVerified || deviceTrust.signedByOwner;
   } catch {
     // device does not support encryption
     return null;
@@ -214,27 +215,20 @@ export function hasCrossSigningAccountData() {
 
 export function getDefaultSSKey() {
   const mx = initMatrix.matrixClient;
-  try {
-    return mx.getAccountData('m.secret_storage.default_key').getContent().key;
-  } catch {
-    return undefined;
-  }
+  return mx.getAccountData('m.secret_storage.default_key')?.getContent()?.key;
 }
 
-export function getSSKeyInfo(key) {
+export function getSSKeyInfo(key: string) {
   const mx = initMatrix.matrixClient;
-  try {
-    return mx.getAccountData(`m.secret_storage.key.${key}`).getContent();
-  } catch {
-    return undefined;
-  }
+  return mx.getAccountData(`m.secret_storage.key.${key}`)?.getContent();
 }
 
-export async function hasDevices(userId) {
+export async function hasDevices(userId: string) {
   const mx = initMatrix.matrixClient;
   try {
-    const usersDeviceMap = await mx.downloadKeys([userId, mx.getUserId()]);
-    return Object.values(usersDeviceMap).every(
+    // const usersDeviceMap = await mx.downloadKeys([userId, mx.getUserId()]);
+    const usersDeviceMap = await mx.getCrypto()?.getUserDeviceInfo([userId, mx.getUserId()!]);
+    return Object.values(usersDeviceMap!).every(
       (userDevices) => Object.keys(userDevices).length > 0,
     );
   } catch (e) {

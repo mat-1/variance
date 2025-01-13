@@ -37,7 +37,7 @@ const promptDeviceName = async (deviceName: string): Promise<string | null> =>
     const renderContent = (onComplete: (name: string | null) => void) => {
       const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const name = e.target.session.value;
+        const name = (e.target as HTMLFormElement).session.value;
         if (typeof name !== 'string') onComplete(null);
         onComplete(name);
       };
@@ -202,11 +202,13 @@ function DeviceManage() {
 
   const verifyWithEmojis = async (deviceId: string) => {
     const req = await mx.getCrypto()!.requestDeviceVerification(mx.getUserId()!, deviceId);
-    openEmojiVerification(req, { userId: mx.getUserId(), deviceId });
+    console.log('starting to verify device', deviceId, 'with emojis', req);
+    openEmojiVerification(req, { userId: mx.getUserId()!, deviceId });
   };
 
   const verify = (device: IMyDevice, isCurrentDevice: boolean) => {
     if (isCurrentDevice) {
+      console.log('trying to verify current device, verifying with key instead of emojis');
       verifyWithKey(device);
       return;
     }

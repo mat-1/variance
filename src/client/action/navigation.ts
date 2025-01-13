@@ -1,6 +1,8 @@
+import { VerificationRequest } from 'matrix-js-sdk/lib/crypto-api';
 import { EmojiData } from '../../app/organisms/emoji-board/EmojiBoard';
 import appDispatcher from '../dispatcher';
 import cons from '../state/cons';
+import { TargetDevice } from '../../app/organisms/emoji-verification/EmojiVerification';
 
 export function selectTab(tabId: string) {
   appDispatcher.dispatch({
@@ -187,7 +189,7 @@ export function openReusableDialog(title, render, afterClose) {
   });
 }
 
-export function openEmojiVerification(request, targetDevice) {
+export function openEmojiVerification(request: VerificationRequest, targetDevice: TargetDevice) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_EMOJI_VERIFICATION,
     request,

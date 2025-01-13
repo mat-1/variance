@@ -10,16 +10,27 @@ import ScrollView from '../../atoms/scroll/ScrollView';
 import RawModal from '../../atoms/modal/RawModal';
 
 function Dialog({
-  className = null,
+  className,
   isOpen,
   title,
-  onAfterOpen = null,
-  onAfterClose = null,
-  contentOptions = null,
-  onRequestClose = null,
+  onAfterOpen,
+  onAfterClose,
+  contentOptions,
+  onRequestClose,
   closeFromOutside = true,
   children,
   invisibleScroll = false,
+}: {
+  className?: string;
+  isOpen: boolean;
+  title: string | React.ReactNode;
+  contentOptions?: React.ReactNode;
+  onAfterOpen?: () => void;
+  onAfterClose?: () => void;
+  onRequestClose?: () => void;
+  closeFromOutside?: boolean;
+  children: React.ReactNode;
+  invisibleScroll?: boolean;
 }) {
   return (
     <RawModal
