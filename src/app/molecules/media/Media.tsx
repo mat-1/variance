@@ -49,18 +49,24 @@ export async function getUrl(
     if (cachedUnencryptedMedia.has(link)) {
       const cachedValue = cachedUnencryptedMedia.get(link);
       if (typeof cachedValue === 'string') return cachedValue;
-      return (await cachedValue)!;
+      const res = (await cachedValue)!;
+      return res;
     }
 
     // insert a promise
-    let resolvePromise;
-    const promise = new Promise<string>((resolve) => {
+    let resolvePromise: undefined | ((_value: string) => void);
+    const promise = new Promise<string>((resolve: (_value: string) => void) => {
       resolvePromise = resolve;
     });
     cachedUnencryptedMedia.set(link, promise);
     if (cachedUnencryptedMedia.size > 10000) {
       console.info('cachedUnencryptedMedia is too large, clearing');
-      cachedUnencryptedMedia.clear();
+      // remove everything except the promises
+      cachedUnencryptedMedia.entries().forEach(([key, value]) => {
+        if (typeof value === 'string') {
+          cachedUnencryptedMedia.delete(key);
+        }
+      });
     }
 
     const response = await fetch(link, {
@@ -73,12 +79,17 @@ export async function getUrl(
       if (!contentType) {
         throw new Error('Cannot decrypt media without a content type');
       }
-      return URL.createObjectURL(await getDecryptedBlob(response, contentType, decryptionData));
+      const objectUrl = URL.createObjectURL(
+        await getDecryptedBlob(response, contentType, decryptionData),
+      );
+      cachedUnencryptedMedia.set(link, objectUrl);
+      resolvePromise?.(objectUrl);
+      return objectUrl;
     }
     const blob = await response.blob();
-    const objectUrl = URL.createObjectURL(blob);
+    const objectUrl: string = URL.createObjectURL(blob);
     cachedUnencryptedMedia.set(link, objectUrl);
-    resolvePromise(objectUrl);
+    resolvePromise?.(objectUrl);
     return objectUrl;
   } catch (e) {
     console.error(e);
