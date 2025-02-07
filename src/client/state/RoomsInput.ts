@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import encrypt from 'matrix-encrypt-attachment';
 import { encode } from 'blurhash';
-import { EventTimeline, MatrixClient, MatrixEvent } from 'matrix-js-sdk';
+import { EventTimeline, EventType, MatrixClient, MatrixEvent, MsgType } from 'matrix-js-sdk';
 import { getShortcodeToEmoji } from '../../app/organisms/emoji-board/custom-emoji';
 import { getBlobSafeMimeType } from '../../util/mimetypes';
 import { sanitizeText } from '../../util/sanitize';
@@ -183,11 +183,10 @@ class RoomsInput extends EventEmitter {
     this.roomIdToInput.set(roomId, input);
   }
 
-  setAttachment(roomId: string, file) {
+  setAttachment(roomId: string, file: File) {
     const input = this.getInput(roomId);
-    input.attachment = {
-      file,
-    };
+    console.log('setting attachment for input', input);
+    input.attachment = { file };
     this.roomIdToInput.set(roomId, input);
   }
 
@@ -326,6 +325,9 @@ class RoomsInput extends EventEmitter {
     const input = this.getInput(roomId);
     input.isSending = true;
     this.roomIdToInput.set(roomId, input);
+
+    console.log('sending input', input);
+
     if (input.attachment) {
       await this.sendFile(roomId, input.attachment.file);
       if (!this.isSending(roomId)) return;
@@ -361,7 +363,7 @@ class RoomsInput extends EventEmitter {
       // send sticker without info
     }
 
-    this.matrixClient.sendEvent(roomId, 'm.sticker', {
+    this.matrixClient.sendEvent(roomId, EventType.Sticker, {
       body,
       url,
       info,
@@ -370,6 +372,8 @@ class RoomsInput extends EventEmitter {
   }
 
   async sendFile(roomId: string, file: File) {
+    const mx = this.matrixClient;
+
     const fileType = getBlobSafeMimeType(file.type).slice(0, file.type.indexOf('/'));
     const info: {
       mimetype: string;
@@ -397,16 +401,18 @@ class RoomsInput extends EventEmitter {
     let uploadData = null;
 
     if (fileType === 'image') {
+      console.log('loading image', file);
       const img = await loadImage(URL.createObjectURL(file));
+      console.log('loaded image', img);
 
       info.w = img.width;
       info.h = img.height;
       info[blurhashField] = encodeBlurhash(img);
 
-      content.msgtype = 'm.image';
+      content.msgtype = MsgType.Image;
       content.body = file.name || 'Image';
     } else if (fileType === 'video') {
-      content.msgtype = 'm.video';
+      content.msgtype = MsgType.Video;
       content.body = file.name || 'Video';
 
       try {
@@ -448,6 +454,7 @@ class RoomsInput extends EventEmitter {
       });
       this.emit(cons.events.roomsInput.FILE_UPLOADED, roomId);
     } catch (e) {
+      console.error("couldn't upload file:", e);
       this.emit(cons.events.roomsInput.FILE_UPLOAD_CANCELED, roomId);
       return;
     }
@@ -460,7 +467,8 @@ class RoomsInput extends EventEmitter {
     }
   }
 
-  async uploadFile(roomId, file, progressHandler) {
+  async uploadFile(roomId: string, file: File, progressHandler) {
+    const mx = this.matrixClient;
     const isEncryptedRoom = mx.getRoom(roomId)?.hasEncryptionStateEvent();
 
     let encryptInfo = null;

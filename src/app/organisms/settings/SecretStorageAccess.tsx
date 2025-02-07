@@ -163,10 +163,6 @@ export const accessSecretStorage = (title: string) =>
         await makeRequest(auth);
       });
       console.log('[secretstorage] isDone:', isDone);
-      // setTimeout(() => {
-      //   if (isDone) securityKeyDialog(recoveryKey);
-      //   else failedDialog();
-      // });
     };
 
     openReusableDialog(

@@ -110,7 +110,7 @@ function RoomViewInput({
     }
   };
 
-  function uploadingProgress(myRoomId, { loaded, total }) {
+  function uploadingProgress(myRoomId: string, { loaded, total }) {
     if (myRoomId !== roomId) return;
     const progressPer = Math.round((loaded * 100) / total);
     uploadProgressRef.current.textContent = `Uploading: ${bytesToSize(loaded)}/${bytesToSize(
@@ -118,7 +118,7 @@ function RoomViewInput({
     )} (${progressPer}%)`;
     inputBaseRef.current.style.backgroundImage = `linear-gradient(90deg, var(--bg-surface-hover) ${progressPer}%, var(--bg-surface-low) ${progressPer}%)`;
   }
-  function clearAttachment(myRoomId) {
+  function clearAttachment(myRoomId: string) {
     if (roomId !== myRoomId) return;
     setAttachment(null);
     inputBaseRef.current.style.backgroundImage = 'unset';
@@ -245,8 +245,10 @@ function RoomViewInput({
     if (roomsInput.isSending(roomId)) return;
     sendIsTyping(false);
 
+    console.log('sendbody', attachment);
+
     roomsInput.setMessage(roomId, body);
-    if (attachment !== null) {
+    if (attachment) {
       roomsInput.setAttachment(roomId, attachment);
     }
     readOnly = true;

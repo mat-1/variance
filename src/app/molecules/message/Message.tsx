@@ -7,6 +7,7 @@ import { find } from 'linkifyjs';
 import {
   MatrixEvent,
   MatrixEventEvent,
+  MsgType,
   RoomEvent,
   THREAD_RELATION_TYPE,
   Thread,
@@ -611,10 +612,10 @@ MessageReactionGroup.propTypes = {
 
 function isMedia(mEvent: MatrixEvent) {
   return (
-    mEvent.getContent()?.msgtype === 'm.file' ||
-    mEvent.getContent()?.msgtype === 'm.image' ||
-    mEvent.getContent()?.msgtype === 'm.audio' ||
-    mEvent.getContent()?.msgtype === 'm.video' ||
+    mEvent.getContent()?.msgtype === MsgType.File ||
+    mEvent.getContent()?.msgtype === MsgType.Image ||
+    mEvent.getContent()?.msgtype === MsgType.Audio ||
+    mEvent.getContent()?.msgtype === MsgType.Video ||
     mEvent.getType() === 'm.sticker'
   );
 }
@@ -842,7 +843,7 @@ function genMediaContent(matrixEvent: MatrixEvent) {
   const blurhash = mContent?.info?.['xyz.amorgan.blurhash'];
 
   switch (msgType) {
-    case 'm.file':
+    case MsgType.File:
       return (
         <Media.File
           name={mContent.body}
@@ -851,7 +852,7 @@ function genMediaContent(matrixEvent: MatrixEvent) {
           file={mContent.file || null}
         />
       );
-    case 'm.image':
+    case MsgType.Image:
       return (
         <Media.Image
           name={mContent.body}
@@ -882,7 +883,7 @@ function genMediaContent(matrixEvent: MatrixEvent) {
           type={mContent.info?.mimetype}
         />
       );
-    case 'm.audio':
+    case MsgType.Audio:
       return (
         <Media.Audio
           name={mContent.body}
@@ -891,7 +892,7 @@ function genMediaContent(matrixEvent: MatrixEvent) {
           file={mContent.file || null}
         />
       );
-    case 'm.video':
+    case MsgType.Video:
       if (typeof thumbnailMXC === 'undefined') {
         thumbnailMXC = mContent.info?.thumbnail_file?.url || null;
       }
