@@ -110,9 +110,9 @@ export class InitMatrix extends EventEmitter {
       ERROR: (_prevState: string | null, data?: sdk.SyncStateData) => {
         console.log('ERROR state');
         console.log('Error data:', data?.error);
-        if (data?.error instanceof sdk.InvalidStoreError) {
+        if (data?.error instanceof sdk.InvalidCryptoStoreError) {
           (async () => {
-            console.log("it's an InvalidStoreError, deleting cache");
+            console.log("it's an InvalidCryptoStoreError, deleting cache");
             await this.matrixClient.store.deleteAllData();
             console.log('cache deleted, reloading');
             window.location.reload();

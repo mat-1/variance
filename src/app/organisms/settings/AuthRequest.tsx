@@ -11,9 +11,10 @@ import Input from '../../atoms/input/Input';
 import Spinner from '../../atoms/spinner/Spinner';
 
 import { useStore } from '../../hooks/useStore';
+import { AuthDict } from 'matrix-js-sdk';
 
 let lastUsedPassword: string | undefined;
-const getAuthId = (password: string) => ({
+const getAuthId = (password: string): AuthDict => ({
   type: 'm.login.password',
   password,
   identifier: {
@@ -83,9 +84,12 @@ AuthRequest.propTypes = {
  * @param {(auth) => void} makeRequest request to make
  * @returns {Promise<boolean>} whether the request succeed or not.
  */
-export const authRequest = async (title: string, makeRequest: (auth: unknown) => Promise<void>) => {
+export const authRequest = async (
+  title: string,
+  makeRequest: (auth: AuthDict | null) => Promise<void>,
+) => {
   try {
-    const auth = lastUsedPassword ? getAuthId(lastUsedPassword) : undefined;
+    const auth = lastUsedPassword ? getAuthId(lastUsedPassword) : null;
     await makeRequest(auth);
     return true;
   } catch (e) {

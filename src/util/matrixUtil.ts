@@ -6,7 +6,8 @@ import HashLockIC from '../../public/res/ic/outlined/hash-lock.svg';
 import SpaceIC from '../../public/res/ic/outlined/space.svg';
 import SpaceGlobeIC from '../../public/res/ic/outlined/space-globe.svg';
 import SpaceLockIC from '../../public/res/ic/outlined/space-lock.svg';
-import { RoomMember } from 'matrix-js-sdk';
+import { type RoomMember } from 'matrix-js-sdk';
+import { type SecretStorageKeyDescriptionAesV1 } from 'matrix-js-sdk/lib/secret-storage';
 
 const WELL_KNOWN_URI = '/.well-known/matrix/client';
 
@@ -218,9 +219,10 @@ export function getDefaultSSKey() {
   return mx.getAccountData('m.secret_storage.default_key')?.getContent()?.key;
 }
 
-export function getSSKeyInfo(key: string) {
+export function getSSKeyInfo(key: string): SecretStorageKeyDescriptionAesV1 {
   const mx = initMatrix.matrixClient;
-  return mx.getAccountData(`m.secret_storage.key.${key}`)?.getContent();
+  const content = mx.getAccountData(`m.secret_storage.key.${key}`)?.getContent();
+  return content as SecretStorageKeyDescriptionAesV1;
 }
 
 export async function hasDevices(userId: string) {
