@@ -988,18 +988,17 @@ export function Message({
   const sender = senderId ? roomTimeline?.room.getMember(senderId) : undefined;
 
   let username = sender ? getUsernameOfRoomMember(sender) : getUsername(senderId!);
-  const avatarMxcUrl = sender?.getMxcAvatarUrl() || mEvent.sender?.getMxcAvatarUrl();
+  let avatarMxcUrl = sender?.getMxcAvatarUrl() || mEvent.sender?.getMxcAvatarUrl();
 
-  // used by mautrix discord bridge
+  // MSC4144, used by mautrix discord bridge
   const beeperProfile = mEvent.getContent()['com.beeper.per_message_profile'];
   if (beeperProfile) {
     if (beeperProfile.displayname) {
       username = beeperProfile.displayname;
     }
-    // this sometimes 404s so we don't use it
-    // if (beeperProfile.avatar_url) {
-    //   avatarMxcUrl = beeperProfile.avatar_url;
-    // }
+    if (beeperProfile.avatar_url) {
+      avatarMxcUrl = beeperProfile.avatar_url;
+    }
   }
   const avatarSrc = getHttpUriForMxc(
     initMatrix.matrixClient.baseUrl,
