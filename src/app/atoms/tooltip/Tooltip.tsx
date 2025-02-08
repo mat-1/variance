@@ -2,8 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './Tooltip.scss';
 import Tippy from '@tippyjs/react';
+import { Placement } from 'tippy.js';
 
-function Tooltip({ className = '', placement = 'top', content, delay = [200, 0], children }) {
+function Tooltip({
+  className = '',
+  placement = 'top',
+  content,
+  delay = [200, 0],
+  children,
+}: {
+  className?: string;
+  placement?: Placement;
+  content: React.ReactNode;
+  delay?: [number, number];
+  children: React.ReactElement;
+}) {
   return (
     <Tippy
       content={content}

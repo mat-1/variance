@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './IconButton.scss';
+import { type Placement } from 'tippy.js';
 
 import RawIcon, { IconSize } from '../system-icons/RawIcon';
 import Tooltip from '../tooltip/Tooltip';
@@ -13,10 +14,10 @@ const IconButton = React.forwardRef(
       variant = 'surface',
       size = 'normal',
       type = 'button',
-      tooltip = null,
+      tooltip = undefined,
       tooltipPlacement = 'top',
       src,
-      onClick = null,
+      onClick = undefined,
       tabIndex = 0,
       disabled = false,
       isImage = false,
@@ -26,9 +27,9 @@ const IconButton = React.forwardRef(
       size?: IconSize;
       type?: 'button' | 'submit' | 'reset';
       tooltip?: string;
-      tooltipPlacement?: string;
+      tooltipPlacement?: Placement;
       src: string;
-      onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+      onClick?: (_e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
       tabIndex?: number;
       disabled?: boolean;
       isImage?: boolean;

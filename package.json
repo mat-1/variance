@@ -19,6 +19,7 @@
   "author": "Variance and Cinny contributors",
   "license": "AGPL-3.0-only",
   "dependencies": {
+    "@floating-ui/react": "^0.27.3",
     "@fontsource/atkinson-hyperlegible": "5.1.1",
     "@khanacademy/simple-markdown": "0.13.13",
     "@matrix-org/olm": "^3.2.15",

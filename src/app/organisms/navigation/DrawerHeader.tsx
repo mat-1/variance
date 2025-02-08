@@ -33,11 +33,17 @@ import HashSearchIC from '../../../../public/res/ic/outlined/hash-search.svg';
 import SpacePlusIC from '../../../../public/res/ic/outlined/space-plus.svg';
 import ChevronBottomIC from '../../../../public/res/ic/outlined/chevron-bottom.svg';
 
-export function HomeSpaceOptions({ spaceId = null, afterOptionSelect }) {
+export function HomeSpaceOptions({
+  spaceId = undefined,
+  afterOptionSelect,
+}: {
+  spaceId?: string;
+  afterOptionSelect: () => void;
+}) {
   const mx = initMatrix.matrixClient;
   const room = mx.getRoom(spaceId);
   const canManage = room
-    ? room.currentState.maySendStateEvent('m.space.child', mx.getUserId())
+    ? room.currentState.maySendStateEvent('m.space.child', mx.getUserId()!)
     : true;
 
   return (

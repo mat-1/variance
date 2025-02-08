@@ -28,12 +28,12 @@ interface RoomsCategoryProps {
   hideHeader?: boolean;
   roomIds: string[];
   drawerPostie: {
-    subscribe: (channel: string, key: string, callback: () => void) => () => void;
+    subscribe: (_channel: string, _key: string, _callback: () => void) => () => void;
   };
 }
 
 function RoomsCategory({
-  spaceId = null,
+  spaceId = undefined,
   name,
   hideHeader = false,
   roomIds,

@@ -1,8 +1,8 @@
 import initMatrix from '../client/initMatrix';
 
-export function roomIdByActivity(id1, id2) {
-  const room1 = initMatrix.matrixClient.getRoom(id1);
-  const room2 = initMatrix.matrixClient.getRoom(id2);
+export function roomIdByActivity(id1: string, id2: string) {
+  const room1 = initMatrix.matrixClient.getRoom(id1)!;
+  const room2 = initMatrix.matrixClient.getRoom(id2)!;
 
   return room2.getLastActiveTimestamp() - room1.getLastActiveTimestamp();
 }
