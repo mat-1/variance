@@ -161,7 +161,7 @@ const tabItems = [
 function RoomSettings({ roomId }) {
   const [, forceUpdate] = useForceUpdate();
   const [selectedTab, setSelectedTab] = useState(tabItems[0]);
-  const room = initMatrix.matrixClient.getRoom(roomId);
+  const room = initMatrix.matrixClient?.getRoom(roomId);
 
   const handleTabChange = (tabItem) => {
     setSelectedTab(tabItem);
@@ -185,6 +185,7 @@ function RoomSettings({ roomId }) {
   }, [forceUpdate]);
 
   if (!navigation.isRoomSettings) return null;
+  if (!room) return null;
 
   return (
     <div className="room-settings">

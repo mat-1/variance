@@ -5,9 +5,10 @@ const cons = {
     DEVICE_ID: 'cinny_device_id',
     USER_ID: 'cinny_user_id',
     BASE_URL: 'cinny_hs_base_url',
-    SLIDING_SYNC_PROXY_URL: 'cinny_sliding_sync_proxy_url',
   },
-  DEVICE_DISPLAY_NAME: 'Variance Web',
+  ACTIVE_ROOM_ID: 'variance_active_room_id',
+
+  DEVICE_DISPLAY_NAME: 'Variance',
   IN_CINNY_SPACES: 'in.cinny.spaces',
   tabs: {
     HOME: 'home',

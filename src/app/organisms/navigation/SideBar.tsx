@@ -57,11 +57,12 @@ function ProfileAvatarMenu() {
   const mx = initMatrix.matrixClient;
   const [profile, setProfile] = useState({
     avatarUrl: null,
-    displayName: mx.getUser(mx.getUserId())?.displayName,
+    displayName: mx ? mx.getUser(mx.getUserId())?.displayName : undefined,
   });
 
   useEffect(() => {
-    const user = mx.getUser(mx.getUserId());
+    if (!mx) return () => {};
+    const user = mx.getUser(mx.getUserId()!)!;
     const setNewProfile = (avatarUrl: string, displayName: string) =>
       setProfile({
         avatarUrl: avatarUrl || null,
@@ -78,6 +79,8 @@ function ProfileAvatarMenu() {
       user.removeListener('User.avatarUrl', onAvatarChange);
     };
   }, []);
+
+  if (!mx) return null;
 
   return (
     <SidebarAvatar
@@ -257,6 +260,8 @@ function DraggableSpaceShortcut({ isActive, spaceId, index, moveShortcut, onDrop
     if (isDragging) shortcutRef.current.style.opacity = 0;
     else shortcutRef.current.style.opacity = 1;
   }
+
+  if (!room) return null;
 
   return (
     <SidebarAvatar

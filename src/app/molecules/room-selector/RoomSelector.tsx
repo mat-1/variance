@@ -63,9 +63,9 @@ RoomSelectorWrapper.propTypes = {
 
 interface RoomSelectorProps {
   name: string;
-  parentName: string | null;
+  parentName?: string | null;
   roomId: string;
-  imageSrc?: string;
+  imageSrc?: string | null;
   iconSrc?: string;
   isSelected: boolean;
   isMuted: boolean;

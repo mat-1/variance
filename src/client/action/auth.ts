@@ -2,25 +2,18 @@ import * as sdk from 'matrix-js-sdk';
 import cons from '../state/cons';
 import { WellKnown, getWellKnown } from '../../util/matrixUtil';
 
-function updateLocalStore(
-  accessToken: string,
-  deviceId: string,
-  userId: string,
-  baseUrl: string,
-  slidingSyncProxyUrl?: string,
-) {
+function updateLocalStore(accessToken: string, deviceId: string, userId: string, baseUrl: string) {
   localStorage.setItem(cons.secretKey.ACCESS_TOKEN, accessToken);
   localStorage.setItem(cons.secretKey.DEVICE_ID, deviceId);
   localStorage.setItem(cons.secretKey.USER_ID, userId);
   localStorage.setItem(cons.secretKey.BASE_URL, baseUrl);
-  localStorage.setItem(cons.secretKey.SLIDING_SYNC_PROXY_URL, slidingSyncProxyUrl);
 }
 
-function createTemporaryClient(baseUrl) {
+function createTemporaryClient(baseUrl: string) {
   return sdk.createClient({ baseUrl });
 }
 
-async function startSsoLogin(baseUrl, type, idpId) {
+async function startSsoLogin(baseUrl: string, type, idpId) {
   const client = createTemporaryClient(baseUrl);
   localStorage.setItem(cons.secretKey.BASE_URL, client.baseUrl);
   window.location.href = client.getSsoLoginUrl(window.location.href, type, idpId);
@@ -49,8 +42,7 @@ async function login(baseUrl: string, username: string, email: string, password:
   // const wellKnown: WellKnown | undefined = res?.well_known;
   const wellKnown: WellKnown = await getWellKnown(baseUrl);
   const myBaseUrl = wellKnown?.['m.homeserver']?.base_url || client.baseUrl;
-  const mySlidingSyncProxyUrl = wellKnown?.['org.matrix.msc3575.proxy']?.url;
-  updateLocalStore(res.access_token, res.device_id, res.user_id, myBaseUrl, mySlidingSyncProxyUrl);
+  updateLocalStore(res.access_token, res.device_id, res.user_id, myBaseUrl);
 }
 
 async function loginWithToken(baseUrl, token) {

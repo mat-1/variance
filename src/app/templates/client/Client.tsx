@@ -21,6 +21,7 @@ import cons from '../../../client/state/cons';
 import DragDrop from '../../organisms/drag-drop/DragDrop';
 
 import VerticalMenuIC from '../../../../public/res/ic/outlined/vertical-menu.svg';
+import { selectRoom } from '../../../client/action/navigation';
 
 function Client() {
   const [isLoading, changeLoading] = useState(true);

@@ -1,29 +1,30 @@
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-useless-return */
+
 import { openSearch, toggleRoomSettings } from '../action/navigation';
 import navigation from '../state/navigation';
 import { markAsRead } from '../action/notifications';
 
-function shouldFocusMessageField(code: string) {
-  // do not focus on F keys
-  if (/^F\d+$/.test(code)) return false;
+let hotkeysInitialized = false;
+function initHotkeys() {
+  if (hotkeysInitialized) removeHotkeys();
+  hotkeysInitialized = true;
 
-  // do not focus on numlock/scroll lock
-  if (
-    code.startsWith('OS') ||
-    code.startsWith('Meta') ||
-    code.startsWith('Shift') ||
-    code.startsWith('Alt') ||
-    code.startsWith('Control') ||
-    code.startsWith('Arrow') ||
-    code === 'Tab' ||
-    code === 'Space' ||
-    code === 'Enter' ||
-    code === 'NumLock' ||
-    code === 'ScrollLock'
-  ) {
-    return false;
-  }
+  document.body.addEventListener('keydown', listenKeyboard);
 
-  return true;
+  // detect browser forward and back
+  window.addEventListener('popstate', listenPopState);
+  history.pushState({ back: true }, '', '');
+  history.pushState({ present: true }, '', '');
+  history.pushState({ forward: true }, '', '');
+  history.back();
+}
+
+function removeHotkeys() {
+  document.body.removeEventListener('keydown', listenKeyboard);
+  window.removeEventListener('popstate', listenPopState);
+
+  hotkeysInitialized = false;
 }
 
 function listenKeyboard(e: KeyboardEvent) {
@@ -139,69 +140,87 @@ function listenKeyboard(e: KeyboardEvent) {
   }
 }
 
-/* eslint-disable no-restricted-globals */
-/* eslint-disable no-useless-return */
+function shouldFocusMessageField(code: string) {
+  // do not focus on F keys
+  if (/^F\d+$/.test(code)) return false;
+
+  // do not focus on numlock/scroll lock
+  if (
+    code.startsWith('OS') ||
+    code.startsWith('Meta') ||
+    code.startsWith('Shift') ||
+    code.startsWith('Alt') ||
+    code.startsWith('Control') ||
+    code.startsWith('Arrow') ||
+    code === 'Tab' ||
+    code === 'Space' ||
+    code === 'Enter' ||
+    code === 'NumLock' ||
+    code === 'ScrollLock'
+  ) {
+    return false;
+  }
+
+  return true;
+}
 
 function listenPopState(e: PopStateEvent) {
-  console.log('popstate', e.state);
-
-  if (e.state.forward === true) {
+  if (e.state.forward) {
     history.go(-1);
 
-    // open members list room-header__members-btn
-    const membersBtnEl = document.querySelector(
-      '.room-header__members-btn',
-    ) as HTMLDivElement | null;
-    if (membersBtnEl && membersBtnEl.checkVisibility()) {
-      membersBtnEl.click();
-      return;
-    }
-
-    // open the current room room-selector--selected
-    const selectedRoomEl = document.querySelector(
-      '.room-selector--selected .room-selector__content',
-    ) as HTMLDivElement | null;
-    if (selectedRoomEl && selectedRoomEl.checkVisibility()) {
-      selectedRoomEl.click();
-      return;
-    }
-  } else if (e.state.back === true) {
+    handleBrowserForward();
+  } else if (e.state.back) {
     history.go(1);
 
-    // close room settings if open
-    const roomViewDroppedEl = document.querySelector(
-      '.room-settings__header-btn',
-    ) as HTMLDivElement | null;
-    if (roomViewDroppedEl && roomViewDroppedEl.checkVisibility()) {
-      roomViewDroppedEl.click();
-      return;
-    }
-
-    // open the drawer if the button is visible
-    const roomHeaderBackBtnEl = document.querySelector(
-      '.room-header__back-btn',
-    ) as HTMLDivElement | null;
-    if (roomHeaderBackBtnEl && roomHeaderBackBtnEl.checkVisibility()) {
-      roomHeaderBackBtnEl.click();
-      return;
-    }
+    handleBrowserBack();
   }
 }
 
-function initHotkeys() {
-  document.body.addEventListener('keydown', listenKeyboard);
+function handleBrowserForward() {
+  // open members list room-header__members-btn
+  const membersBtnEl = document.querySelector('.room-header__members-btn') as HTMLDivElement | null;
+  if (membersBtnEl && membersBtnEl.checkVisibility()) {
+    membersBtnEl.click();
+    return;
+  }
 
-  // detect browser forward and back
-  window.addEventListener('popstate', listenPopState);
-  history.pushState({ back: true }, '', '');
-  history.pushState({ present: true }, '', '');
-  history.pushState({ forward: true }, '', '');
-  history.back();
+  // open the current room room-selector--selected
+  const selectedRoomEl = document.querySelector(
+    '.room-selector--selected .room-selector__content',
+  ) as HTMLDivElement | null;
+  const roomWrapperEl = document.querySelector('.room__wrapper') as HTMLDivElement | null;
+  if (
+    selectedRoomEl &&
+    selectedRoomEl.checkVisibility() &&
+    (!roomWrapperEl || !roomWrapperEl.checkVisibility())
+  ) {
+    selectedRoomEl.click();
+    return;
+  }
+
+  navigation._navigateForward();
 }
 
-function removeHotkeys() {
-  document.body.removeEventListener('keydown', listenKeyboard);
-  window.removeEventListener('popstate', listenPopState);
+function handleBrowserBack() {
+  // close room settings if open
+  const roomViewDroppedEl = document.querySelector(
+    '.room-settings__header-btn',
+  ) as HTMLDivElement | null;
+  if (roomViewDroppedEl && roomViewDroppedEl.checkVisibility()) {
+    roomViewDroppedEl.click();
+    return;
+  }
+
+  // open the drawer if the button is visible
+  const roomHeaderBackBtnEl = document.querySelector(
+    '.room-header__back-btn',
+  ) as HTMLDivElement | null;
+  if (roomHeaderBackBtnEl && roomHeaderBackBtnEl.checkVisibility()) {
+    roomHeaderBackBtnEl.click();
+    return;
+  }
+
+  navigation._navigateBack();
 }
 
 export { initHotkeys, removeHotkeys };

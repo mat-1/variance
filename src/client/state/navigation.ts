@@ -20,6 +20,10 @@ class Navigation extends EventEmitter {
 
   recentRooms: string[];
 
+  roomNavigationHistory: string[];
+
+  roomNavigationHistoryIndex: number;
+
   spaceToRoom: Map<string, { roomId: string; timestamp: number }>;
 
   rawModelStack: boolean[];
@@ -37,6 +41,8 @@ class Navigation extends EventEmitter {
     this.selectedThreadId = null;
     this.isRoomSettings = false;
     this.recentRooms = [];
+    this.roomNavigationHistory = [];
+    this.roomNavigationHistoryIndex = -1;
 
     this.spaceToRoom = new Map();
 
@@ -62,6 +68,7 @@ class Navigation extends EventEmitter {
 
   _mapRoomToSpace(roomId: string) {
     const { roomList } = this.initMatrix;
+    if (!roomList) return;
     if (
       this.selectedTab === cons.tabs.HOME &&
       roomList.rooms.has(roomId) &&
@@ -107,6 +114,44 @@ class Navigation extends EventEmitter {
       this.emit(cons.events.navigation.ROOM_SETTINGS_TOGGLED, this.isRoomSettings);
     }
 
+    // add to localStorage so we can restore it on reload
+    localStorage.setItem(cons.ACTIVE_ROOM_ID, roomId);
+
+    console.log('[select room] emitting ROOM_SELECTED');
+
+    // this gets accessed by hotkeys
+
+    console.log(
+      'roomNavigationHistory before',
+      this.roomNavigationHistoryIndex,
+      this.roomNavigationHistory,
+    );
+    if (this.roomNavigationHistoryIndex !== this.roomNavigationHistory.length - 1) {
+      // this means we previously went back
+
+      if (this.roomNavigationHistory[this.roomNavigationHistoryIndex] === roomId) {
+        // this means we went forwards/backwards normally. do nothing
+      } else {
+        // we selected a different room, delete history and add new room
+        this.roomNavigationHistory.splice(this.roomNavigationHistoryIndex);
+        this.roomNavigationHistory.push(roomId);
+        this.roomNavigationHistoryIndex += 1;
+      }
+    } else {
+      const lastRoomId = this.roomNavigationHistory[this.roomNavigationHistoryIndex];
+      // don't add to history if it's the same room
+
+      if (lastRoomId !== roomId) {
+        this.roomNavigationHistory.push(roomId);
+        this.roomNavigationHistoryIndex += 1;
+      }
+    }
+    console.log(
+      'roomNavigationHistory after',
+      this.roomNavigationHistoryIndex,
+      this.roomNavigationHistory,
+    );
+
     this.emit(
       cons.events.navigation.ROOM_SELECTED,
       this.selectedRoomId,
@@ -116,8 +161,26 @@ class Navigation extends EventEmitter {
     );
   }
 
+  _navigateBack() {
+    if (this.roomNavigationHistoryIndex <= 0) return;
+    this.roomNavigationHistoryIndex -= 1;
+    const roomId = this.roomNavigationHistory[this.roomNavigationHistoryIndex];
+    this._selectTabWithRoom(roomId);
+    this._selectRoom(roomId);
+  }
+
+  _navigateForward() {
+    console.log('_navigateForward', this.roomNavigationHistoryIndex);
+    if (this.roomNavigationHistoryIndex >= this.roomNavigationHistory.length - 1) return;
+    this.roomNavigationHistoryIndex += 1;
+    const roomId = this.roomNavigationHistory[this.roomNavigationHistoryIndex];
+    this._selectTabWithRoom(roomId);
+    this._selectRoom(roomId);
+  }
+
   _selectTabWithRoom(roomId: string) {
     const { roomList, accountData } = this.initMatrix;
+    if (!accountData) return;
     const { categorizedSpaces } = accountData;
 
     if (roomList.isOrphan(roomId)) {
@@ -146,6 +209,7 @@ class Navigation extends EventEmitter {
     }
 
     const spaceInPath = [...this.selectedSpacePath].reverse().find((sId) => parents.has(sId));
+    console.log('[select room] spaceInPath', spaceInPath);
     if (spaceInPath) {
       this._selectSpace(spaceInPath, false, false);
       return;
@@ -251,8 +315,10 @@ class Navigation extends EventEmitter {
     this._selectRoom(this._getLatestActiveRoomId(children));
   }
 
-  _selectRoomWithTab(tabId) {
+  _selectRoomWithTab(tabId: string) {
     const { roomList } = this.initMatrix;
+    if (!roomList) return;
+
     if (tabId === cons.tabs.HOME || tabId === cons.tabs.DIRECTS) {
       const data = this.spaceToRoom.get(tabId);
       if (data) {
@@ -266,7 +332,7 @@ class Navigation extends EventEmitter {
     this._selectRoomWithSpace(tabId);
   }
 
-  removeRecentRoom(roomId) {
+  removeRecentRoom(roomId: string) {
     if (typeof roomId !== 'string') return;
     const roomIdIndex = this.recentRooms.indexOf(roomId);
     if (roomIdIndex >= 0) {
@@ -274,7 +340,7 @@ class Navigation extends EventEmitter {
     }
   }
 
-  addRecentRoom(roomId) {
+  addRecentRoom(roomId: string) {
     if (typeof roomId !== 'string') return;
 
     this.recentRooms.push(roomId);

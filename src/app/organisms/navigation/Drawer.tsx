@@ -65,6 +65,8 @@ function Drawer() {
     });
   }, [selectedTab]);
 
+  if (!roomList) return null;
+
   return (
     <div className="drawer">
       <DrawerHeader selectedTab={selectedTab} spaceId={spaceId} />

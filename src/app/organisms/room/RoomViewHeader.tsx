@@ -36,7 +36,7 @@ import { useForceUpdate } from '../../hooks/useForceUpdate';
 function RoomViewHeader({ roomId, threadId }: { roomId: string; threadId?: string }) {
   const [, forceUpdate] = useForceUpdate();
   const mx = initMatrix.matrixClient;
-  const isDM = initMatrix.roomList.directs.has(roomId);
+  const isDM = initMatrix.roomList?.directs?.has(roomId);
 
   const roomHeaderBtnRef = useRef(null);
   useEffect(() => {
@@ -62,6 +62,8 @@ function RoomViewHeader({ roomId, threadId }: { roomId: string; threadId?: strin
       roomList.removeListener(cons.events.roomList.ROOM_PROFILE_UPDATED, handleProfileUpdate);
     };
   }, [roomId]);
+
+  if (!mx) return null;
 
   const room = mx.getRoom(roomId);
   if (!room) {

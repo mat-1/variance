@@ -124,7 +124,7 @@ export function openSettings(tabText: string) {
 
 export function openEmojiBoard(
   cords,
-  requestEmojiCallback: (emoji: EmojiData) => void,
+  requestEmojiCallback: (_emoji: EmojiData) => void,
   allowTextReactions: boolean,
 ) {
   appDispatcher.dispatch({
