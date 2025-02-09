@@ -298,7 +298,9 @@ function SpaceShortcut() {
   const { accountData } = initMatrix;
   const [selectedTab] = useSelectedTab();
   useNotificationUpdate();
-  const [spaceShortcut, setSpaceShortcut] = useState([...accountData.spaceShortcut]);
+  const [spaceShortcut, setSpaceShortcut] = useState(
+    accountData ? [...accountData.spaceShortcut] : [],
+  );
 
   useEffect(() => {
     const handleShortcut = () => setSpaceShortcut([...accountData.spaceShortcut]);
@@ -307,6 +309,8 @@ function SpaceShortcut() {
       accountData.removeListener(cons.events.accountData.SPACE_SHORTCUT_UPDATED, handleShortcut);
     };
   }, []);
+
+  if (!accountData) return;
 
   const moveShortcut = (dragIndex, hoverIndex) => {
     const dragSpaceId = spaceShortcut[dragIndex];

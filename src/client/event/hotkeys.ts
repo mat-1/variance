@@ -139,12 +139,69 @@ function listenKeyboard(e: KeyboardEvent) {
   }
 }
 
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-useless-return */
+
+function listenPopState(e: PopStateEvent) {
+  console.log('popstate', e.state);
+
+  if (e.state.forward === true) {
+    history.go(-1);
+
+    // open members list room-header__members-btn
+    const membersBtnEl = document.querySelector(
+      '.room-header__members-btn',
+    ) as HTMLDivElement | null;
+    if (membersBtnEl && membersBtnEl.checkVisibility()) {
+      membersBtnEl.click();
+      return;
+    }
+
+    // open the current room room-selector--selected
+    const selectedRoomEl = document.querySelector(
+      '.room-selector--selected .room-selector__content',
+    ) as HTMLDivElement | null;
+    if (selectedRoomEl && selectedRoomEl.checkVisibility()) {
+      selectedRoomEl.click();
+      return;
+    }
+  } else if (e.state.back === true) {
+    history.go(1);
+
+    // close room settings if open
+    const roomViewDroppedEl = document.querySelector(
+      '.room-settings__header-btn',
+    ) as HTMLDivElement | null;
+    if (roomViewDroppedEl && roomViewDroppedEl.checkVisibility()) {
+      roomViewDroppedEl.click();
+      return;
+    }
+
+    // open the drawer if the button is visible
+    const roomHeaderBackBtnEl = document.querySelector(
+      '.room-header__back-btn',
+    ) as HTMLDivElement | null;
+    if (roomHeaderBackBtnEl && roomHeaderBackBtnEl.checkVisibility()) {
+      roomHeaderBackBtnEl.click();
+      return;
+    }
+  }
+}
+
 function initHotkeys() {
   document.body.addEventListener('keydown', listenKeyboard);
+
+  // detect browser forward and back
+  window.addEventListener('popstate', listenPopState);
+  history.pushState({ back: true }, '', '');
+  history.pushState({ present: true }, '', '');
+  history.pushState({ forward: true }, '', '');
+  history.back();
 }
 
 function removeHotkeys() {
   document.body.removeEventListener('keydown', listenKeyboard);
+  window.removeEventListener('popstate', listenPopState);
 }
 
 export { initHotkeys, removeHotkeys };

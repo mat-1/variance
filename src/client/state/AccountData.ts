@@ -53,7 +53,15 @@ class AccountData extends EventEmitter {
     }
   }
 
-  _updateSpaceShortcutData(shortcutList) {
+  _updateSpaceShortcutData(shortcutList: string[]) {
+    console.log('_updateSpaceShortcutData', shortcutList);
+
+    // check if we've finished loading yet to avoid corrupting our data
+    if (!this.matrixClient.isInitialSyncComplete()) {
+      console.warn('tried to set _updateSpaceShortcutData before initial sync complete');
+      return;
+    }
+
     const spaceContent = this._getAccountData();
     spaceContent.shortcut = shortcutList;
     this.matrixClient.setAccountData(cons.IN_CINNY_SPACES, spaceContent);
@@ -74,7 +82,15 @@ class AccountData extends EventEmitter {
     }
   }
 
-  _updateCategorizedSpacesData(categorizedSpaceList) {
+  _updateCategorizedSpacesData(categorizedSpaceList: string[]) {
+    console.log('_updateCategorizedSpacesData', categorizedSpaceList);
+
+    // check if we've finished loading yet to avoid corrupting our data
+    if (!this.matrixClient.isInitialSyncComplete()) {
+      console.warn('tried to set _updateCategorizedSpacesData before initial sync complete');
+      return;
+    }
+
     const spaceContent = this._getAccountData();
     spaceContent.categorized = categorizedSpaceList;
     this.matrixClient.setAccountData(cons.IN_CINNY_SPACES, spaceContent);
