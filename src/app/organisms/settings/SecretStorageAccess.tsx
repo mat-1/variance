@@ -2,6 +2,8 @@ import React, { FormEvent, useState } from 'react';
 import PropTypes from 'prop-types';
 import './SecretStorageAccess.scss';
 import { deriveKey } from 'matrix-js-sdk/lib/crypto/key_passphrase';
+import { decodeRecoveryKey } from 'matrix-js-sdk/lib/crypto-api';
+import { AuthDict, UIAResponse } from 'matrix-js-sdk';
 
 import initMatrix from '../../../client/initMatrix';
 import { openReusableDialog } from '../../../client/action/navigation';
@@ -18,9 +20,7 @@ import Input from '../../atoms/input/Input';
 import Spinner from '../../atoms/spinner/Spinner';
 
 import { useStore } from '../../hooks/useStore';
-import { decodeRecoveryKey } from 'matrix-js-sdk/lib/crypto-api';
 import { authRequest } from './AuthRequest';
-import { AuthDict, UIAResponse } from 'matrix-js-sdk';
 
 interface KeyData {
   keyId: string;
@@ -29,19 +29,15 @@ interface KeyData {
   privateKey: Uint8Array<ArrayBufferLike>;
 }
 
-function SecretStorageAccess({ onComplete }: { onComplete: (data: KeyData) => void }) {
+function SecretStorageAccess({ onComplete }: { onComplete: (_data: KeyData) => void }) {
   const mx = initMatrix.matrixClient;
   const sSKeyId = getDefaultSSKey();
   const sSKeyInfo = getSSKeyInfo(sSKeyId)!;
-  const isPassphrase = !!sSKeyInfo.passphrase;
-  const [withPhrase, setWithPhrase] = useState(isPassphrase);
   const [process, setProcess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const mountStore = useStore();
 
   console.log('[secretstorage] sSKeyInfo', sSKeyInfo);
-
-  const toggleWithPhrase = () => setWithPhrase(!withPhrase);
 
   const processInput = async ({ key, phrase }: KeyInput) => {
     mountStore.setItem(true);
@@ -79,11 +75,13 @@ function SecretStorageAccess({ onComplete }: { onComplete: (data: KeyData) => vo
 
   const handleForm = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const password = e.target.password.value;
+    const password = (e.target as HTMLFormElement).password.value;
     if (password.trim() === '') return;
+    const looksLikeKey = password.match(/^([a-zA-Z0-9]{4} ){11}[a-zA-Z0-9]{4}$/);
+
     const data: KeyInput = {};
-    if (withPhrase) data.phrase = password;
-    else data.key = password;
+    if (looksLikeKey) data.key = password;
+    else data.phrase = password;
     processInput(data);
   };
 
@@ -97,7 +95,7 @@ function SecretStorageAccess({ onComplete }: { onComplete: (data: KeyData) => vo
       <form onSubmit={handleForm}>
         <Input
           name="password"
-          label={`Security ${withPhrase ? 'Phrase' : 'Key'}`}
+          label="Security Phrase or Key"
           type="password"
           onChange={handleChange}
           required
@@ -108,11 +106,6 @@ function SecretStorageAccess({ onComplete }: { onComplete: (data: KeyData) => vo
             <Button variant="primary" type="submit">
               Continue
             </Button>
-            {isPassphrase && (
-              <Button onClick={toggleWithPhrase}>{`Use Security ${
-                withPhrase ? 'Key' : 'Phrase'
-              }`}</Button>
-            )}
           </div>
         )}
       </form>
@@ -156,9 +149,9 @@ export const accessSecretStorage = (title: string) =>
     };
 
     const authUploadDeviceSigningKeys = async (
-      makeRequest: (authData: AuthDict | null) => Promise<UIAResponse<void>>,
+      makeRequest: (_authData: AuthDict | null) => Promise<UIAResponse<void>>,
     ) => {
-      console.log('[secretstorage] bootstrapping cross signing with authData:', authData);
+      console.log('[secretstorage] bootstrapping cross signing');
       const isDone = await authRequest('Setup cross signing', async (auth) => {
         await makeRequest(auth);
       });
@@ -173,7 +166,7 @@ export const accessSecretStorage = (title: string) =>
         <SecretStorageAccess
           onComplete={(keyData) => {
             handleComplete(keyData);
-            requestClose(requestClose);
+            requestClose();
           }}
         />
       ),

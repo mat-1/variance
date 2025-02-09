@@ -3,6 +3,7 @@ import { EmojiData } from '../../app/organisms/emoji-board/EmojiBoard';
 import appDispatcher from '../dispatcher';
 import cons from '../state/cons';
 import { TargetDevice } from '../../app/organisms/emoji-verification/EmojiVerification';
+import { JSX } from 'react';
 
 export function selectTab(tabId: string) {
   appDispatcher.dispatch({
@@ -180,7 +181,11 @@ export function openReusableContextMenu(
   });
 }
 
-export function openReusableDialog(title, render, afterClose) {
+export function openReusableDialog(
+  title: JSX.Element | string,
+  render: (_close: () => void) => JSX.Element,
+  afterClose: () => void,
+) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_REUSABLE_DIALOG,
     title,

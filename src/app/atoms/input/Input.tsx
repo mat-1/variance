@@ -1,26 +1,42 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { FormEventHandler } from 'react';
 import './Input.scss';
 
 import TextareaAutosize from 'react-autosize-textarea';
 
 function Input({
-  id = null,
+  id = undefined,
   label = '',
   name = '',
   value = '',
   placeholder = '',
   required = false,
   type = 'text',
-  onChange = null,
-  forwardRef = null,
+  onChange = undefined,
+  forwardRef = undefined,
   resizable = false,
   minHeight = 46,
-  onResize = null,
+  onResize = undefined,
   state = 'normal',
-  onKeyDown = null,
+  onKeyDown = undefined,
   disabled = false,
   autoFocus = false,
+}: {
+  id?: string;
+  label?: string;
+  name?: string;
+  value?: string;
+  placeholder?: string;
+  required?: boolean;
+  type?: string;
+  onChange?: FormEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  forwardRef?: React.Ref<HTMLInputElement | HTMLTextAreaElement>;
+  resizable?: boolean;
+  minHeight?: number;
+  onResize?: (_event: Event) => void;
+  state?: 'normal' | 'success' | 'error';
+  onKeyDown?: (_event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  disabled?: boolean;
+  autoFocus?: boolean;
 }) {
   return (
     <div className="input-container">
@@ -36,7 +52,7 @@ function Input({
           name={name}
           id={id}
           className={`input input--resizable${state !== 'normal' ? ` input--${state}` : ''}`}
-          ref={forwardRef}
+          ref={forwardRef as React.Ref<HTMLTextAreaElement>}
           type={type}
           placeholder={placeholder}
           required={required}
@@ -47,11 +63,14 @@ function Input({
           onKeyDown={onKeyDown}
           disabled={disabled}
           autoFocus={autoFocus}
+          // react complains if we don't have these two
+          onPointerEnterCapture={undefined}
+          onPointerLeaveCapture={undefined}
         />
       ) : (
         <input
           dir="auto"
-          ref={forwardRef}
+          ref={forwardRef as React.Ref<HTMLInputElement>}
           id={id}
           name={name}
           className={`input ${state !== 'normal' ? ` input--${state}` : ''}`}
@@ -70,24 +89,5 @@ function Input({
     </div>
   );
 }
-
-Input.propTypes = {
-  id: PropTypes.string,
-  name: PropTypes.string,
-  label: PropTypes.string,
-  value: PropTypes.string,
-  placeholder: PropTypes.string,
-  required: PropTypes.bool,
-  type: PropTypes.string,
-  onChange: PropTypes.func,
-  forwardRef: PropTypes.shape({}),
-  resizable: PropTypes.bool,
-  minHeight: PropTypes.number,
-  onResize: PropTypes.func,
-  state: PropTypes.oneOf(['normal', 'success', 'error']),
-  onKeyDown: PropTypes.func,
-  disabled: PropTypes.bool,
-  autoFocus: PropTypes.bool,
-};
 
 export default Input;

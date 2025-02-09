@@ -9,8 +9,8 @@ import Dialog from './Dialog';
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
 interface DialogueData {
-  title: string;
-  render: (close: () => void) => React.ReactNode;
+  title: React.ReactNode;
+  render: (_close: () => void) => React.ReactNode;
   afterClose?: () => void;
 }
 
@@ -20,8 +20,8 @@ function ReusableDialog() {
 
   useEffect(() => {
     const handleOpen = (
-      title: string,
-      render: (close: () => void) => React.ReactNode,
+      title: React.ReactNode,
+      render: (_close: () => void) => React.ReactNode,
       afterClose?: () => void,
     ) => {
       setIsOpen(true);
