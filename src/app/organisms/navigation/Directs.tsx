@@ -11,13 +11,14 @@ import { roomIdByActivity } from '../../../util/sort';
 import RoomsCategory from './RoomsCategory';
 
 const drawerPostie = new Postie();
-function Directs({ size }) {
+function Directs({ size }: { size: number }) {
   const mx = initMatrix.matrixClient;
   const { roomList, notifications } = initMatrix;
   const [directIds, setDirectIds] = useState<string[]>([]);
 
   useEffect(() => {
     setDirectIds([...roomList.directs].sort(roomIdByActivity));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size]);
 
   useEffect(() => {
