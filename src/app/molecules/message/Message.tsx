@@ -982,6 +982,8 @@ export function Message({
     };
   }, [mEvent]);
 
+  if (!initMatrix.matrixClient) return null;
+
   const msgType = content?.msgtype;
 
   const senderId = mEvent.getSender();

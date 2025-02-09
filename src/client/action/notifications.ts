@@ -1,4 +1,4 @@
-import { ReceiptType } from 'matrix-js-sdk';
+import { NotificationCountType, ReceiptType } from 'matrix-js-sdk';
 import initMatrix from '../initMatrix';
 import settings from '../state/settings';
 

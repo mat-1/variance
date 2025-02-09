@@ -353,7 +353,7 @@ function useEventArrive(
   timelineScrollRef,
   eventLimitRef,
 ) {
-  const myUserId = initMatrix.matrixClient.getUserId();
+  const myUserId = initMatrix.matrixClient?.getUserId();
   const [newEvent, setEvent] = useState(null);
 
   useEffect(() => {

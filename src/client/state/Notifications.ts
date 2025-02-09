@@ -1,4 +1,7 @@
 import EventEmitter from 'events';
+import { CryptoBackend } from 'matrix-js-sdk/lib/common-crypto/CryptoBackend';
+import { EventType, MatrixClient, MatrixEvent, ReceiptType, Room, RoomEvent } from 'matrix-js-sdk';
+
 import renderAvatar from '../../app/atoms/avatar/render';
 import { cssColorMXID } from '../../util/colorMXID';
 import { selectRoom } from '../action/navigation';
@@ -11,11 +14,9 @@ import LogoSVG from '../../../public/res/svg/cinny.svg';
 import LogoUnreadSVG from '../../../public/res/svg/cinny-unread.svg';
 import LogoHighlightSVG from '../../../public/res/svg/cinny-highlight.svg';
 import { html, plain } from '../../util/markdown';
-import { MatrixClient, MatrixEvent, Room, RoomEvent } from 'matrix-js-sdk';
 import RoomList from './RoomList';
-import { CryptoBackend } from 'matrix-js-sdk/lib/common-crypto/CryptoBackend';
 
-function isNotifEvent(mEvent) {
+function isNotifEvent(mEvent: MatrixEvent) {
   const eType = mEvent.getType();
   if (!cons.supportEventTypes.includes(eType)) return false;
   if (eType === 'm.room.member') return false;
@@ -43,7 +44,7 @@ class Notifications extends EventEmitter {
 
   roomList: RoomList;
 
-  roomIdToNoti: Map<string, { total: number; highlight: number; from: Set<string> }>;
+  roomIdToNoti: Map<string, { total: number; highlight: number; from: Set<string> | null }>;
 
   roomIdToPopupNotis: Map<string, Notification[]>;
 
@@ -72,7 +73,7 @@ class Notifications extends EventEmitter {
     this.initialized = false;
     this.roomIdToNoti = new Map();
 
-    const addNoti = (roomId) => {
+    const addNoti = (roomId: string) => {
       const room = this.matrixClient.getRoom(roomId);
       if (this.getNotiType(room.roomId) === cons.notifs.MUTE) return;
       if (this.doesRoomHaveUnread(room) === false) return;
@@ -88,20 +89,40 @@ class Notifications extends EventEmitter {
     this._updateFavicon();
   }
 
-  doesRoomHaveUnread(room) {
-    const userId = this.matrixClient.getUserId();
-    const readUpToId = room.getEventReadUpTo(userId);
+  doesRoomHaveUnread(room: Room) {
+    const userId = this.matrixClient.getUserId()!;
+    let readUpToId = room.getEventReadUpTo(userId);
     const liveEvents = room.getLiveTimeline().getEvents();
 
     if (liveEvents[liveEvents.length - 1]?.getSender() === userId) {
       return false;
     }
 
+    // this is a workaround for a matrix-js-sdk bug (i think) where it sometimes stores the wrong
+    // read indicator, but has the correct FullyRead data in the room account data
+    const fullyReadToEventId = room.getAccountData(EventType.FullyRead)?.event?.content?.event_id;
+    if (fullyReadToEventId) {
+      // update readUpToId if it's after
+      const fullyReadToEvent = room.findEventById(fullyReadToEventId);
+      const readUpToEvent = readUpToId ? room.findEventById(readUpToId) : undefined;
+      if (fullyReadToEvent) {
+        if (readUpToEvent) {
+          if (fullyReadToEvent.getTs() > readUpToEvent.getTs()) {
+            readUpToId = fullyReadToEventId;
+          }
+        } else {
+          readUpToId = fullyReadToEventId;
+        }
+      }
+    }
+
     for (let i = liveEvents.length - 1; i >= 0; i -= 1) {
       const event = liveEvents[i];
       if (event.getId() === readUpToId) return false;
+
       if (isNotifEvent(event)) return true;
     }
+
     return true;
   }
 
@@ -180,8 +201,8 @@ class Notifications extends EventEmitter {
     setFavicon(this.favicon);
   }
 
-  _setNoti(roomId, total, highlight) {
-    const addNoti = (id, t, h, fromId) => {
+  _setNoti(roomId: string, total: number, highlight: number) {
+    const addNoti = (id: string, t: number, h: number, fromId?: string) => {
       const prevTotal = this.roomIdToNoti.get(id)?.total ?? null;
       const noti = this.getNoti(id);
 
@@ -368,7 +389,7 @@ class Notifications extends EventEmitter {
       }
     });
 
-    this.matrixClient.on('accountData', (mEvent, oldMEvent) => {
+    this.matrixClient.on('accountData', (mEvent: MatrixEvent, oldMEvent) => {
       if (mEvent.getType() === 'm.push_rules') {
         const override = mEvent?.getContent()?.global?.override;
         const oldOverride = oldMEvent?.getContent()?.global?.override;
@@ -405,10 +426,10 @@ class Notifications extends EventEmitter {
       }
     });
 
-    this.matrixClient.on('Room.receipt', (mEvent, room) => {
+    this.matrixClient.on(RoomEvent.Receipt, (mEvent, room) => {
       if (mEvent.getType() !== 'm.receipt' || room.isSpaceRoom()) return;
       const content = mEvent.getContent();
-      const userId = this.matrixClient.getUserId();
+      const userId = this.matrixClient.getUserId()!;
 
       Object.keys(content).forEach((eventId) => {
         Object.entries(content[eventId]).forEach(([receiptType, receipt]) => {
@@ -421,7 +442,7 @@ class Notifications extends EventEmitter {
       });
     });
 
-    this.matrixClient.on('Room.myMembership', (room, membership) => {
+    this.matrixClient.on(RoomEvent.MyMembership, (room, membership) => {
       if (membership === 'leave' && this.hasNoti(room.roomId)) {
         this.deleteNoti(room.roomId);
       }

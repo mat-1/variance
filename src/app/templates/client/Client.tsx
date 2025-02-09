@@ -21,7 +21,6 @@ import cons from '../../../client/state/cons';
 import DragDrop from '../../organisms/drag-drop/DragDrop';
 
 import VerticalMenuIC from '../../../../public/res/ic/outlined/vertical-menu.svg';
-import { selectRoom } from '../../../client/action/navigation';
 
 function Client() {
   const [isLoading, changeLoading] = useState(true);
@@ -29,8 +28,8 @@ function Client() {
   const [dragCounter, setDragCounter] = useState(0);
   const classNameHidden = 'client__item-hidden';
 
-  const navWrapperRef = useRef(null);
-  const roomWrapperRef = useRef(null);
+  const navWrapperRef = useRef<null | HTMLDivElement>(null);
+  const roomWrapperRef = useRef<null | HTMLDivElement>(null);
 
   function onRoomSelected() {
     navWrapperRef.current?.classList.add(classNameHidden);
@@ -52,6 +51,11 @@ function Client() {
   }, []);
 
   useEffect(() => {
+    if (initMatrix.matrixClient) {
+      // client is already ready, nothing to do
+      return () => {};
+    }
+
     let counter = 0;
     const iId = setInterval(() => {
       const msgList = ['Almost there...', 'Looks like you have a lot of stuff to heat up!'];
@@ -64,19 +68,25 @@ function Client() {
       counter += 1;
     }, 15000);
     initMatrix.once('init_loading_finished', () => {
+      console.log('[init] loading finished');
       clearInterval(iId);
       initHotkeys();
       initRoomListListener(initMatrix.roomList);
       changeLoading(false);
     });
     initMatrix.init();
+    console.log('[init] starting client');
 
     return () => {
       removeHotkeys();
     };
   }, []);
 
+  console.log('[init] client reloaded', initMatrix.matrixClient);
+
   if (isLoading) {
+    console.log('[init] rendering loading');
+
     return (
       <div className="loading-display">
         <div className="loading__menu">
@@ -109,7 +119,7 @@ function Client() {
     );
   }
 
-  function dragContainsFiles(e) {
+  function dragContainsFiles(e: React.DragEvent) {
     if (!e.dataTransfer.types) return false;
 
     for (let i = 0; i < e.dataTransfer.types.length; i += 1) {
@@ -122,7 +132,7 @@ function Client() {
     return navigation.isRawModalVisible && dragCounter <= 0;
   }
 
-  function handleDragOver(e) {
+  function handleDragOver(e: React.DragEvent) {
     if (!dragContainsFiles(e)) return;
 
     e.preventDefault();
@@ -132,7 +142,7 @@ function Client() {
     }
   }
 
-  function handleDragEnter(e) {
+  function handleDragEnter(e: React.DragEvent) {
     e.preventDefault();
 
     if (navigation.selectedRoomId && !modalOpen() && dragContainsFiles(e)) {
@@ -140,7 +150,7 @@ function Client() {
     }
   }
 
-  function handleDragLeave(e) {
+  function handleDragLeave(e: React.DragEvent) {
     e.preventDefault();
 
     if (navigation.selectedRoomId && !modalOpen() && dragContainsFiles(e)) {
@@ -148,7 +158,7 @@ function Client() {
     }
   }
 
-  function handleDrop(e) {
+  function handleDrop(e: React.DragEvent) {
     e.preventDefault();
 
     setDragCounter(0);
@@ -164,6 +174,8 @@ function Client() {
     initMatrix.roomsInput.setAttachment(roomId, file);
     initMatrix.roomsInput.emit(cons.events.roomsInput.ATTACHMENT_SET, file);
   }
+
+  console.log('[init] rendering main content');
 
   return (
     <div

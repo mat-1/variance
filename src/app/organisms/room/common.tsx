@@ -137,7 +137,7 @@ function getTimelineJSXMessages() {
   };
 }
 
-function getUsersActionJsx(roomId, userIds, actionStr) {
+function getUsersActionJsx(roomId: string, userIds: string[], actionStr: string) {
   const room = initMatrix.matrixClient.getRoom(roomId);
   const getUserDisplayName = (userId) => {
     if (room?.getMember(userId)) return getUsernameOfRoomMember(room.getMember(userId));

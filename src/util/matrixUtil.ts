@@ -43,6 +43,7 @@ export async function getWellKnown(servername: string): Promise<WellKnown> {
 
 export function getUsername(userId: string): string {
   const mx = initMatrix.matrixClient;
+  if (!mx) return '';
   const user = mx.getUser(userId);
   if (user === null) return userId;
   let username = user.displayName;
