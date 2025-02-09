@@ -25,7 +25,12 @@ function ConfirmDialog({
       if (!acceptingInputs.current) {
         return;
       }
-      if (e.key === 'Enter') onComplete(true);
+      if (e.key === 'Enter') {
+        // don't type an enter in the input box
+        e.preventDefault();
+
+        onComplete(true);
+      }
     };
     document.addEventListener('keydown', handleKeyDown);
 

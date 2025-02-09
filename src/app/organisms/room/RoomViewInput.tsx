@@ -268,7 +268,13 @@ function RoomViewInput({
     const cmdName = cmdBody.slice(1, spaceIndex > -1 ? spaceIndex : undefined);
     const cmdData = spaceIndex > -1 ? cmdBody.slice(spaceIndex + 1) : '';
     if (!commands[cmdName]) {
-      confirmDialog('Invalid Command', `"${cmdName}" is not a valid command.`, 'Alright');
+      confirmDialog('Invalid Command', `"${cmdName}" is not a valid command.`, 'Send anyways').then(
+        (confirmed) => {
+          if (confirmed) {
+            sendBody(cmdBody);
+          }
+        },
+      );
       return;
     }
     if (['me', 'shrug', 'plain', 'html', 'rainbow'].includes(cmdName)) {
