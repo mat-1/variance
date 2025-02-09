@@ -23,7 +23,7 @@ function Dialog({
 }: {
   className?: string;
   isOpen: boolean;
-  title: string | React.ReactNode;
+  title: React.ReactNode;
   contentOptions?: React.ReactNode;
   onAfterOpen?: () => void;
   onAfterClose?: () => void;

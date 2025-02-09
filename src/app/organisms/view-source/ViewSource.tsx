@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import './ViewSource.scss';
 
+import hljs from 'highlight.js';
+import hljsJson from 'highlight.js/lib/languages/json';
+
+import type { MatrixEvent } from 'matrix-js-sdk';
+
 import cons from '../../../client/state/cons';
 import navigation from '../../../client/state/navigation';
 
@@ -12,13 +17,23 @@ import PopupWindow from '../../molecules/popup-window/PopupWindow';
 
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
 
-function ViewSourceBlock({ title, json }) {
+hljs.registerLanguage('json', hljsJson);
+
+function ViewSourceBlock({ title, json }: { title: string; json: Record<string, unknown> }) {
   return (
     <div className="view-source__card">
       <MenuHeader>{title}</MenuHeader>
       <ScrollView horizontal vertical={false} autoHide>
         <pre className="text text-b1">
-          <code className="language-json">{JSON.stringify(json, null, 2)}</code>
+          <code
+            className="language-json"
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{
+              __html: hljs.highlight(JSON.stringify(json, null, 2), {
+                language: 'json',
+              }).value,
+            }}
+          />
         </pre>
       </ScrollView>
     </div>
@@ -31,10 +46,10 @@ ViewSourceBlock.propTypes = {
 
 function ViewSource() {
   const [isOpen, setIsOpen] = useState(false);
-  const [event, setEvent] = useState(null);
+  const [event, setEvent] = useState<MatrixEvent | null>(null);
 
   useEffect(() => {
-    const loadViewSource = (e) => {
+    const loadViewSource = (e: MatrixEvent) => {
       setEvent(e);
       setIsOpen(true);
     };
@@ -50,10 +65,10 @@ function ViewSource() {
 
   const renderViewSource = () => (
     <div className="view-source">
-      {event.isEncrypted() && (
-        <ViewSourceBlock title="Decrypted source" json={event.getEffectiveEvent()} />
+      {event!.isEncrypted() && (
+        <ViewSourceBlock title="Decrypted source" json={event!.getEffectiveEvent()} />
       )}
-      <ViewSourceBlock title="Original source" json={event.event} />
+      <ViewSourceBlock title="Original source" json={event!.event} />
     </div>
   );
 

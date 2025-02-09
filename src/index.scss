@@ -332,3 +332,13 @@ audio:not([controls]) {
   justify-content: center;
   align-items: center;
 }
+
+.hljs-attr {
+  color: var(--code-tag);
+}
+.hljs-string {
+  color: var(--code-string);
+}
+.hljs-number {
+  color: var(--code-constant);
+}

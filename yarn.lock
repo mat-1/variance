@@ -1185,6 +1185,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/highlight.js@npm:^10.1.0":
+  version: 10.1.0
+  resolution: "@types/highlight.js@npm:10.1.0"
+  dependencies:
+    highlight.js: "npm:*"
+  checksum: 10/284f47e89bfe300f307ad76523a257ff12ed7cf0318cdc0a7fe6965a1d7e21840d133cfc623ec705495550d37341c278c2c9641bafce8b8dbb4bea4acd46f0ec
+  languageName: node
+  linkType: hard
+
 "@types/hoist-non-react-statics@npm:^3.3.1":
   version: 3.3.6
   resolution: "@types/hoist-non-react-statics@npm:3.3.6"
@@ -3281,6 +3290,13 @@ __metadata:
   dependencies:
     function-bind: "npm:^1.1.2"
   checksum: 10/7898a9c1788b2862cf0f9c345a6bec77ba4a0c0983c7f19d610c382343d4f98fa260686b225dfb1f88393a66679d2ec58ee310c1d6868c081eda7918f32cc70a
+  languageName: node
+  linkType: hard
+
+"highlight.js@npm:*, highlight.js@npm:^11.11.1":
+  version: 11.11.1
+  resolution: "highlight.js@npm:11.11.1"
+  checksum: 10/205272f12f2c8ab1760452a75c58b043b11129cf3a5d2a9c0c90d43993580d0f5c385a73a4b8aba197eef20c0ec37d64000e6b35c4ed5991324f4c2dc78f4e43
   languageName: node
   linkType: hard
 
@@ -5816,6 +5832,7 @@ __metadata:
     "@rollup/plugin-wasm": "npm:6.2.2"
     "@tippyjs/react": "npm:4.2.6"
     "@types/dateformat": "npm:^5.0.3"
+    "@types/highlight.js": "npm:^10.1.0"
     "@types/node": "npm:22.10.5"
     "@types/prop-types": "npm:^15.7.14"
     "@types/react": "npm:19.0.3"
@@ -5840,6 +5857,7 @@ __metadata:
     flux: "npm:4.0.4"
     formik: "npm:2.4.6"
     globals: "npm:^15.14.0"
+    highlight.js: "npm:^11.11.1"
     html-react-parser: "npm:5.2.2"
     katex: "npm:0.16.19"
     linkify-html: "npm:4.2.0"

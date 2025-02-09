@@ -4,6 +4,7 @@ import appDispatcher from '../dispatcher';
 import cons from '../state/cons';
 import { TargetDevice } from '../../app/organisms/emoji-verification/EmojiVerification';
 import { JSX } from 'react';
+import { MatrixEvent } from 'matrix-js-sdk';
 
 export function selectTab(tabId: string) {
   appDispatcher.dispatch({
@@ -142,7 +143,7 @@ export function openReadReceipts(roomId: string, userIds: string[]) {
   });
 }
 
-export function openViewSource(event: string) {
+export function openViewSource(event: MatrixEvent) {
   appDispatcher.dispatch({
     type: cons.actions.navigation.OPEN_VIEWSOURCE,
     event,

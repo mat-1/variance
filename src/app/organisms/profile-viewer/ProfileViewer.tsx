@@ -7,7 +7,11 @@ import { twemojify } from '../../../util/twemojify';
 import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
 import navigation from '../../../client/state/navigation';
-import { selectRoom, openReusableContextMenu } from '../../../client/action/navigation';
+import {
+  selectRoom,
+  openReusableContextMenu,
+  openViewSource,
+} from '../../../client/action/navigation';
 import * as roomActions from '../../../client/action/room';
 
 import {
@@ -34,10 +38,11 @@ import ShieldEmptyIC from '../../../../public/res/ic/outlined/shield-empty.svg';
 import ChevronRightIC from '../../../../public/res/ic/outlined/chevron-right.svg';
 import ChevronBottomIC from '../../../../public/res/ic/outlined/chevron-bottom.svg';
 import CrossIC from '../../../../public/res/ic/outlined/cross.svg';
+import CmdIC from '../../../../public/res/ic/outlined/cmd.svg';
 
 import { useForceUpdate } from '../../hooks/useForceUpdate';
 import { confirmDialog } from '../../molecules/confirm-dialog/ConfirmDialog';
-import { Device, DeviceMap } from 'matrix-js-sdk';
+import { Device, DeviceMap, EventTimeline, EventType, RoomMemberEvent } from 'matrix-js-sdk';
 
 function ModerationTools({ roomId, userId }) {
   const mx = initMatrix.matrixClient;
@@ -282,13 +287,13 @@ ProfileFooter.propTypes = {
   onRequestClose: PropTypes.func.isRequired,
 };
 
-function useToggleDialog() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [roomId, setRoomId] = useState(null);
-  const [userId, setUserId] = useState(null);
+function useToggleDialog(): [boolean, string | null, string | null, () => void, () => void] {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadProfile = (uId, rId) => {
+    const loadProfile = (uId: string, rId: string) => {
       setIsOpen(true);
       setUserId(uId);
       setRoomId(rId);
@@ -309,7 +314,7 @@ function useToggleDialog() {
   return [isOpen, roomId, userId, closeDialog, afterClose];
 }
 
-function useRerenderOnProfileChange(roomId, userId) {
+function useRerenderOnProfileChange(roomId: string | null, userId: string | null) {
   const mx = initMatrix.matrixClient;
   const [, forceUpdate] = useForceUpdate();
   useEffect(() => {
@@ -321,11 +326,11 @@ function useRerenderOnProfileChange(roomId, userId) {
         forceUpdate();
       }
     };
-    mx.on('RoomMember.powerLevel', handleProfileChange);
-    mx.on('RoomMember.membership', handleProfileChange);
+    mx.on(RoomMemberEvent.PowerLevel, handleProfileChange);
+    mx.on(RoomMemberEvent.Membership, handleProfileChange);
     return () => {
-      mx.removeListener('RoomMember.powerLevel', handleProfileChange);
-      mx.removeListener('RoomMember.membership', handleProfileChange);
+      mx.removeListener(RoomMemberEvent.PowerLevel, handleProfileChange);
+      mx.removeListener(RoomMemberEvent.Membership, handleProfileChange);
     };
   }, [roomId, userId]);
 }
@@ -335,9 +340,18 @@ function ProfileViewer() {
   useRerenderOnProfileChange(roomId, userId);
 
   const mx = initMatrix.matrixClient;
-  const room = mx.getRoom(roomId);
+  const room = roomId ? mx.getRoom(roomId) : null;
 
   const renderProfile = () => {
+    if (!userId) {
+      console.error('called ProfileViewer without userId');
+      return null;
+    }
+    if (!room) {
+      console.error('called ProfileViewer without room');
+      return null;
+    }
+
     const roomMember = room.getMember(userId);
     const username = roomMember ? getUsernameOfRoomMember(roomMember) : getUsername(userId);
     const avatarMxc = roomMember?.getMxcAvatarUrl?.() || mx.getUser(userId)?.avatarUrl;
@@ -345,13 +359,16 @@ function ProfileViewer() {
       avatarMxc && avatarMxc !== 'null' ? mx.mxcUrlToHttp(avatarMxc, 80, 80, 'crop') : null;
 
     const powerLevel = roomMember?.powerLevel || 0;
-    const myPowerLevel = room.getMember(mx.getUserId())?.powerLevel || 0;
+    const myPowerLevel = room.getMember(mx.getUserId()!)?.powerLevel || 0;
 
     const canChangeRole =
-      room.currentState.maySendEvent('m.room.power_levels', mx.getUserId()) &&
+      room
+        .getLiveTimeline()
+        .getState(EventTimeline.FORWARDS)!
+        .maySendEvent(EventType.RoomPowerLevels, mx.getUserId()!) &&
       (powerLevel < myPowerLevel || userId === mx.getUserId());
 
-    const handleChangePowerLevel = async (newPowerLevel) => {
+    const handleChangePowerLevel = async (newPowerLevel: number) => {
       if (newPowerLevel === powerLevel) return;
       const SHARED_POWER_MSG =
         'You will not be able to undo this change as you are promoting the user to have the same power level as yourself. Are you sure?';
@@ -400,8 +417,9 @@ function ProfileViewer() {
             <Text variant="s1" weight="medium">
               {twemojify(username)}
             </Text>
-            <Text variant="b2">{twemojify(userId)}</Text>
+            <Text variant="b3">{twemojify(userId)}</Text>
           </div>
+
           <div className="profile-viewer__user__role">
             <Text variant="b3">Role</Text>
             <Button
@@ -421,6 +439,34 @@ function ProfileViewer() {
     );
   };
 
+  const handleOpenViewSource = () => () => {
+    if (!userId) {
+      console.error('called handleOpenViewSource without userId');
+      return null;
+    }
+    if (!room) {
+      console.error('called handleOpenViewSource without room');
+      return null;
+    }
+
+    const roomMember = room.getMember(userId);
+    if (!roomMember) {
+      console.error("called handleOpenViewSource on a user that's not in the room");
+      return null;
+    }
+    const memberEvent = roomMember.events.member;
+
+    if (!memberEvent) {
+      console.error('called handleOpenViewSource on a member without an event');
+      return null;
+    }
+
+    // close the menu
+    closeDialog();
+
+    openViewSource(memberEvent);
+  };
+
   return (
     <Dialog
       className="profile-viewer__dialog"
@@ -428,7 +474,12 @@ function ProfileViewer() {
       title={room?.name ?? ''}
       onAfterClose={handleAfterClose}
       onRequestClose={closeDialog}
-      contentOptions={<IconButton src={CrossIC} onClick={closeDialog} tooltip="Close" />}
+      contentOptions={
+        <>
+          <IconButton src={CmdIC} onClick={handleOpenViewSource()} tooltip="View source" />
+          <IconButton src={CrossIC} onClick={closeDialog} tooltip="Close" />
+        </>
+      }
     >
       {roomId ? renderProfile() : <div />}
     </Dialog>

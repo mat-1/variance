@@ -64,6 +64,20 @@ export interface ThemeStyle {
     box_shadow_primary_border: string;
     box_shadow_primary_outline: string;
   };
+
+  code: {
+    tag: string;
+    func: string;
+    entity: string;
+    string: string;
+    regexp: string;
+    markup: string;
+    keyword: string;
+    special: string;
+    comment: string;
+    constant: string;
+    operator: string;
+  };
 }
 
 export const LIGHT_THEME: ThemeStyle = {
@@ -141,6 +155,21 @@ export const LIGHT_THEME: ThemeStyle = {
     box_shadow_primary_border: 'inset 0 0 0 1px var(--bg-primary-border)',
     box_shadow_primary_outline: '0 0 0 2px var(--bg-primary-border)',
   },
+
+  // ayu light colors
+  code: {
+    tag: '#55B4D4',
+    func: '#F2AE49',
+    entity: '#399EE6',
+    string: '#86B300',
+    regexp: '#4CBF99',
+    markup: '#F07171',
+    keyword: '#FA8D3E',
+    special: '#E6BA7E',
+    comment: '#787B8099',
+    constant: '#A37ACC',
+    operator: '#ED9366',
+  },
 };
 
 export const CLASSIC_THEME: ThemeStyle = {
@@ -217,6 +246,21 @@ export const CLASSIC_THEME: ThemeStyle = {
 
     box_shadow_primary_border: 'inset 0 0 0 1px var(--bg-primary-border)',
     box_shadow_primary_outline: '0 0 0 2px var(--bg-primary-border)',
+  },
+
+  // ayu dark colors
+  code: {
+    tag: '#39BAE6',
+    func: '#FFB454',
+    entity: '#59C2FF',
+    string: '#AAD94C',
+    regexp: '#95E6CB',
+    markup: '#F07178',
+    keyword: '#FF8F40',
+    special: '#E6B673',
+    comment: '#ACB6BF8C',
+    constant: '#D2A6FF',
+    operator: '#F29668',
   },
 };
 

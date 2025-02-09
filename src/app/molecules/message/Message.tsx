@@ -633,6 +633,10 @@ function shouldShowThreadSummary(mEvent: MatrixEvent, roomTimeline: RoomTimeline
 // if editedTimeline has mEventId then pass editedMEvent else pass mEvent to openViewSource
 function handleOpenViewSource(mEvent: MatrixEvent, roomTimeline: RoomTimeline) {
   const eventId = mEvent.getId();
+  if (!eventId) {
+    console.error('called handleOpenViewSource on an event without an id', mEvent);
+    return;
+  }
   const { editedTimeline } = roomTimeline ?? {};
   let editedMEvent;
   if (editedTimeline?.has(eventId)) {

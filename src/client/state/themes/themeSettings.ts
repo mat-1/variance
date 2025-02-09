@@ -243,6 +243,18 @@ export class ThemeSettings {
 
       'bs-primary-border': themeStyle.shadow_and_overlay.box_shadow_primary_border,
       'bs-primary-outline': themeStyle.shadow_and_overlay.box_shadow_primary_outline,
+
+      'code-tag': themeStyle.code.tag,
+      'code-func': themeStyle.code.func,
+      'code-entity': themeStyle.code.entity,
+      'code-string': themeStyle.code.string,
+      'code-regexp': themeStyle.code.regexp,
+      'code-markup': themeStyle.code.markup,
+      'code-keyword': themeStyle.code.keyword,
+      'code-special': themeStyle.code.special,
+      'code-comment': themeStyle.code.comment,
+      'code-constant': themeStyle.code.constant,
+      'code-operator': themeStyle.code.operator,
     };
 
     Object.entries(properties).forEach(([key, value]) => {
