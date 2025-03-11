@@ -217,6 +217,7 @@ function EmojiBoard({
     const term = searchRef.current.value;
 
     const emoji = availableEmojis.flatMap(({ emoticons }) => emoticons);
+    emoji.push(...emojis);
     asyncSearch.setup(emoji, { keys: ['shortcode'], isContain: true, limit: 40 });
 
     asyncSearch.search(term);
