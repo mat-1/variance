@@ -216,8 +216,13 @@ function EmojiBoard({
   function handleSearchChange() {
     const term = searchRef.current.value;
 
+    // availableEmojis is an array of image packs. We need to extract the
+    // cumulative set of emoticons in each pack. Flatmap is our friend.
     const emoji = availableEmojis.flatMap(({ emoticons }) => emoticons);
+
+    // Add in the standard emoji set
     emoji.push(...emojis);
+
     asyncSearch.setup(emoji, { keys: ['shortcode'], isContain: true, limit: 40 });
 
     asyncSearch.search(term);
