@@ -4,9 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import './EmojiBoard.scss';
 
-import parse from 'html-react-parser';
 import { emojiGroups, emojis } from './emoji';
-import { getRelevantPacks } from './custom-emoji';
+import availableEmojis from './available-emoji';
 import initMatrix from '../../../client/initMatrix';
 import cons from '../../../client/state/cons';
 import navigation from '../../../client/state/navigation';
@@ -216,6 +215,10 @@ function EmojiBoard({
 
   function handleSearchChange() {
     const term = searchRef.current.value;
+
+    const emoji = availableEmojis.flatMap(({ emoticons }) => emoticons);
+    asyncSearch.setup(emoji, { keys: ['shortcode'], isContain: true, limit: 40 });
+
     asyncSearch.search(term);
     scrollEmojisRef.current.scrollTop = 0;
     setSearchTerm(term);
@@ -230,36 +233,12 @@ function EmojiBoard({
     });
   }
 
-  const [availableEmojis, setAvailableEmojis] = useState([]);
   const [recentEmojis, setRecentEmojis] = useState([]);
   const [searchedEmojis, setSearchedEmojis] = useState(null);
 
   const recentOffset = recentEmojis.length > 0 ? 1 : 0;
 
   useEffect(() => {
-    const updateAvailableEmoji = (selectedRoomId: string) => {
-      if (!selectedRoomId) {
-        setAvailableEmojis([]);
-        return;
-      }
-
-      const mx = initMatrix.matrixClient;
-      const room = mx.getRoom(selectedRoomId);
-      const parentIds = initMatrix.roomList.getAllParentSpaces(room.roomId);
-      const parentRooms = [...parentIds].map((id) => mx.getRoom(id));
-      if (room) {
-        const packs = getRelevantPacks(room.client, [room, ...parentRooms]).filter(
-          (pack) => pack.getEmojis().length !== 0,
-        );
-
-        // Set an index for each pack so that we know where to jump when the user uses the nav
-        for (let i = 0; i < packs.length; i += 1) {
-          packs[i].packIndex = i;
-        }
-        setAvailableEmojis(packs);
-      }
-    };
-
     const onOpen = () => {
       searchRef.current.value = '';
       handleSearchChange();
@@ -268,10 +247,8 @@ function EmojiBoard({
       setRecentEmojis(getRecentEmojis(3 * ROW_EMOJIS_COUNT));
     };
 
-    navigation.on(cons.events.navigation.ROOM_SELECTED, updateAvailableEmoji);
     navigation.on(cons.events.navigation.EMOJIBOARD_OPENED, onOpen);
     return () => {
-      navigation.removeListener(cons.events.navigation.ROOM_SELECTED, updateAvailableEmoji);
       navigation.removeListener(cons.events.navigation.EMOJIBOARD_OPENED, onOpen);
     };
   }, []);
