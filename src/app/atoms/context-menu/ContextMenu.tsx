@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './ContextMenu.scss';
 
@@ -22,9 +22,40 @@ function ContextMenu({
   render: (toggleMenu: () => void) => React.ReactNode;
   afterToggle?: (isVisible: boolean) => void;
 }) {
+  // Initialize with an empty, disconnected element. This is for type-safety.
+  const ref = useRef(document.createElement('div'));
+
   const [isVisible, setVisibility] = useState(false);
-  const showMenu = () => setVisibility(true);
-  const hideMenu = () => setVisibility(false);
+
+  // If this menu is attached to a message, add a class to the message to
+  // indicate that the menu is open. This is used to keep the menu visible if
+  // the user moves hover away from the message.
+  const showMenu = () => {
+    if (ref) {
+      const parent: Element = ref.current;
+      if (parent?.closest) {
+        const message = parent.closest('.message');
+        if (message) {
+          message.classList.add('message--menu-visible');
+        }
+      }
+    }
+    return setVisibility(true);
+  };
+
+  const hideMenu = () => {
+    // If this menu is attached to a message, remove the menu class.
+    if (ref) {
+      const parent: Element = ref.current;
+      if (parent?.closest) {
+        const message = parent.closest('.message');
+        if (message) {
+          message.classList.remove('message--menu-visible');
+        }
+      }
+    }
+    return setVisibility(false);
+  };
 
   useEffect(() => {
     if (afterToggle) afterToggle(isVisible);
@@ -35,6 +66,7 @@ function ContextMenu({
     <Tippy
       animation="scale-extreme"
       className="context-menu"
+      ref={ref}
       visible={isVisible}
       onClickOutside={hideMenu}
       content={
