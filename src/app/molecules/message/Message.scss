@@ -9,7 +9,8 @@
   @include dir.side(padding, var(--sp-normal), var(--sp-extra-tight));
   display: flex;
 
-  &:hover {
+  &:hover,
+  &.message--menu-visible {
     background-color: var(--bg-surface-hover);
     & .message__options {
       display: flex;
