@@ -239,6 +239,10 @@
   &-status-not_sent > .text,
   &-status-cancelled > .text {
     color: var(--tc-danger-high);
+
+    a {
+      color: inherit;
+    }
   }
 
   &-bad-encryption > .text {

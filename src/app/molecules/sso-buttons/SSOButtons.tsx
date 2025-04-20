@@ -7,6 +7,11 @@ import { createTemporaryClient, startSsoLogin } from '../../../client/action/aut
 import Button from '../../atoms/button/Button';
 
 function SSOButtons({ type, identityProviders, baseUrl }) {
+  if (!identityProviders) {
+    console.log('no identity providers');
+    return;
+  }
+
   const tempClient = createTemporaryClient(baseUrl);
   function handleClick(id) {
     startSsoLogin(baseUrl, type, id);
