@@ -1,6 +1,5 @@
 import EventEmitter from 'events';
 import * as sdk from 'matrix-js-sdk';
-import Olm from '@matrix-org/olm';
 
 import { secret } from './state/auth';
 import RoomList from './state/RoomList';
@@ -9,8 +8,6 @@ import RoomsInput from './state/RoomsInput';
 import Notifications from './state/Notifications';
 import { cryptoCallbacks } from './state/secretStorageKeys';
 import navigation from './state/navigation';
-
-global.Olm = Olm;
 
 // logger.disableAll();
 
@@ -63,7 +60,7 @@ export class InitMatrix extends EventEmitter {
     });
 
     // variance doesn't support voip / turn, so disable it to avoid the unnecessary requests
-    (this.matrixClient as any).canSupportVoip = false;
+    (this.matrixClient as unknown).canSupportVoip = false;
 
     await indexedDBStore.startup();
     await this.matrixClient.initRustCrypto();
@@ -74,7 +71,8 @@ export class InitMatrix extends EventEmitter {
 
       // slidingSync: new SlidingSync(),
     });
-    this.matrixClient.setGlobalErrorOnUnknownDevices(false);
+    const crypto = this.matrixClient.getCrypto();
+    if (crypto) crypto.globalBlacklistUnverifiedDevices = false;
   }
 
   setupSync() {

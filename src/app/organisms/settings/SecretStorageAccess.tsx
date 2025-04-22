@@ -1,8 +1,7 @@
 import React, { FormEvent, useState } from 'react';
 import PropTypes from 'prop-types';
 import './SecretStorageAccess.scss';
-import { deriveKey } from 'matrix-js-sdk/lib/crypto/key_passphrase';
-import { decodeRecoveryKey } from 'matrix-js-sdk/lib/crypto-api';
+import { decodeRecoveryKey, deriveRecoveryKeyFromPassphrase } from 'matrix-js-sdk/lib/crypto-api';
 import { AuthDict, UIAResponse } from 'matrix-js-sdk';
 
 import initMatrix from '../../../client/initMatrix';
@@ -49,7 +48,9 @@ function SecretStorageAccess({ onComplete }: { onComplete: (_data: KeyData) => v
       }
 
       const { salt, iterations } = sSKeyInfo.passphrase || {};
-      const privateKey = key ? decodeRecoveryKey(key) : await deriveKey(phrase!, salt, iterations);
+      const privateKey = key
+        ? decodeRecoveryKey(key)
+        : await deriveRecoveryKeyFromPassphrase(phrase!, salt, iterations);
       const isCorrect = await mx.secretStorage.checkKey(privateKey, sSKeyInfo);
 
       if (!mountStore.getItem()) return;
@@ -59,12 +60,7 @@ function SecretStorageAccess({ onComplete }: { onComplete: (_data: KeyData) => v
         return;
       }
 
-      onComplete({
-        keyId: sSKeyId,
-        key,
-        phrase,
-        privateKey,
-      });
+      onComplete({ keyId: sSKeyId, key, phrase, privateKey });
     } catch (e) {
       console.error("[secretstorage] couldn't validate security key/phrase:", e);
       if (!mountStore.getItem()) return;
@@ -113,9 +109,7 @@ function SecretStorageAccess({ onComplete }: { onComplete: (_data: KeyData) => v
     </div>
   );
 }
-SecretStorageAccess.propTypes = {
-  onComplete: PropTypes.func.isRequired,
-};
+SecretStorageAccess.propTypes = { onComplete: PropTypes.func.isRequired };
 
 interface KeyInput {
   key?: string;
@@ -141,9 +135,7 @@ export const accessSecretStorage = (title: string) =>
       storePrivateKey(keyData.keyId, keyData.privateKey);
 
       console.log('[secretstorage] calling bootstrapCrossSigning');
-      await mx.getCrypto()!.bootstrapCrossSigning({
-        authUploadDeviceSigningKeys,
-      });
+      await mx.getCrypto()!.bootstrapCrossSigning({ authUploadDeviceSigningKeys });
 
       resolve(keyData);
     };

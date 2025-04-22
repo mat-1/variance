@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
-import { CryptoEvent, type IMyDevice } from 'matrix-js-sdk';
+import { type IMyDevice } from 'matrix-js-sdk';
+import { CryptoEvent } from 'matrix-js-sdk/lib/crypto-api';
 import initMatrix from '../../client/initMatrix';
 
 export function useDeviceList(): IMyDevice[] | null {

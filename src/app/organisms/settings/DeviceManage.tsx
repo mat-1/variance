@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './DeviceManage.scss';
 import dateFormat from 'dateformat';
 
-import { AuthDict, CryptoEvent, IMyDevice } from 'matrix-js-sdk';
+import { CryptoEvent } from 'matrix-js-sdk/lib/crypto-api';
+import { AuthDict, IMyDevice } from 'matrix-js-sdk';
 import { OwnDeviceKeys } from 'matrix-js-sdk/lib/crypto-api';
 
 import initMatrix from '../../../client/initMatrix';
@@ -159,9 +160,7 @@ function DeviceManage() {
     if (newName.trim() === device.display_name) return;
     addToProcessing(device);
     try {
-      await mx.setDeviceDetails(device.device_id, {
-        display_name: newName,
-      });
+      await mx.setDeviceDetails(device.device_id, { display_name: newName });
     } catch (err) {
       // ignore errors
       console.error("Couldn't rename device:", err);
